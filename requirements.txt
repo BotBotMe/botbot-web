@@ -1,0 +1,39 @@
+django==1.5.5
+
+south==0.8
+pytz==2012c
+psycopg2==2.5.1
+dj-redis-url==0.1.4
+dj-database-url==0.2.2
+django-dotenv==1.2
+# waiting for pull request https://github.com/aino/django-hstore/pull/1 and release
+# django-hstore==1.1.1
+-e git+https://github.com/roncohen/django-hstore.git@65295e98ab17f36c0bbf1060aaa11771bfcd2b90#egg=django-hstore
+markdown==2.3.1
+redis==2.7.6
+webassets==0.8.0
+django-assets==0.8.0
+    yuicompressor==2.4.7
+honcho==0.4.2
+django-sse==0.4.1
+    sse==1.2
+
+# postgresql fulltext search
+djorm-ext-pgfulltext==0.4.0
+djorm-ext-pgarray==0.4.1
+
+django-social-auth==0.7.25
+    # python-openid==2.2.5
+    # waiting for https://github.com/openid/python-openid/pull/39
+    https://github.com/lincolnloop/python-openid/tarball/master
+    oauth2==1.5.211
+
+# Needs pinning
+-e git+https://github.com/lincolnloop/django-jsonit.git#egg=jsonit
+-e git+https://github.com/lincolnloop/django-launchpad.git#egg=launchpad
+
+# For plugins
+-e git+https://github.com/lincolnloop/botbot-plugins.git#egg=botbot-plugins
+
+# Production
+newrelic==1.4.0.137

@@ -1,0 +1,55 @@
+
+[MASTER]
+
+# Add <file or directory> to the black list. It should be a base name, not a
+# path. You may set this option multiple times.
+ignore=conf
+ignore=migrations
+
+
+[MESSAGES CONTROL]
+
+# Disable pylint checkers which don't play well with Django
+# or which don't help us
+#
+#C0111  Missing docstring               # We're grown ups. Maybe.
+#
+#E1002  Use super on an old style class # Pylint (incorrectly) thinks CBVs are old style classes
+#E1101  %s %r has no %r member          # ForeignKey has lots of magic methods
+#E1103  %s %r has no %r member (but some types could not be inferred)
+#
+#R0201  Method could be a function      # It's useful to organise methods into classes
+#R0901  Too many ancestors              # CBVs
+#R0902  Too many instance attributes    # BaseTestCase has lots of attributes
+#R0903  Too few public methods (%s/%s)  # Meta, Admin, etc
+#R0904  Too many public methods (%s/%s) # All managers and CBVs
+#R0921  Abstract class not referenced   # Abstract class in different file
+#
+#W0142  Used * or ** magic              # Never used by accident
+#W0232  Class has no __init__ method    # Django is different
+
+# Disable pylint checkers which don't help us
+#
+
+disable=C0111,E1002,E1101,E1103,R0201,R0901,R0903,R0904,R0902,R0921,W0142,W0232,R0801
+
+
+[BASIC]
+
+# Good variable names which should always be accepted, separated by a comma
+# Anytime you get an E1101 that you consider invalid, add the variable here.
+good-names=_,i,j,k,pk,qs,dt,urlpatterns,register,setUp,tearDown
+
+# Bad variable names which should always be refused, separated by a comma
+bad-names=foo,bar,baz,toto,tutu,tata
+
+# Increase max method name length, to include tests.py methods names
+# Regular expression which should only match correct method names
+method-rgx=[a-z_][a-z0-9_]{2,50}$
+
+
+[TYPECHECK]
+
+# List of members which are set dynamically and missed by pylint inference
+generated-members=objects,DoesNotExist,id,pk,_default_manager,_meta,get_profile
+

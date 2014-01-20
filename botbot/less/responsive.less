@@ -1,0 +1,154 @@
+/* We really only have problems on small tables in portrait 
+   mode, so tackle anything smaller than that */
+@media only screen 
+and (max-width: 768px) {
+	.context-help,
+	.timeline-navigation,
+	.log-view #Site-Header,
+	.log-title .icon-lock { display: none; }
+
+	#Content { padding: 0 10px; }
+
+	#Log-Header { 
+		#gradient > .vertical(@darkContrast, #424749); // XXX - Use variables
+    	border-bottom: 1px solid @darkContrast2;
+
+		padding: 4px 10px 4px 90px;
+		top: 0; height: 50px;
+
+		.brand-btn { 
+			display: inline-block; 
+		}
+
+		h1 { font-size: 18px; color: #fff; }
+		.divider, h1 { display: none; }
+
+		.date { color: #fff; line-height: 45px; }
+
+		.mobile-nav { display: block; float: right; }
+	}
+
+	.nav-toggle { 
+		.border-radius(4px);
+		.box-shadow(inset 0 0 2px @darkContrast);
+		#gradient > .vertical(#424749, #464C4F);
+
+		outline: 0; 
+		border: 1px solid; 
+		display: inline-block; 
+		vertical-align: middle;
+		height: 40px; 
+		width: 40px;
+		line-height: 40px;
+		margin-left: 10px;
+
+		font-size: 22px;
+		text-align: center;
+
+		color: @partialLight;
+		border: 1px solid #3C4142;
+
+		&:hover { color: #fff; text-decoration: none; }
+	}
+
+	.channel-nav {
+		a { color: #A9C6C1; }
+		a:hover { color: #fff; }
+	}
+
+	#Search {
+		display: none;
+		margin-top: 6px;
+	}
+
+	#id_q { width: 6em; margin-bottom: 0; }
+
+	// @leftRailWidth = 110px
+
+	.log {
+		.message, .info { margin-left: 102px; }
+		.actor { width: 90px; }
+	}
+
+	#Log-Container {
+
+		margin-top: 12px;
+
+		.timeline-navigation {
+			width: auto;
+			top: 50px;
+			left: 0;
+			z-index: 50;
+
+
+			& > ul { padding: 0; margin: 0; }
+
+			// first anchor should have more padding so we don't mess with the header
+			& > ul > .year:first-of-type > a { padding-top: 30px; } 
+
+			li { border-bottom: 1px solid #636363; }
+			.year > a { font-weight: bold; }
+			.year > ul a { padding-left: 40px; }
+
+			li:before, .month:before { display: none; }
+
+			a { 
+				.border-radius(0);
+				display: block; 
+				background: @darkContrast;
+				color: #fff; 
+				text-shadow: none; 
+				padding: 10px 10px 10px 20px; 
+				font-size: 16px; 
+				line-height: 24px; 
+			}
+
+			.active a { 
+				.border-radius(0); 
+				background: @highlight1; 
+				
+				span { background: none; }
+			}
+		}
+
+		article { margin-right: 0; position: relative; z-index: 0; }
+	}
+
+	#Log-Nav:target { display: block; }
+	#Site-Footer { 
+		margin-right: 0;
+
+		.support { margin-bottom: 10px; float: none; }
+		.support h5 { display: block; margin-bottom: 4px; }
+
+		body.log-view .misc-links { float: none; }
+	}
+}
+
+@media only screen
+and (max-width: 480px) {
+	.log { 
+		background: none; 
+
+		li { background: #fff; border: 1px solid #eee; margin-bottom: 10px; padding: 6px; }
+		li:hover .message { background: none; }
+
+		.actor { float: none; text-align: left; padding: 0; display: block; }
+		.message { margin-left: 0; border-left: none; padding: 0; }
+		.moment { padding: 0; }
+
+		li .info { margin-left: 0; border-left: none; }
+		li + .same { margin-top: -15px; border-top: none; }
+	}
+
+	.channel-nav { display: none; }
+
+	#Log-Container article { border: none; }
+	.error-view #Site-Footer { margin-left: 0; }
+	#Primary-Nav { display: none; }
+}
+
+@media only screen
+and (max-width: 1096px) {
+	body.log-view #Site-Footer .misc-links { float: none; }
+}

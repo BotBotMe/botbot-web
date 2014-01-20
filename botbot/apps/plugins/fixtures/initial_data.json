@@ -1,0 +1,74 @@
+[
+    {
+        "pk": 1, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "Logger", 
+            "slug": "logger"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "Ping",
+            "slug": "ping"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "Wolfram|Alpha",
+            "slug": "wolfram"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "Help",
+            "slug": "help"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "Images",
+            "slug": "images"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "Memory",
+            "slug": "brain"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "Last Seen",
+            "slug": "last_seen"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "plugins.plugin", 
+        "fields": {
+            "name": "GitHub",
+            "slug": "github"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "plugins.plugin",
+        "fields": {
+            "name": "!m",
+            "slug": "bangmotivate"
+        }
+    }
+]

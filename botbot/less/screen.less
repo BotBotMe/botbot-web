@@ -1,0 +1,573 @@
+@import "bootstrap/bootstrap.less";
+@import "globals.less";
+
+// Twitter Bootstrap Overrides
+
+
+/*  ------
+    Common
+    ------
+*/
+
+html, body { height: 100%; }
+
+body { 
+    background: @backgroundColor url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQImWP48uXLfwYkAOfDGOgKcAtgaEVWAAAd8yK0HBWm1wAAAABJRU5ErkJggg==); 
+}
+
+fieldset { margin-bottom: 30px; }
+legend { border-bottom: none; margin-bottom: 10px; } // Default line-height here gives us plenty of padding
+
+label { font-weight: bold; }
+label small { font-weight: normal; font-size: 80%; }
+
+input[type=checkbox], input[type=radio] { margin-right: 2px; }
+
+.check label { display: inline-block; vertical-align: middle; }
+
+.page-header .nav { margin-bottom: 0; }
+.page-header h1 ~ .nav { margin-left: 20px; }
+
+[class^="icon-"], [class*=" icon-"] { 
+    vertical-align: middle; // Underp Twitter Bootstrap
+
+    &:hover { text-decoration: none; }
+}
+
+.wicon:hover { text-decoration: none; }
+.wicon:hover span { text-decoration: underline; }
+
+h1, h2, h3 { font-family: @baseFontFamily; }
+h1 { color: @highlight2; }
+
+object[type='image/svg+xml'] { vertical-align: middle; }
+
+.logo-standalone {
+    .border-radius(12px);
+    background: @darkContrast2; 
+    padding: 14px 16px; 
+    margin-bottom: 20px;
+}
+
+.logo-standalone.wiggler {
+    border: 6px solid #fff;
+    display: block;
+    width: 128px;
+    height: 128px;
+
+    &:hover { background-color: @highlight1; }
+}
+
+.introduction { 
+    margin: 20px 0; 
+    font-size: 18px; line-height: 26px;
+}
+
+.speech-bubble {
+    .border-radius(20px);
+
+    width: 140px;
+    padding: 20px;
+    color: @backgroundColor;
+    background: @highlight1;
+    position: relative;
+
+    &:before {
+        @arrowSize: 26px;
+        content:"";
+        position: absolute;
+        right: 100%;
+        top: 26px;
+        width: 0;
+        height: 0;
+        border-top: @arrowSize/2 solid transparent;
+        border-right: @arrowSize solid @highlight1;
+        border-bottom: @arrowSize/2 solid transparent;
+    }
+}
+
+.channel-list { 
+    margin: 0 0 20px;
+
+    li { list-style: none; display: inline-block; vertical-align: middle; margin-right: 10px; }
+    a { font-size: 20px; line-height: 28px; }
+}
+
+.channel-list-compact {
+    margin: 0 0 20px;
+
+    li { list-style: none; display: inline-block; vertical-align: middle; margin-right: 5px; line-height: 2; }
+    a { font-size: 16px; }
+}
+
+#IE-Warning { display: none; }
+
+/*  -------
+    Framing
+    -------
+*/
+
+.navbar-inner {
+    .box-shadow(none);
+    #gradient > .vertical(@darkContrast, #424749); // XXX - Use variables
+    border-bottom: 1px solid @darkContrast2;
+}
+
+#Site-Header .mobile-nav-cta { display: none; }
+
+.brand-btn { 
+    .border-radius(12px);
+    
+    background: @darkContrast2 url(../img/logo.svg) no-repeat center center;
+    text-indent: -999em;
+
+    outline: 1px solid transparent; // removes the jaggies when rotating, son
+    
+    position: absolute; 
+    border: 4px solid #fff; 
+    top: 4px;
+    left: 20px;
+
+    padding: 4px 10px;
+    margin: 0;
+    width: 32px;
+    height: 40px;
+
+    &:hover {
+        background-color: @highlight1;
+    }
+}
+
+.nav li, .nav a { line-height: @baseLineHeight - 2; }
+#Primary-Nav { margin-left: 80px; }
+
+#Content { margin-top: 80px; }
+
+#Search {
+   display: inline-block;
+   vertical-align: middle;
+   text-align: right;
+}
+
+/*  ----------
+    Timeline
+    ----------
+*/
+
+#Timezone {
+    display: none;
+}
+
+.timeline-navigation {
+    overflow: hidden;
+
+    ul { margin: 0; padding: 0; }
+    
+
+    li:before {
+        content: "";
+        position: absolute;
+        
+        height: 100%;
+
+        width: 2px;
+        top: 0;
+        left: 7px;
+
+        background: @partialLight;
+
+        display: block;
+        z-index: -1;
+    }
+
+    li {
+        list-style: none;
+        position: relative;
+        z-index: 10;
+    }
+
+    // The very first element should adjust its line.
+    .older:before,
+    .older + .year:before {
+        height: 100%;
+        top: 1em;
+    }
+
+    & > ul > li:last-of-type:before {
+        height: 50%;
+        bottom: 50%;
+    }
+
+    a { 
+        background: url(../img/timeline-circle-large.svg) no-repeat left center;
+        background-size: 16px 16px;
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 15px; 
+        line-height: 2;
+        padding: 2px 6px 2px 22px;
+        text-shadow: 0 1px 0 #fff;
+    }
+
+    .active { 
+        a {     
+            background-image: url(../img/timeline-circle-selected-large.svg);
+            font-weight: 600; 
+
+            &:hover { text-decoration: none; }
+        }
+
+        span { 
+            .border-radius(4px);
+
+            background: @currentColor; 
+            color: #fff;
+            padding: 2px 6px;
+            text-shadow: none;
+        }
+    }
+
+    .older a {
+        background-image: url(../img/timeline-more.svg);
+    }
+
+    .year ul { display: none; }
+
+    .month a { font-size: 13px; line-height: 24px; }
+
+    .month a {
+        background-image: url(../img/timeline-circle-small.svg);
+        background-position: 2px center;
+        background-size: 12px 12px;
+    }
+
+    .month.active a {
+        background-image: url(../img/timeline-circle-selected-small.svg);
+    }
+}
+
+/*  ----------
+    Log Styles
+    ----------
+*/
+
+body.log-view { 
+    #Content { margin-top: 40px; margin-bottom: 20px; }
+    #Site-Footer { margin-top: 0; }
+    .misc-links { float: right; }
+}
+
+#Log-Header {
+    .box-sizing(border-box);
+    #gradient > .vertical(@backgroundColor, #f9f9f9);
+
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    z-index: 100;
+    
+    padding: 20px 20px 6px;
+    width: 100%;
+
+    .brand-btn { display: none; }
+
+    .log-title { float: left; }
+    .log-title .icon-lock { color: @highlight1; position: relative; top: 2px; } // XXX - gross alignment
+
+    h1 { 
+        font-size: 24px;
+
+        a { color: @highlight2; }
+        a:hover { color: #005588; }
+    }
+
+    h1, .date, .divider {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    h4 { color: @currentColor; }
+
+    .divider { font-size: 22px; margin: 0 10px; color: @lightColor; }
+}
+
+.channel-nav { 
+    display: inline-block; 
+    vertical-align: middle; 
+    float: right; 
+    line-height: 32px;
+    margin-right: 20px;
+
+    a { margin-left: 10px; }
+}
+
+.mobile-nav { display: none; }
+
+#Search { 
+    float: right; margin-bottom: 0; 
+    .icon-large:before { font-size: 1.8em; }
+    input { margin-bottom: 0; width: 12em; }
+}
+
+.channel-nav, #Search { margin-top: 5px; } // XXX - Gross way to align everything
+
+#Log-Container {
+    margin-top: 74px;
+
+    .timeline-navigation {
+        width: 180px;
+        position: fixed;
+        right: 0;
+        top: 140px;
+    }
+
+    .timeline-navigation > ul { margin-left: 20px; }
+
+    article {
+        border: 1px solid #eee;
+        margin-right: 160px;
+    }
+}
+
+#Log-Prep-Prev, #Log-Prep-Next { position: absolute; left:-9999em; }
+
+
+
+
+.log {
+    @leftRailWidth: 128px;
+
+    background: #fff;
+    clear: both;
+
+    margin-bottom: 0;
+
+    h3 { 
+        margin: 20px 0; 
+        text-align: center; 
+        font-size: 20px; // XXX - Should take @baseFontSize into consideration
+        line-height: 28px;
+        position: relative;
+
+        color: @darkContrast2;
+
+        span {
+            background: #fff;  
+            padding: 0 20px; 
+            position: relative;  
+            z-index: 5;
+        }
+    }
+
+    h3:before {
+        content: "";  
+        display: block;  
+        border-top: solid 1px #f3f3f3;  
+        width: 80%;
+        left: 10%;
+        height: 1px;  
+        position: absolute;  
+        top: 50%;  
+        z-index: 1;  
+    }
+
+    h3:first-child { margin-top: 0; }
+
+    li {
+        overflow: hidden;
+
+        background: #FDFDFD;
+        list-style: none;
+
+        &.highlight, &.highlight:hover {
+            .message, .moment, .info { background: #EFEFFC; }
+        }
+
+        &.highlight .moment { 
+            color: #777; 
+
+            &:hover { color: #222; }
+        }
+
+        &:hover {
+            .message, .info, .moment { background: #FCFCFC; }
+        }
+    }
+
+    .moment {
+        background: #fff;
+        color: #c3c3c3;
+        float: right;
+        padding: 6px;
+        margin-left: 10px;
+
+        text-align: right;
+    }
+
+    .message {
+        background: #fff;
+
+        padding: 6px 0 6px 10px;
+        margin: 0 0 0 @leftRailWidth;
+        .highlight { background:yellow; padding:3px; }
+    }
+
+    .actor {
+        .box-sizing('border-box');
+
+        float: left;
+        padding: 6px 6px 0;
+        margin: 0;
+
+        font-weight: 600;
+
+        width: @leftRailWidth - 12px; // padding x 2
+        height: 100%;
+
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .info {
+        color: #999;
+        background: #fff;
+        padding: 6px 0 6px 10px;
+        margin-left: @leftRailWidth;
+        font-style: italic;
+
+        &:hover { background: #f4f4f4; }
+    }
+
+    .message, .info { border-left: 1px solid #eee; }
+}
+
+.preview-img { display: block; margin: 4px 0 0; }
+
+/*
+    Small Log Styles
+*/
+
+.log.smaller {
+    font-size: .9em;
+
+    .moment, .message, .actor, .info { padding-top: 3px; padding-bottom: 3px; }
+}
+
+#Site-Footer {
+    .clearfix;
+
+    padding: 0 20px 4px;
+    margin-right: 160px;
+    margin-top: 40px;
+
+    .support {
+        margin-bottom: 10px;
+        float: left;
+
+        h5 { display: inline-block; vertical-align: middle; font-size: 14px; line-height: 22px; margin-right: 20px; }
+        a { display: inline-block; vertical-align: middle; margin-right: 20px; }
+    }
+}
+
+.misc-links { font-size: 13px; line-height: 21px; margin-bottom: 10px; vertical-align: middle; display: inline-block; }
+.misc-links a { margin-right: 20px; }
+.misc-links a:last-child { margin-right: 0; }
+
+/* 404 */
+.error-view {
+
+    header { 
+        position: relative;
+        padding-top: 118px;
+        float: left; margin-right: 40px;
+    }
+
+    .brand {
+        .rotate(-5deg);
+        position: absolute;
+        outline: 1px solid transparent;
+        top: 0;
+        left: 66px;
+        z-index: 10;
+    }
+
+    h1 { 
+        .border-radius(12px);
+        .rotate(-5deg);
+
+        border: 6px solid #fff;
+
+        font-size: 64px;
+        line-height: 72px;
+        font-weight: normal;
+
+        width: 260px;
+        margin-bottom: 40px;
+        padding: 10px;
+        text-align: center;
+
+        background: @highlight1;
+        color: #fff;
+    }
+
+    h2 { 
+        color: @highlight2;
+        font-size: 32px; line-height: 40px; margin-bottom: 20px; 
+    }
+
+    section { padding-top: 100px; }
+    .explanatory { font-size: 26px; line-height: 34px; }
+
+    #Site-Footer { 
+        margin-right: 0; 
+        margin-top: 20px;
+        margin-left: 334px;
+        position: static;
+
+        .support { margin-bottom: 10px; float: none; }
+        .support h5 { display: block; margin-bottom: 4px; }
+    }
+}
+
+
+
+/*  ----------
+    Animations
+    ----------
+*/
+
+/* Animations */
+/* safari and chrome */
+@-webkit-keyframes wiggler {
+    0% {-webkit-transform:rotate(4deg);}
+    50% {-webkit-transform:rotate(-4deg);}
+    100% {-webkit-transform:rotate(4deg);}
+}
+
+/* firefox */
+@-moz-keyframes wiggler {
+    0% {-moz-transform:rotate(4deg);}
+    50% {-moz-transform:rotate(-4deg);}
+    100% {-moz-transform:rotate(4deg);}
+}
+ 
+/* anyone brave enough to implement the ideal method */
+@keyframes wiggler {
+    0% {transform:rotate(4deg);}
+    50% {transform:rotate(-4deg);}
+    100% {transform:rotate(4deg);}
+}
+
+.wiggler:hover {
+    -webkit-animation: wiggler 0.3s infinite;
+    -moz-animation: wiggler 0.3s infinite;
+    animation: wiggler 0.3s infinite;
+}
+
+/* Include all of our CSS into one file */
+@import "animate-custom.less";
+@import "nick-colors.less";
+
+/* Responsive stuff is always last */
+@import "responsive.less";

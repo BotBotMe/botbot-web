@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head_title %}Settings {{ block.super }}{% endblock %}
+
+{% block content %}
+	<div class="page-header">
+		<h1>Settings</h1>
+	</div>
+    <p>Give yourself a username so other users can find you. If it's available, use the same username you use in your chatroom.</p>
+
+    <form action="." method="post">{% csrf_token %}
+    	{% for field in form %}
+        	{% include "includes/field.html" with field=field %}
+        {% endfor %}
+        <p class="actions">
+        	<button type="submit" class="btn">Update</button>
+        </p>
+    </form>
+{% endblock content %}

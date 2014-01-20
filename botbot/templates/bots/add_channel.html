@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load verbatim %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+      <h1>Manage {{ chatbot.connection.rooms }}</h1>
+    </div>
+
+
+    <form action="." method="post" id="chatbot">{% csrf_token %}
+
+    <fieldset>
+      <legend>Connection Information</legend>
+      {% for field in form %}
+        {% if field.name == "is_public" or field.name == "is_active" or field.name == "identifiable_url" %}
+          {% include "includes/checkbox.html" %}
+        {% else %}
+          {% include "includes/field.html" %}
+        {% endif %}
+      {% endfor %}
+    </fieldset>
+
+    <p class="actions">
+      <button type="submit" class="btn btn-primary">Save</button>
+    </p>
+  </form>
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}

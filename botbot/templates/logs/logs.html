@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load channel_url assets %}
+
+{% block head_title %}Logs for {{ channel.name }} {{ block.super }}{% endblock %}
+{% block body_class %}log-view {% if big %}big{% endif %}{% endblock %}
+
+{% block content_outer %}
+    <header id="Log-Header">
+        <a href="/dashboard/" class="brand-btn">
+            <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
+        </a>
+        <div class="log-title">
+          <h1><a href="{% channel_url channel 'log_all' %}">{{ channel.name }}</a></h1>
+          {% if not channel.is_public %}<i class="icon icon-large icon-lock" title="This is a private channel"></i>{% endif %}
+          <span class="divider">/</span>
+          <h4 class="date"></h4>
+        </div>
+
+        <nav class="mobile-nav">
+          {# <a href="#Search" class="nav-toggle"><i class="icon-search icon-large"></i></a> #}
+          <a href="#Log-Nav" class="nav-toggle"><i class="icon-calendar icon-large"></i></a>
+        </nav>
+
+        <form id="Search" method="get" action="{% channel_url channel 'log_search' %}">
+            {{ search_form.q }}
+            {# <a href="#" class="context-help"> <i class="icon-question-sign icon-large"></i></a> #}
+        </form>
+
+        <nav class="channel-nav">
+          {% comment %}
+          <span class="user-count wicon">
+            <i class="icon-group icon-large"></i>
+            {{ size }}
+          </span>
+          {% endcomment %}
+
+          {% comment %}
+          <a href="#" class="wicon">
+            <i class="icon-text-height icon-large"></i>
+            <span>Smaller Text</span>
+          </a>
+          {% endcomment %}
+
+          <a href="{% channel_url channel 'help_bot' %}" class="wicon">
+            <i class="icon-book icon-large"></i>
+            <span>Channel Docs</span>
+          </a>
+        </nav>
+    </header>
+
+    <div id="Content" class="container-fluid">
+      {% block content %}
+      <!-- Current users: {{size}} -->
+      <div id="Log-Container">
+        <article>
+            <span id="first"></span>
+            <ul id="Log-Prep-Prev" class="log"></ul>
+            <ul id="Log-Prep-Next" class="log"></ul>
+            <ul id="Log" class="log unstyled" data-source="{% url 'log_update' channel_pk=channel.pk %}" data-next="{{ next_page }}" data-previous="{{ prev_page }}" {% if newest_first %}data-order="reversed"{% endif %} data-current="{{ is_current }}" {% if q %}data-search-term="{{ q }}"{% endif %} data-timezone="{{ request.session.django_timezone }}">
+                {% include "logs/log_display.html" %}
+            </ul>
+            <span id="last"></span>
+        </article>
+        {% if timeline %}
+        <nav class="timeline-navigation" id="Log-Nav">
+          <ul>
+              {% if timeline|length > 3 %}
+              <li class="older"><a href="#">Older</a></li>
+              {% endif %}
+              {% for year, months in timeline.items %}
+                  <li class="year"><a href="#{{ year }}"><span>{{ year }}</span></a>
+                    <ul class="month-list">
+                      {% for first_of_month in months %}
+                        <li class="month"><a class="jump-date" data-date="{{ first_of_month|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=first_of_month|date:"Y" month=first_of_month|date:"m" day=first_of_month|date:"d" %}"><span>{{ first_of_month|date:"F" }}</span></a></li>
+                      {% endfor %}
+                      {# Account for times when the start of the last month is after the week dates below. The ".5" is added to ensure a date never matches it.  #}
+                      {% if forloop.last %}
+                        <li class="month"><a class="jump-date" data-date="{{ last_month.adjusted|date:"Ymd" }}.5" href="{% channel_url channel 'log_day' year=last_month.real|date:"Y" month=last_month.real|date:"m" day=last_month.real|date:"d" %}"><span>{{ last_month.real|date:"F" }}</span></a></li>
+                      {% endif %}
+                    </ul>
+                  </li>
+              {% endfor %}
+              <li><a class="jump-date" data-date="{{ last_week|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=last_week|date:"Y" month=last_week|date:"m" day=last_week|date:"d" %}"><span>Last Week</span></a></li>
+              <li><a class="jump-date" data-date="{{ this_week|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=this_week|date:"Y" month=this_week|date:"m" day=this_week|date:"d" %}"><span>This Week</span></a></li>
+              <li><a class="jump-date current" data-date="99999999" href="{% channel_url channel 'log_all' %}"><span>Current</span></a></li>
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+      {% endblock content %}
+    </div>
+    {# not visible to end-user, but used to determine/post timezone #}
+    <form id="Timezone" method="post" action="{% url '_set_timezone' %}">{% csrf_token %}{{ tz_form.timezone }}</form>
+{% endblock content_outer %}
+
+{% block extra_js %}
+{% assets filters="yui_js", output="gen/logs.js", "js/app/logs/default.js" %}
+    <script src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% endblock %}
+
+{% block extra_head %}
+<style type="text/css">
+  .log li[data-nick='{{ user.username }}'] .actor { color: #757500; }
+</style>
+{% endblock %}

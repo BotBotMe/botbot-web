@@ -1,0 +1,35 @@
+{% load logs_tags %}
+{% load cache %}
+{% for line in message_list %}
+    {% ifchanged line.timestamp|date:"d" %}
+    {% if show_first_header or not forloop.first %}
+      <h3 class="utc" id="date-{{ line.timestamp|date:"Ymd" }}" data-date="{{ line.timestamp|date:"Ymd" }}"><span>{{ line.timestamp|date:"F jS, Y" }}</span></h3>
+    {% endif %}
+    {% endifchanged %}
+    <li class="{% ifequal line.pk highlight_pk %}highlight {% endifequal %}{% if line.action %}action {% endif %}{% if same_nick %}same {% endif %}{{ line.command|lower }}" data-nick="{{ line.nick }}" data-type="{% if line.command = "PRIVMSG" %}message{% else %}info{% endif %}">
+    <a href="{{ line.get_absolute_url }}" class="moment" rel="nofollow">
+        <time datetime="{{ line.timestamp|date:"c" }}">{{ line.timestamp|date:"g:i A" }}</time>
+    </a>
+    {% if line.action %}
+        <div class="actor">{{ line.nick }} {{ line.text|bbme_urlizetrunc:50 }}</div>
+    {% else %}
+        {% if line.command = "PRIVMSG" %}
+            {% if line.nick %}
+                {% ifchanged %}
+                    <div class="nick-color{{ line.get_nick_color }} actor">{{ line.nick }}</div>
+                {% endifchanged %}
+                <div class="message">{{ line.text|bbme_urlizetrunc:50 }}</div>
+            {% else %}
+                <div class="message"><em>{{ line.text|bbme_urlizetrunc:50 }}</em></div>
+            {% endif %}
+
+        {% else %}
+            {# JOIN, PART, QUIT, NICK, etc #}
+            <div class="info">{{line}}</div>
+        {% endif %}
+    {% endif %}
+    </li>
+
+{% endfor %}
+
+
