@@ -72,7 +72,10 @@ See :doc:`getting_started` for instructions on configuring a bot.
 Running Tests
 --------------
 
-TODO
+The tests can currently be run with the following command::
+
+    manage.py test accounts bots logs plugins
+
 
 Building Documentation
 ----------------------
