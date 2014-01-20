@@ -40,7 +40,7 @@ Install
 Run in a terminal::
 
     virtualenv botbot && source botbot/bin/activate
-    pip install -e git+https://github.com/lincolnloop/botbot.git#egg=botbot
+    pip install -e git+https://github.com/BotBotMe/botbot-web.git#egg=botbot
     cd $VIRTUAL_ENV/src/botbot
 
     # This builds the project environment and will run for at least several minutes
@@ -49,7 +49,6 @@ Run in a terminal::
     # Adjust `.env` file if necessary. Defaults are chosen for local debug environments.
     # If your Postgres server requires a password, you'll need to override DATABASE_URL
     # The default database name is 'botbot'
-    cp .env.example .env
     $EDITOR .env
 
     createdb botbot

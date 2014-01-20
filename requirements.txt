@@ -33,7 +33,7 @@ django-social-auth==0.7.25
 -e git+https://github.com/lincolnloop/django-launchpad.git#egg=launchpad
 
 # For plugins
--e git+https://github.com/lincolnloop/botbot-plugins.git#egg=botbot-plugins
+-e git+https://github.com/BotBotMe/botbot-plugins.git#egg=botbot-plugins
 
 # Production
 newrelic==1.4.0.137
