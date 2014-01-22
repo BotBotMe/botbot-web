@@ -113,12 +113,13 @@ DATABASES['default']['OPTIONS'] = {'autocommit': True}
 #==============================================================================
 # Templates
 #==============================================================================
-TEMPLATE_LOADERS = (
-    ('django.template.loaders.cached.Loader', (
-        'django.template.loaders.filesystem.Loader',
-        'django.template.loaders.app_directories.Loader',
-    )),
-)
+if not DEBUG:
+    TEMPLATE_LOADERS = (
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),
+    )
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_DIR, 'templates'),
