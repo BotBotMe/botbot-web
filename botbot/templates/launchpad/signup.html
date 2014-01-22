@@ -31,8 +31,8 @@
 <div class="container">
     <div class="sidebar">
         <a href="{% url "home" %}">
+            <img src="{{ STATIC_URL }}img/evil-logo-large.svg" class="logo-standalone wiggler"/>
         </a>
-            <img src="{{ STATIC_URL }}img/evil-logo-large.svg"/>
         {% block sidebar %}
         <section class="donate">
             <a href="{% url "donate" %}" class="btn btn-info">Donate</a>
