@@ -1,0 +1,24 @@
+{% extends "launchpad/signup.html" %}
+
+{% block "extra_css" %}
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/new-temp.css" />
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block header %}
+    <h1 class="tag-line">
+        Why donate to BotBot.me?
+    </h1>
+
+    <p class="introduction">BotBot.me is a <a href="http://lincolnloop.com">Lincoln Loop</a> service that we run completly free of charge for you and others.
+    </p>
+    <p class="introduction">Donating to the service will help us keep it the way it is: a beautiful, real-time and ad-free IRC logging service, and allows us to continue to support and improve it.</p>
+{% endblock %}
+
+{% block content %}
+    <p>
+        <input id="donate-amount" type="text" name"ammount" placeholder="$0"> <button id="donate-btn" class="btn btn-primary">Donate</button>
+    </p>
+    <p id="donations-powered-by">Donations via <a href="https://stripe.com">Stripe</a></p>
+{% endblock %}

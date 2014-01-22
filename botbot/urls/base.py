@@ -1,5 +1,7 @@
 from django.conf.urls.defaults import patterns, url, include
 from django.conf import settings
+from django.views.generic.base import TemplateView
+
 
 from botbot.apps.accounts.views import Dashboard
 from botbot.apps.bots.views import AddChannel, SuggestUsers
@@ -12,8 +14,9 @@ channel_patterns = patterns('',
 )
 
 urlpatterns = patterns('',
-    (r'^$', LandingPage.as_view()),
+    url(r'^$', LandingPage.as_view(), name='home'),
     (r'', include('launchpad.urls')),
+    url(r'^donate/$', TemplateView.as_view(template_name='donate.html'), name='donate'),
     url(r'^dashboard/$', Dashboard.as_view(), name='dashboard'),
     url(r'^add/$', AddChannel.as_view(), name="add_channel"),
     (r'^accounts/', include('botbot.apps.accounts.urls')),

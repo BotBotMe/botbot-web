@@ -1,0 +1,31 @@
+/*
+ * Donation styles
+ * TODO: Eventually add this into LESS
+ */
+
+.sidebar {
+    float: left;
+    width: 172px;
+    text-align: center;
+}
+
+.sidebar #donate-btn {
+    display: inline-block;
+    width: 168px;
+}
+
+.sidebar p {
+    padding: 5px 0;
+    font-size: 0.85em;
+    color: #AAA;
+}
+
+#donate-amount {
+    width: 120px;
+    text-align: right;
+}
+
+#donations-powered-by {
+    color: #AAA;
+    font-size: 0.9em;
+}

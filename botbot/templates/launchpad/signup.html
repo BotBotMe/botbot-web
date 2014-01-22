@@ -24,74 +24,91 @@
     <link href='//fonts.googleapis.com/css?family=Droid+Serif:400,700,700italic,400italic' rel='stylesheet' type='text/css'>
 
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" />
+    {% block "extra_css" %}{% endblock %}
 </head>
 
 <body>
 <div class="container">
-    <object data="{{ STATIC_URL }}img/evil-logo-large.svg" type="image/svg+xml" class="logo-standalone wiggler"></object>
+    <div class="sidebar">
+        <a href="{% url "home" %}">
+        </a>
+            <img src="{{ STATIC_URL }}img/evil-logo-large.svg"/>
+        {% block sidebar %}
+        <section class="donate">
+            <a href="{% url "donate" %}" class="btn btn-info">Donate</a>
+            <p>Why should I?</p>
+        </section>
+        {% endblock %}
+    </div>
 
     <article>
         <header class="Page-Header">
+            {% block header %}
             <h1 class="tag-line">
                 BotBot.me makes IRC logs <em>awesome</em>
             </h1>
 
-            <p class="introduction">Never miss a message. BotBot.me will watch your favorite IRC channels even when you're offline. Don't hassle with setting up an always-on connection.
+            <p class="introduction">Never miss a message. BotBot.me will watch your favorite IRC channels even when you're offline. Don't hassle with setting up an always-on connection.</p>
+            {% endblock %}
         </header>
 
-        <section class="preview-box">
-            <h3>Featured channels</h3>
-            <ul class="channel-list">
-            {% for channel in featured_channels %}
+        {% block content %}
+            <section class="preview-box">
+                <h3>Featured channels</h3>
+                <ul class="channel-list">
+                {% for channel in featured_channels %}
+                    <li><a href="{% channel_url channel 'log_all' %}">{{ channel.name }}</a></li>
+                {% endfor %}
+                </ul>
+
+                <p><strong>New to IRC?</strong> <a href="/how-to-setup-irc-channel/">Check out our quick start guide</a></p>
+            </section>
+
+            <form id="subscribe-form" method="post" action="." class="teaser-form">{% csrf_token %}
+
+                <div class="request">
+                    <h2>Get Updates</h2>
+
+                    <p class="disclaimer"><strong>We promise</strong> not to abuse this info</p>
+    {# <p>Already administer a channel on Freenode?<br />Enter its name below if you'd like to invite BotBot.me to join.</p> #}
+                    <p class="message failure"><strong>Danger!</strong> There was a problem. Please make sure your email is OK and try again.</p>
+
+                    <fieldset class="clearfix">
+                        <div class="field">
+                            {{ form.email }}
+                        </div>
+                        {% comment %}
+                        <div class="field">
+                            {{ form.channel }}
+                        </div>
+                        {% endcomment %}
+
+                        <button type="submit" class="btn btn-info">Subscribe</button>
+                    </fieldset>
+                </div>
+
+                <div class="success">
+                    <h2>Word Up!</h2>
+                    <p>Thanks for subscribing. We'll keep you posted on our launch. <em>You rock</em>.</p>
+                </div>
+            </form>
+
+            More public channels:
+            <ul class="channel-list-compact">
+            {% for channel in public_not_featured_channels %}
                 <li><a href="{% channel_url channel 'log_all' %}">{{ channel.name }}</a></li>
             {% endfor %}
             </ul>
+        {% endblock content %}
 
-            <p><strong>New to IRC?</strong> <a href="/how-to-setup-irc-channel/">Check out our quick start guide</a></p>
-        </section>
-
-        <form method="post" action="." class="teaser-form">{% csrf_token %}
-
-            <div class="request">
-                <h2>Get Updates</h2>
-
-                <p class="disclaimer"><strong>We promise</strong> not to abuse this info</p>
-{# <p>Already administer a channel on Freenode?<br />Enter its name below if you'd like to invite BotBot.me to join.</p> #}
-                <p class="message failure"><strong>Danger!</strong> There was a problem. Please make sure your email is OK and try again.</p>
-
-                <fieldset class="clearfix">
-                    <div class="field">
-                        {{ form.email }}
-                    </div>
-                    {% comment %}
-                    <div class="field">
-                        {{ form.channel }}
-                    </div>
-                    {% endcomment %}
-
-                    <button type="submit" class="btn btn-info">Subscribe</button>
-                </fieldset>
-            </div>
-
-            <div class="success">
-                <h2>Word Up!</h2>
-                <p>Thanks for subscribing. We'll keep you posted on our launch. <em>You rock</em>.</p>
-            </div>
-        </form>
-
-        More public channels:
-        <ul class="channel-list-compact">
-        {% for channel in public_not_featured_channels %}
-            <li><a href="{% channel_url channel 'log_all' %}">{{ channel.name }}</a></li>
-        {% endfor %}
-        </ul>
-
-        {% include "includes/footer.html" %}
+        {% block footer %}
+            {% include "includes/footer.html" %}
+        {% endblock %}
     </article>
 </div>
 
 {% include "includes/ie-no-support.html" %}
-
+    <script src="https://checkout.stripe.com/checkout.js"></script>
     <script type="text/javascript">
 
           var _gaq = _gaq || [];
@@ -106,41 +123,6 @@
 
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script>
-        $('form').submit(function (event) {
-            var $form = $(this),
-                $button = $form.find('button');
-            event.preventDefault();
-            $.post(this.action, {
-                email: $('#id_email').val(),
-                {# channel: $('#id_channel').val(), #}
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
-            },
-            function (data) {
-                $button.attr('disabled', 'disabled');
-                $button.text('Working');
-
-                if (data.success) {
-                    if (document.location.hostname === 'botbot.me') {
-                        _gaq.push(['_trackEvent', 'Prelaunch', 'Signup']);
-                    }
-                    $('.failure, .request').hide();
-                    $form.removeClass('error');
-
-                    $('.success').show();
-
-
-                } else {
-                    $form.addClass('shake animated error');
-
-                    $('.success').hide();
-                    $('.failure').show();
-
-                    $button.removeAttr('disabled');
-                    $button.text('Subscribe');
-                }
-            });
-        });
-    </script>
+    <script src="{{ STATIC_URL }}/botbot.js"></script>
 </body>
 </html>
