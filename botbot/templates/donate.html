@@ -1,11 +1,5 @@
 {% extends "launchpad/signup.html" %}
 
-{% block "extra_css" %}
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/new-temp.css" />
-{% endblock %}
-
-{% block sidebar %}{% endblock %}
-
 {% block header %}
     <h1 class="tag-line">
         Why donate to BotBot.me?
@@ -17,8 +11,23 @@
 {% endblock %}
 
 {% block content %}
-    <p>
-        <input id="donate-amount" type="text" name"ammount" placeholder="$0"> <button id="donate-btn" class="btn btn-primary">Donate</button>
-    </p>
-    <p id="donations-powered-by">Donations via <a href="https://stripe.com">Stripe</a></p>
+    <div class="donate-form">
+        <p>
+            <input id="donate-stripe-amount" type="text" placeholder="$0" pattern="^\d*(\.\d{2}$)?">
+            <button id="donate-stripe" class="btn btn-primary">Donate</button>
+        </p>
+        <!--
+        <p>or</p>
+        <p>
+            <input id="donate-bitcoin-amount" type="text" name"ammount" placeholder="$0"> <button id="donate-bitcoin" class="btn btn-primary">Donate Bitcoins</button>
+        </p>
+        -->
+    </div>
+    <div class="donate-form-thanks">
+        <p class="introduction">Thank you for your donation!</p>
+    </div>
+{% endblock %}
+
+{% block "extra_js" %}
+    <script src="{{ STATIC_URL }}js/donate.js"></script>
 {% endblock %}

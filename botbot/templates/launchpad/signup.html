@@ -23,6 +23,8 @@
     <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Droid+Serif:400,700,700italic,400italic' rel='stylesheet' type='text/css'>
 
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/new-temp.css" />
+
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" />
     {% block "extra_css" %}{% endblock %}
 </head>
@@ -30,14 +32,10 @@
 <body>
 <div class="container">
     <div class="sidebar">
-        <a href="{% url "home" %}">
-            <img src="{{ STATIC_URL }}img/evil-logo-large.svg" class="logo-standalone wiggler"/>
-        </a>
         {% block sidebar %}
-        <section class="donate">
-            <a href="{% url "donate" %}" class="btn btn-info">Donate</a>
-            <p>Why should I?</p>
-        </section>
+        <a href="{% url "home" %}">
+            <img src="{{ STATIC_URL }}img/evil-logo-large.svg" class="logo-standalone wiggler" alt="Botbot's garage"/>
+        </a>
         {% endblock %}
     </div>
 
@@ -93,6 +91,10 @@
                 </div>
             </form>
 
+            <section class="donate">
+                Want to <a href="{% url "donate" %}">donate to BotBot.me</a> and support it's development?
+            </section>
+
             More public channels:
             <ul class="channel-list-compact">
             {% for channel in public_not_featured_channels %}
@@ -123,6 +125,8 @@
 
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script src="{{ STATIC_URL }}/botbot.js"></script>
+    {% block "extra_js" %}
+        <script src="{{ STATIC_URL }}js/signup.js"></script>
+    {% endblock %}
 </body>
 </html>

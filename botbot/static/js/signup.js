@@ -1,28 +1,4 @@
 //
-// Stripe
-//
-(function () {
-    var handler = StripeCheckout.configure({
-        key: 'pk_test_mQxyOcJvcRl1ryOuow2YvXW3',
-        image: '/square-image.png',
-        token: function(token, args) {
-          // Use the token to create the charge with a server-side script.
-        }
-    });
-
-    document.getElementById('donate-btn').addEventListener('click', function(e) {
-        // Open Checkout with further options
-        handler.open({
-            name: 'BotBot',
-            description: 'Donate',
-            amount: 1000
-        });
-        e.preventDefault();
-      });
-
-})();
-
-//
 // Subscribe form
 //
 $('#subscribe-form').submit(function (event) {

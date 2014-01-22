@@ -9,15 +9,23 @@
     text-align: center;
 }
 
-.sidebar #donate-btn {
-    display: inline-block;
-    width: 168px;
+article .donate {
+    margin-bottom: 10px;
 }
 
-.sidebar p {
-    padding: 5px 0;
-    font-size: 0.85em;
-    color: #AAA;
+.donate-form input {
+    width: 120px;
+    text-align: right;
+}
+
+.donate-form input.error {
+    color: red;
+    border-color: red;
+}
+
+.donate-form-thanks {
+    display: none;
+    color: #ee632a;
 }
 
 #donate-amount {
