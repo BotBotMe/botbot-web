@@ -94,6 +94,7 @@
 {% endblock content_outer %}
 
 {% block extra_js %}
+{{ block.super }}
 {% assets filters="yui_js", output="gen/logs.js", "js/app/logs/default.js" %}
     <script src="{{ ASSET_URL }}"></script>
 {% endassets %}

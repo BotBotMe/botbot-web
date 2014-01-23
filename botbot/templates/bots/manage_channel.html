@@ -88,6 +88,7 @@
 {% endblock content %}
 
 {% block extra_js %}
+{{ block.super }}
 {% assets filters="yui_js", output="gen/manage_vendor.js", "js/vendor/handlebars.js", "js/vendor/jquery-ui-1.9.1.custom.js" %}
     <script src="{{ ASSET_URL }}"></script>
 {% endassets %}
