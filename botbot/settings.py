@@ -107,8 +107,6 @@ STATICFILES_DIRS = (
 
 DATABASES = {'default': dj_database_url.config(
     default='postgres://localhost:5432/botbot')}
-DATABASES['default']['ENGINE'] = 'django_hstore.postgresql_psycopg2'
-DATABASES['default']['OPTIONS'] = {'autocommit': True}
 
 #==============================================================================
 # Templates
