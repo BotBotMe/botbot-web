@@ -144,6 +144,9 @@ MIDDLEWARE_CLASSES += (
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 AUTHENTICATION_BACKENDS += (
+    # WARNING! Users are automatically associated by email in the
+    # social pipeline. Before adding additional social auth backends
+    # Be sure you trust the provider to confirm the email address.
     'social.backends.google.GoogleOpenId',
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -277,7 +280,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_user',
     #'social.pipeline.user.get_username',
     #'social.pipeline.user.create_user',
-    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.associate_by_email',
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details'
 )
