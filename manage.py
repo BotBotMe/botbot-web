@@ -6,6 +6,7 @@ if __name__ == "__main__":
             'run_plugins' in sys.argv and '--with-gevent' in sys.argv):
         # import gevent as soon as possible
         from gevent import monkey; monkey.patch_all()
+        from psycogreen.gevent import patch_psycopg; patch_psycopg()
 
     import os
     import dotenv
