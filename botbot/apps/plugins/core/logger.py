@@ -1,6 +1,5 @@
 import datetime
 
-from django.db import transaction
 from django.utils.timezone import utc
 
 from botbot.apps.logs.models import Log
@@ -26,14 +25,13 @@ class Plugin(BasePlugin):
             rfc3339micro = ''.join([rfc3339, '.', micro, 'Z'])
             timestamp = datetime.datetime.strptime(
                 rfc3339micro, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=utc)
-            with transaction.commit_on_success():
-                Log.objects.create(
-                    channel_id=line._channel.pk,
-                    timestamp=timestamp,
-                    nick=line.user,
-                    text=line.full_text,
-                    room=line._channel,
-                    command=line._command,
-                    raw=line._raw)
+            Log.objects.create(
+                channel_id=line._channel.pk,
+                timestamp=timestamp,
+                nick=line.user,
+                text=line.full_text,
+                room=line._channel,
+                command=line._command,
+                raw=line._raw)
 
     logit.route_rule = ('firehose', ur'(.*)')
