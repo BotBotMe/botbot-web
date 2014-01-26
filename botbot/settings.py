@@ -273,6 +273,7 @@ SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
 SOCIAL_AUTH_DEFAULT_USERNAME = 'user'
 SOCIAL_AUTH_ASSOCIATE_BY_MAIL = True
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/accounts/manage/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/accounts/login/?error'
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',
     'social.pipeline.social_auth.social_uid',

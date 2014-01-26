@@ -52,7 +52,7 @@ $(NPM_BIN):
 	@echo "Installed npm"
 
 $(LESS_BIN): $(NPM_BIN)
-	NPM_CONFIG_PREFIX=$(VIRTUAL_ENV) npm install less -g
+	NPM_CONFIG_PREFIX=$(VIRTUAL_ENV) npm install "less@<1.4" -g
 
 less-install: $(LESS_BIN)
 
