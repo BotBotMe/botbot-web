@@ -22,12 +22,9 @@
 
 <p><button type="submit" class="btn btn-info">Log In</button>
 <a href="{% url 'django.contrib.auth.views.password_reset' %}" class="forgot">Forgotten Password?</a></p>
-{% comment %}
 <p class="third-party">
     <small>Log in with</small>
-<a href="{% url 'socialauth_begin' 'facebook' %}" class="btn fb-btn">Facebook</a>
-<a href="{% url 'socialauth_begin' 'google' %}" class="btn gg-btn">Google</a>
+    <a href="{% url 'social:begin' 'google' %}" class="btn"><i class="icon icon-google-plus"></i> Google</a>
 </p>
-{% endcomment %}
 </form>
 {% endblock content %}
