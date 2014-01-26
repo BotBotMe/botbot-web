@@ -107,6 +107,8 @@ STATICFILES_DIRS = (
 
 DATABASES = {'default': dj_database_url.config(
     default='postgres://localhost:5432/botbot')}
+# Reuse database connections
+DATABASES['default']['CONN_MAX_AGE'] = None
 
 #==============================================================================
 # Templates
