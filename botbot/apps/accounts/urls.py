@@ -11,7 +11,7 @@ urlpatterns = patterns('django.contrib.auth.views',
     url('password/sent/$', 'password_reset_done',
         name='password_reset_done'),
     (r'', include('django.contrib.auth.urls')),
-    (r'', include('social_auth.urls')),
+    url('', include('social.apps.django_app.urls', namespace='social')),
 
     url('manage/$', views.ManageAccount.as_view(), name='account_manage'),
     url('_timezone/$', views.SetTimezone.as_view(), name="_set_timezone"),

@@ -10,7 +10,7 @@
         {{ login_form.as_p }}
         <p class="actions">
             <button type="submit" class="btn">Log in</button> or
-            <a class="button" href="{% url 'socialauth_begin' "google" %}">Log in with Google</a>
+            <a class="button" href="{% url "social:begin" "google" %}">Log in with Google</a>
         </p>
     </form>
     {% endif %}

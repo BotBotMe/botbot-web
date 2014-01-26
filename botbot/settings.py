@@ -39,7 +39,7 @@ INSTALLED_APPS = (
     'django_hstore',
     'south',
     'launchpad',
-    'social_auth',
+    'social.apps.django_app.default',
     'django_assets',
 
     'django.contrib.auth',
@@ -123,8 +123,10 @@ TEMPLATE_DIRS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS += (
-    "django.core.context_processors.request",
-    "django.core.context_processors.tz",
+    'django.core.context_processors.request',
+    'django.core.context_processors.tz',
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
 )
 
 #==============================================================================
@@ -142,7 +144,7 @@ MIDDLEWARE_CLASSES += (
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 AUTHENTICATION_BACKENDS += (
-    'social_auth.backends.google.GoogleBackend',
+    'social.backends.google.GoogleOpenId',
     'django.contrib.auth.backends.ModelBackend',
 )
 
