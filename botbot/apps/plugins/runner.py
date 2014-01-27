@@ -14,9 +14,6 @@ import botbot_plugins.plugins
 from .plugin import RealPluginMixin
 
 CACHE_TIMEOUT_2H = 7200
-# The number of logger greenlets we can spawn before we start blocking
-# Used to prevent exhausting the available database connections
-MAX_LOGGER_GREENLETS = 50
 LOG = logging.getLogger('botbot.plugin_runner')
 
 class Line(object):
@@ -111,8 +108,6 @@ class PluginRunner(object):
     def __init__(self, use_gevent=False):
         if use_gevent:
             import gevent
-            from gevent import pool
-            self.logger_pool = pool.Pool(size=MAX_LOGGER_GREENLETS)
             self.gevent = gevent
         self.bot_bus = redis.StrictRedis.from_url(
             settings.REDIS_PLUGIN_QUEUE_URL)
@@ -176,8 +171,8 @@ class PluginRunner(object):
                 channel_plugin = self.setup_plugin_for_channel(
                     plugin.__class__, line)
                 new_func = getattr(channel_plugin, func.__name__)
-                if hasattr(self, 'logger_pool'):
-                    self.logger_pool.spawn(new_func, line)
+                if hasattr(self, 'gevent'):
+                    self.gevent.Greenlet.spawn(new_func, line)
                 else:
                     new_func(line)
 
