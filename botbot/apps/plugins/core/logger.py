@@ -1,12 +1,6 @@
-import datetime
-import logging
-
-from django.utils.timezone import utc, now
-
 from botbot.apps.logs.models import Log
+from botbot.apps.plugins.utils import convert_nano_timestamp
 from botbot_plugins.base import BasePlugin
-
-LOG = logging.getLogger('botbot.plugin_runner')
 
 class Plugin(BasePlugin):
     """
@@ -20,17 +14,7 @@ class Plugin(BasePlugin):
         # If the Channel do not startswtih "#" that means the message
         # is part of a /query
         if line._channel_name.startswith("#"):
-            # convert nanoseconds to microseconds
-            # http://stackoverflow.com/a/10612166/116042
-            rfc3339, nano_part = line._received.split('.')
-            micro = nano_part[0:5]
-            rfc3339micro = ''.join([rfc3339, '.', micro, 'Z'])
-            try:
-                timestamp = datetime.datetime.strptime(
-                    rfc3339micro, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=utc)
-            except ValueError:
-                LOG.warn("Can't parse timestamp: %s", line._received)
-                timestamp = now()
+            timestamp = convert_nano_timestamp(line._received)
             Log.objects.create(
                 channel_id=line._channel.pk,
                 timestamp=timestamp,
