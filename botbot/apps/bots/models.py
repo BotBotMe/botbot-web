@@ -1,12 +1,15 @@
 import datetime
+import uuid
 
 from django.core.cache import cache
+from django.conf import settings
 from django.db import models
 from django.db.models import Max, Min
 from django.utils.datastructures import SortedDict
 from django_hstore import hstore
 from djorm_pgarray.fields import ArrayField
 from botbot.apps.plugins import models as plugins_models
+from botbot.apps.logs import utils as log_utils
 
 PRETTY_SLUG = {
     "chat.freenode.net": "freenode",
@@ -15,7 +18,6 @@ PRETTY_SLUG = {
     "irc.coldfront.net": "coldfront",
     "irc.synirc.net": "synirc",
 }
-
 
 class ChatBot(models.Model):
     is_active = models.BooleanField(default=False)
@@ -83,6 +85,20 @@ class Channel(models.Model):
     def get_absolute_url(self):
         from botbot.apps.bots.utils import reverse_channel
         return reverse_channel(self, 'log_all')
+
+    def get_eventsource_url(self):
+        """
+        Provides URL for the SSE endpoint
+
+        It creates a short-lived unique token that is shared
+        with the endpoint over Redis which is used to verify the
+        user can access the channel.
+        """
+        token = uuid.uuid4().hex
+        redis_channel = 'channel_update:{0}'.format(self.pk)
+        log_utils.REDIS.setex(token, settings.TOKEN_TTL, redis_channel)
+        endpoint_url = settings.SSE_ENDPOINT.format(token=token)
+        return endpoint_url
 
     @property
     def active_plugin_slugs_cache_key(self):

@@ -56,7 +56,7 @@
             <span id="first"></span>
             <ul id="Log-Prep-Prev" class="log"></ul>
             <ul id="Log-Prep-Next" class="log"></ul>
-            <ul id="Log" class="log unstyled" data-source="{% url 'log_update' channel_pk=channel.pk %}" data-next="{{ next_page }}" data-previous="{{ prev_page }}" {% if newest_first %}data-order="reversed"{% endif %} data-current="{{ is_current }}" {% if q %}data-search-term="{{ q }}"{% endif %} data-timezone="{{ request.session.django_timezone }}">
+            <ul id="Log" class="log unstyled" data-source="{{ channel.get_eventsource_url }}" data-next="{{ next_page }}" data-previous="{{ prev_page }}" {% if newest_first %}data-order="reversed"{% endif %} data-current="{{ is_current }}" {% if q %}data-search-term="{{ q }}"{% endif %} data-timezone="{{ request.session.django_timezone }}">
                 {% include "logs/log_display.html" %}
             </ul>
             <span id="last"></span>

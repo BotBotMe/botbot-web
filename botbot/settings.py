@@ -4,7 +4,6 @@ import urlparse
 # Import global settings to make it easier to extend settings.
 from django.conf.global_settings import *   # pylint: disable=W0614,W0401
 import dj_database_url
-import dj_redis_url
 
 #==============================================================================
 # Generic Django project settings
@@ -252,21 +251,17 @@ REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL',
                                         'redis://localhost:6379/0')
 REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL',
                                           'redis://localhost:6379/1')
+REDIS_SSE_URL = os.environ.get('REDIS_SSE',
+                                    'redis://localhost:6379/2')
+# Life span of auth token for realtime endpoint in seconds
+TOKEN_TTL = 20
+SSE_ENDPOINT = os.environ.get('SSE_ENDPOINT', '/push/{token}')
 
 #==============================================================================
 # Third party app settings
 #==============================================================================
 
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
-
-REDIS_SSEQUEUE = dj_redis_url.config('REDIS_SSEQUEUE_URL',
-                                     'redis://localhost:6379/2')
-
-REDIS_SSEQUEUE_CONNECTION_SETTINGS = {
-    'location': '{HOST}:{PORT}'.format(**REDIS_SSEQUEUE),
-    'password': REDIS_SSEQUEUE['PASSWORD'],
-    'db': REDIS_SSEQUEUE['DB'],
-}
 
 SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']

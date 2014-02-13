@@ -3,7 +3,6 @@ from django.conf import settings
 
 from botbot.apps.accounts.views import Dashboard
 from botbot.apps.bots.views import AddChannel, SuggestUsers
-from botbot.apps.logs.views import LogUpdate
 from botbot.apps.preview.views import LandingPage
 
 channel_patterns = patterns('',
@@ -17,9 +16,6 @@ urlpatterns = patterns('',
     url(r'^dashboard/$', Dashboard.as_view(), name='dashboard'),
     url(r'^add/$', AddChannel.as_view(), name="add_channel"),
     (r'^accounts/', include('botbot.apps.accounts.urls')),
-    # log_update url is only there to be able to reverse it
-    url(r'^eventsource/(?P<channel_pk>\d+)/updates/$', LogUpdate.as_view(),
-        name="log_update"),
     url(r'^_suggest_users/$', SuggestUsers.as_view(), name='suggest_users'),
 
     url(r'^(?P<bot_slug>[\-\w\:\.]+(\@[\w]+)?)/(?P<channel_slug>[\-\w]+)/',

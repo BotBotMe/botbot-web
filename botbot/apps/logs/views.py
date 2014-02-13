@@ -8,7 +8,6 @@ from django.utils.decorators import method_decorator
 from django.utils.timezone import get_current_timezone_name
 from django.views.generic import ListView, TemplateView
 from django.views.decorators.csrf import csrf_exempt
-from django_sse import redisqueue
 from django.conf import settings
 import pytz
 
@@ -306,43 +305,3 @@ class MissedLogViewer(LogViewer):
         self.fetch_after = (last_exit.timestamp -
             datetime.timedelta(milliseconds=1))
         return queryset.filter(**date_filter)
-
-
-class LogUpdate(ChannelMixin, redisqueue.RedisQueueView):
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(LogUpdate, self).dispatch(request, *args, **kwargs)
-
-    def iterator(self):
-        connection = redisqueue._connect()
-        pubsub = connection.pubsub()
-        pubsub.subscribe(self.get_redis_channel())
-        last_id = self.get_last_id()
-        # catch up with missed messages
-        if last_id:
-            missed = self.channel.filtered_logs().filter(timestamp__gt=last_id)
-            missed = list(missed)
-            try:
-                self.sse.set_event_id(missed[-1].timestamp.isoformat())
-                for line in missed:
-                    self.sse.add_message('log', line.as_html())
-                yield
-            except IndexError:
-                pass
-
-        # listen to new messages
-        for message in pubsub.listen():
-            if message['type'] == 'message':
-                try:
-                    event, data, event_id = json.loads(message['data'])
-                except ValueError:
-                    event_id = None
-                    event, data = json.loads(message['data'])
-                if event_id:
-                    self.sse.set_event_id(event_id)
-                self.sse.add_message(event, data)
-                yield
-
-    def get_redis_channel(self):
-        return 'channel_update:{0}'.format(self.channel.pk)
