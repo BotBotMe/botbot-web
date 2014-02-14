@@ -39,7 +39,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'botbot'
-copyright = u'%d, myauthor' % datetime.date.today().year
+copyright = u'%d, Lincoln Loop' % datetime.date.today().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -174,7 +174,7 @@ htmlhelp_basename = 'botbotdoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'botbot.tex', u'botbot Documentation',
-   u'myauthor', 'manual'),
+   u'Lincoln Loop', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

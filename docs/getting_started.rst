@@ -12,7 +12,9 @@ A bot acts as an IRC client. It connects to one or more IRC servers and joins on
 
 1. Go to ``http://localhost:8000/admin/bots/chatbot/add/``
 
-2. Log in with your username. If you didn’t create a superuser during installation, you can create one via::
+2. Log in with your username. If you didn’t create a superuser during installation, you can create one via:
+
+.. code-block:: bash
 
     manage.py createsuperuser
 
@@ -50,7 +52,7 @@ Now that your bot is connected to a network or server, you can start having it j
     12:14:42 bot.1     | 2013/09/19 12:14:42 config.Channel: [#botbot-test ]
     12:14:42 bot.1     | 2013/09/19 12:14:42 [RAW1] -->JOIN #botbot-test
 
-7. In your IRC client, join `#botbot-dev <irc://irc.freenode.net:6667/botbot-test>`_. Try issuing a `ping` command (using your bot's nick in place of "mybot"). The bot should respond with a friendly message.
+7. In your IRC client, join `#botbot-test <irc://irc.freenode.net:6667/botbot-test>`_. Try issuing a `ping` command (using your bot's nick in place of "mybot"). The bot should respond with a friendly message.
 8. Go back to the home page ``http://localhost:8000``, you should see the channel listed as a public channel.
 9. **Add another Active Plugin** and this time select **Logger**.
 10. **Save**.  Your ``honcho`` console should once again show a refresh

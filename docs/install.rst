@@ -37,7 +37,9 @@ Redis
 Install
 --------
 
-Run in a terminal::
+Run in a terminal:
+
+.. code-block:: bash
 
     virtualenv botbot && source botbot/bin/activate
     pip install -e git+https://github.com/BotBotMe/botbot-web.git#egg=botbot
@@ -46,7 +48,7 @@ Run in a terminal::
     # This builds the project environment and will run for at least several minutes
     make dependencies
 
-    # Adjust `.env` file if necessary. Defaults are chosen for local debug environments.
+    # Adjust ``.env`` file if necessary. Defaults are chosen for local debug environments.
     # If your Postgres server requires a password, you'll need to override DATABASE_URL
     # The default database name is 'botbot'
     $EDITOR .env
@@ -58,7 +60,15 @@ Run in a terminal::
     # You'll need a staff account for creating a bot and registering channels
     manage.py createsuperuser
 
-To run all the services defined in ``Procfile``::
+Redis needs to be running prior to starting the BotBot services. For example:
+
+.. code-block:: bash
+
+    redis-server
+
+Then, to run all the services defined in ``Procfile``:
+
+.. code-block:: bash
 
     honcho start
 
@@ -72,7 +82,9 @@ See :doc:`getting_started` for instructions on configuring a bot.
 Running Tests
 --------------
 
-The tests can currently be run with the following command::
+The tests can currently be run with the following command:
+
+.. code-block:: bash
 
     manage.py test accounts bots logs plugins
 
@@ -81,7 +93,9 @@ Building Documentation
 ----------------------
 
 Documentation is available in ``docs`` and can be built into a number of
-formats using `Sphinx <http://pypi.python.org/pypi/Sphinx>`_: ::
+formats using `Sphinx <http://pypi.python.org/pypi/Sphinx>`_:
+
+.. code-block:: bash
 
     pip install Sphinx
     cd docs
