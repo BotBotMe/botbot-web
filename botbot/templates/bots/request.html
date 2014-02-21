@@ -1,0 +1,21 @@
+{% extends "landing/base.html" %}
+
+{% block content %}
+    <form action="." method="post">{% csrf_token %}
+    <fieldset>
+      <legend>Channel Request</legend>
+      <p>Want BotBot to log your channel, fill out this simple form to get the ball rolling.</p>
+      {% for field in form %}
+        {% if field.name == "is_public" or field.name == "is_active" or field.name == "identifiable_url" %}
+          {% include "includes/checkbox.html" %}
+        {% else %}
+          {% include "includes/field.html" %}
+        {% endif %}
+      {% endfor %}
+    </fieldset>
+
+    <p class="actions">
+      <button type="submit" class="btn btn-primary">Send Request</button>
+    </p>
+  </form>
+{% endblock %}

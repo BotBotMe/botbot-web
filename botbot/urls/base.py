@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url, include
 from django.conf import settings
 
 from botbot.apps.accounts.views import Dashboard
-from botbot.apps.bots.views import AddChannel, SuggestUsers
+from botbot.apps.bots.views import AddChannel, SuggestUsers, RequestChannel
 from botbot.apps.logs.views import LogUpdate
 from botbot.apps.preview.views import LandingPage
 
@@ -16,6 +16,10 @@ urlpatterns = patterns('',
     (r'', include('launchpad.urls')),
     url(r'^dashboard/$', Dashboard.as_view(), name='dashboard'),
     url(r'^add/$', AddChannel.as_view(), name="add_channel"),
+    url(r'^request/$', RequestChannel.as_view(), name='request_channel'),
+    url(r'^request/success/$', 'django.shortcuts.render',
+        {'template_name': 'bots/request_success.html'}, name='request_channel_success'),
+
     (r'^accounts/', include('botbot.apps.accounts.urls')),
     # log_update url is only there to be able to reverse it
     url(r'^eventsource/(?P<channel_pk>\d+)/updates/$', LogUpdate.as_view(),

@@ -34,6 +34,24 @@ class ChannelForm(forms.ModelForm):
                     .lower()
         return super(ChannelForm, self).save(*args, **kwargs)
 
+class ChannelRequestForm(forms.Form):
+    channel_name = forms.CharField()
+    server = forms.CharField(label="IRC Server")
+    github = forms.URLField(label="GitHub Repo URL",
+        help_text="If the channel supports a github repo, the url to the repo.",
+        required=False)
+
+    name = forms.CharField(label="Your name")
+    email = forms.EmailField(label="Your e-mail")
+    nick = forms.CharField(label="Your IRC Nick")
+    op = forms.BooleanField(label="Are you a channel op?")
+
+    def clean_channel_name(self):
+        channel_name = self.cleaned_data['channel_name']
+        if models.Channel.objects.filter(name=channel_name).exists():
+            raise forms.ValidationError("Sorry, this channel is already being monitored.")
+
+        return channel_name
 
 class UsersForm(forms.Form):
     users = forms.ModelMultipleChoiceField(required=False,
