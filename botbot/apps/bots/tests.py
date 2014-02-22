@@ -3,6 +3,7 @@ import datetime
 
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser
+from django.core import mail
 from django.core.urlresolvers import reverse
 import pytz
 
@@ -170,3 +171,65 @@ class UrlTests(BaseTestCase):
     def test_save_empty_slugs(self):
         self.chatbot.channel_set.create(name="#test1", slug="")
         self.chatbot.channel_set.create(name="#test2", slug="")
+
+    def test_show_channel_request_form(self):
+        url = reverse('request_channel')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_request_channel_form_submission(self):
+        url = reverse("request_channel")
+
+        response = self.client.post(url, {
+            "channel_name": "test_channel_name",
+            "server" : "irc.freenode.net:6697",
+            "name": "test_name",
+            "email" : "test@example.com",
+            "nick" : "test_nick",
+            "op" : True
+        })
+        self.assertRedirects(response, reverse('request_channel_success'))
+        channel = models.Channel.objects.get(name="test_channel_name")
+        self.assertFalse(channel.is_active)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_request_channel_form_invalid_submission(self):
+        url = reverse("request_channel")
+
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, "form", "name", "This field is required.")
+        self.assertFormError(response, "form", "server", "This field is required.")
+        self.assertFormError(response, "form", "channel_name", "This field is required.")
+        self.assertFormError(response, "form", "email", "This field is required.")
+        self.assertFormError(response, "form", "nick", "This field is required.")
+        self.assertFormError(response, "form", "op", "This field is required.")
+
+    def test_request_channel_form_duplicate_channel_submission(self):
+        url = reverse("request_channel")
+
+        response = self.client.post(url, {
+            "channel_name": self.public_channel.name,
+            "server" : "irc.freenode.net:6697",
+            "name": "test_name",
+            "email" : "test@example.com",
+            "nick" : "test_nick",
+            "op" : True
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, "form", "channel_name", "Sorry, this channel is already being monitored.")
+
+    def test_request_channel_form_invalid_formatted_server(self):
+        url = reverse("request_channel")
+
+        response = self.client.post(url, {
+            "channel_name": "test_channel_name",
+            "server" : "irc.freenode.net",
+            "name": "test_name",
+            "email" : "test@example.com",
+            "nick" : "test_nick",
+            "op" : True
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, "form", "server", "Incorrect format, should be <url>:<port>")
+
