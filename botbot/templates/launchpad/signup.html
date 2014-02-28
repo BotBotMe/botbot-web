@@ -48,8 +48,9 @@
         <li><a href="{% channel_url channel 'log_all' %}">{{ channel.name }}</a></li>
     {% endfor %}
     </ul>
-
+    {% comment %}
     Are you a channel op? Want BotBot to log your channel? <a href="{% url 'request_channel' %}">Request it here</a>
+    {% endcomment %}
 {% endblock content %}
 {% block tail %}
 <script>
