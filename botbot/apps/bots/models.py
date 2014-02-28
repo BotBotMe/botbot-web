@@ -10,6 +10,7 @@ from botbot.apps.plugins import models as plugins_models
 
 PRETTY_SLUG = {
     "chat.freenode.net": "freenode",
+    "morgan.freenode.net": "freenode",
     "irc.oftc.net": "oftc",
     "irc.mozilla.org": "mozilla",
     "irc.coldfront.net": "coldfront",
