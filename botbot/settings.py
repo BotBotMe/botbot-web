@@ -254,7 +254,7 @@ REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL',
 REDIS_SSE_URL = os.environ.get('REDIS_SSE',
                                     'redis://localhost:6379/2')
 # Life span of auth token for realtime endpoint in seconds
-TOKEN_TTL = 20
+TOKEN_TTL = 120
 SSE_ENDPOINT = os.environ.get('SSE_ENDPOINT', '/push/{token}')
 
 #==============================================================================
