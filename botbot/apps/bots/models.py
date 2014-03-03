@@ -13,6 +13,7 @@ from botbot.apps.logs import utils as log_utils
 
 PRETTY_SLUG = {
     "chat.freenode.net": "freenode",
+    "morgan.freenode.net": "freenode",
     "irc.oftc.net": "oftc",
     "irc.mozilla.org": "mozilla",
     "irc.coldfront.net": "coldfront",

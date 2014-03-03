@@ -1,4 +1,5 @@
 import base64
+import re
 import uuid
 
 from django import forms
@@ -6,6 +7,7 @@ from django import forms
 from botbot.apps.accounts import models as accounts_models
 from . import models
 
+server_regex = re.compile(r"^[\w\-\.]*\:\d*$")
 
 class ChannelForm(forms.ModelForm):
     identifiable_url = forms.BooleanField(
@@ -33,6 +35,31 @@ class ChannelForm(forms.ModelForm):
                 self.instance.slug = base64.b32encode(uuid.uuid4().bytes)[:4]\
                     .lower()
         return super(ChannelForm, self).save(*args, **kwargs)
+
+class ChannelRequestForm(forms.Form):
+    channel_name = forms.CharField()
+    server = forms.CharField(label="IRC Server")
+    github = forms.URLField(label="GitHub Repo URL",
+        help_text="If the channel supports a github repo, the url to the repo.",
+        required=False)
+
+    name = forms.CharField(label="Your name")
+    email = forms.EmailField(label="Your e-mail")
+    nick = forms.CharField(label="Your IRC Nick")
+    op = forms.BooleanField(label="Are you a channel op?")
+
+    def clean_channel_name(self):
+        channel_name = self.cleaned_data['channel_name']
+        if models.Channel.objects.filter(name=channel_name).exists():
+            raise forms.ValidationError("Sorry, this channel is already being monitored.")
+
+        return channel_name
+
+    def clean_server(self):
+        server = self.cleaned_data['server']
+        if not server_regex.match(server):
+            raise forms.ValidationError("Incorrect format, should be <url>:<port>")
+        return server
 
 
 class UsersForm(forms.Form):

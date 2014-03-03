@@ -8,7 +8,7 @@ import redis
 from . import models
 
 
-class ActivePluginInline(admin.TabularInline):
+class ActivePluginInline(admin.StackedInline):
     model = models.Channel.plugins.through
     extra = 0
 

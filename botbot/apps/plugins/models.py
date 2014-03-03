@@ -42,3 +42,6 @@ class ActivePlugin(models.Model):
         cache.delete(self.channel.plugin_config_cache_key(self.plugin.slug))
         cache.delete(self.channel.active_plugin_slugs_cache_key)
         return obj
+
+    def __unicode__(self):
+        return u'{0} for {1}'.format(self.plugin.name, self.channel.name)

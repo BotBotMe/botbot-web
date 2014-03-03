@@ -34,5 +34,5 @@ Before logging any public channels, take a couple simple steps to ensure no misu
 1. Have the consent of a channel operator.
 2. Ask the operator to make it clear in the channel topic that it is being logged.
 
-`Freenode's channel guidelines` <http://freenode.net/channel_guidelines.shtml>`_ don't seem to address non-operator users who want to run bots. (see final bullet point) Our preference is to favor honesty and transparency.
+`Freenode's channel guidelines <http://freenode.net/channel_guidelines.shtml>`_ don't seem to address non-operator users who want to run bots. (see final bullet point) Our preference is to favor honesty and transparency.
 
