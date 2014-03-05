@@ -161,6 +161,8 @@ class LogViewer(ChannelMixin, View):
 
 class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
+    permanent = False
+
     def get_redirect_url(self, **kwargs):
         params = self.request.GET.copy()
         try:
@@ -176,7 +178,6 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
         url = reverse_channel(self.channel, 'log_day',
             kwargs=self._kwargs_with_date(date))
         return '{0}?{1}'.format(url, params.urlencode())
-
 
 
 class DayLogViewer(LogDateMixin, LogViewer, ListView):
