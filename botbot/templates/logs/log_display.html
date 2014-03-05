@@ -6,8 +6,8 @@
       <h3 class="utc" id="date-{{ line.timestamp|date:"Ymd" }}" data-date="{{ line.timestamp|date:"Ymd" }}"><span>{{ line.timestamp|date:"F jS, Y" }}</span></h3>
     {% endif %}
     {% endifchanged %}
-    <li class="{% ifequal line.pk highlight_pk %}highlight {% endifequal %}{% if line.action %}action {% endif %}{% if same_nick %}same {% endif %}{{ line.command|lower }}" data-nick="{{ line.nick }}" data-type="{% if line.command = "PRIVMSG" %}message{% else %}info{% endif %}">
-    <a href="{{ line.get_absolute_url }}" class="moment" rel="nofollow">
+    <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{% if same_nick %}same {% endif %}{{ line.command|lower }}" data-nick="{{ line.nick }}" data-type="{% if line.command = "PRIVMSG" %}message{% else %}info{% endif %}">
+    <a href="{{ request.get_full_path }}#{{ line.pk }}" class="moment" rel="nofollow">
         <time datetime="{{ line.timestamp|date:"c" }}">{{ line.timestamp|date:"g:i A" }}</time>
     </a>
     {% if line.action %}

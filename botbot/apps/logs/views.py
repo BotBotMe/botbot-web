@@ -273,42 +273,6 @@ class DayLogViewer(LogDateMixin, LogViewer, ListView):
 
         return '{0}?{1}'.format(url, params.urlencode())
 
-class MessageLogViewer(LogViewer):
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.highlight = int(kwargs['message_id'])
-        except ValueError:
-            raise Http404
-        return super(MessageLogViewer, self).dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        self.page_base_url = reverse_channel(self.channel, 'log_all')
-        msg_id = self.kwargs['message_id']
-        half_page_count = self.paginate_by / 2
-        queryset = super(MessageLogViewer, self).get_queryset()
-        try:
-            message = queryset.get(pk=msg_id)
-            timestamp = message.timestamp
-        except models.Log.DoesNotExist:
-            raise Http404
-        # This is pretty inefficient, but it gets us the queryset we want
-        messages_before = (queryset.filter(timestamp__lt=timestamp)
-                                   .order_by('-timestamp'))
-        messages_after = (queryset.filter(timestamp__gt=timestamp)
-                                  .order_by('timestamp'))
-
-        try:
-            first = list(messages_before[:half_page_count])[-1]
-        except IndexError:
-            first = message
-        try:
-            last = list(messages_after[:half_page_count - 1])[-1]
-        except IndexError:
-            last = message
-        return queryset.filter(timestamp__range=(first.timestamp,
-                                                 last.timestamp))
-
-
 class SearchLogViewer(LogViewer):
     show_first_header = True
     newest_first = True

@@ -82,7 +82,7 @@ class Channel(models.Model):
 
     def get_absolute_url(self):
         from botbot.apps.bots.utils import reverse_channel
-        return reverse_channel(self, 'log_all')
+        return reverse_channel(self, 'log_current')
 
     @property
     def active_plugin_slugs_cache_key(self):

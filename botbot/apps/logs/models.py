@@ -3,6 +3,8 @@ from djorm_pgfulltext.fields import VectorField
 from django.db import models
 from django.conf import settings
 from django.template.loader import render_to_string
+from botbot.apps.bots.utils import reverse_channel
+
 
 from . import utils
 
@@ -43,17 +45,17 @@ class Log(models.Model):
     class Meta:
         ordering = ('-timestamp',)
 
-    @models.permalink
-    def get_absolute_url(self):
-
-        if self.channel.is_public:
-            bot_slug = self.channel.chatbot.slug
-            chan_slug = self.channel.name.strip("#")
-        else:
-            bot_slug = 'private'
-            chan_slug = self.channel.slug
-
-        return ('log_message', [bot_slug, chan_slug, self.pk])
+    # TODO: We have to include a page to make this work
+    # @models.permalink
+    # def get_absolute_url(self):
+    #     kwargs = {
+    #         'day' : self.timestamp.day,
+    #         'month' : self.timestamp.month,
+    #         'year' : self.timestamp.year,
+    #         'bot_slug' : self.channel.chatbot.slug,
+    #         'channel_slug' : self.channel.slug
+    #     }
+    #     return "%s#%s" % (reverse_channel(self.channel, 'log_day', kwargs=kwargs), self.id)
 
     def as_html(self):
         return render_to_string("logs/log_display.html",
