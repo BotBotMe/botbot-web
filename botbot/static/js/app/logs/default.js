@@ -90,16 +90,21 @@ $$.Views.LogViewer = Backbone.View.extend({
     $logEl: $('#Log'),
 
     events: {
-        'click .toggle-preview': 'toggleImagePreview'
+        'click .toggle-preview': 'toggleImagePreview',
+        'click .moment' : 'messageView'
     },
 
     initialize: function (options) {
         log('LogViewer:initialize');
-        var $highlightedMessage;
         _.bindAll(this, "scrollLoad", "pageLoad",
                         "createDateHeaderWaypoints",
-                        "setDateHeader", "checkPageSplit", "insertCache");
+                        "setDateHeader", "checkPageSplit",
+                        "insertCache", "highlight",
+                        "messageView");
         $$.on('date:change', this.setDateHeader);
+
+        $(window).bind('hashchange', this.highlight)
+
         this.current = options.current;
         this.eventSourceUrl = options.source;
         this.newestFirst = options.newestFirst;
@@ -122,15 +127,19 @@ $$.Views.LogViewer = Backbone.View.extend({
             $el: $('#Log-Prep-Next')
         });
 
+        var self = this;
+        var prevLoaded = $.Deferred(function(dfd) {
+            self.prevCache.on('loaded', dfd.resolve)
+        })
+        var nextLoaded = $.Deferred(function(dfd) {
+            self.nextCache.on('loaded', dfd.resolve)
+        })
+
+        $.when(prevLoaded, nextLoaded).then(function() {
+            self.highlight()
+        })
+
         this.createDateHeaderWaypoints();
-        // jump to highlighted message
-        $highlightedMessage = this.$logEl.find('li.highlight');
-        if ($highlightedMessage.length) {
-            // move to middle of element
-            $('html, body').animate({
-                scrollTop: $highlightedMessage.offset().top + $highlightedMessage.height() - this.$el.offset().top - ($(window).height() - this.$el.offset().top) / 2
-            }, 0);
-        }
         // scroll to the bottom of the page if these are current logs
         if (this.current) {
             $$.trigger('at-bottom');
@@ -143,6 +152,26 @@ $$.Views.LogViewer = Backbone.View.extend({
         window.onscroll = this.scrollLoad;
         // make sure we add more items depending on initial scroll
         this.scrollLoad();
+    },
+
+    messageView: function(event) {
+        // Check to see if we are still on the same path
+        var href = $(event.target).parent().attr('href');
+        if (window.location.href.indexOf(href) > 0) {
+            this.highlight();
+            return false;
+        }
+    },
+
+    highlight: function(event) {
+        this.$logEl.find('.highlight').removeClass('highlight');
+        var highlighted = this.$logEl.find(window.location.hash);
+        highlighted.addClass('highlight')
+
+        // move to middle of element
+        $('html, body').animate({
+            scrollTop: highlighted.offset().top + highlighted.height() - this.$el.offset().top - ($(window).height() - this.$el.offset().top) / 2
+        }, 0);
     },
 
     toggleImagePreview: function (event) {
