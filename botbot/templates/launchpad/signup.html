@@ -45,7 +45,7 @@
     More public channels:
     <ul class="channel-list-compact">
     {% for channel in public_not_featured_channels %}
-        <li><a href="{% channel_url channel 'log_all' %}">{{ channel.name }}</a></li>
+        <li><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></li>
     {% endfor %}
     </ul>
 
