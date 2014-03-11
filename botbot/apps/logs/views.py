@@ -79,23 +79,23 @@ class LogViewer(ChannelMixin, View):
         return self.channel.filtered_logs()
 
     def get_context_data(self, **kwargs):
-        # message to highlight
-        kwargs.update({'highlight_pk': getattr(self, 'highlight', -1)})
-        if self.show_timeline:
-            kwargs.update(self._timeline_context())
+        context = super(LogViewer, self).get_context_data(**kwargs)
 
-        kwargs["size"] = self.channel.current_size()
-        kwargs["big"] = (kwargs["size"] >= settings.BIG_CHANNEL)
+        # message to highlight
+        if self.show_timeline:
+            context.update(self._timeline_context())
+
+        context["size"] = self.channel.current_size()
+        context["big"] = (context["size"] >= settings.BIG_CHANNEL)
 
         if not self.request.is_ajax():
-            kwargs.update({
+            context.update({
                 'is_current': getattr(self, 'is_current', False),
                 'search_form': self.form,
                 'tz_form': accounts_forms.TimezoneForm(self.request),
                 'show_first_header': self.show_first_header,
                 'newest_first': self.newest_first,
             })
-        context = super(LogViewer, self).get_context_data(**kwargs)
         context.update({
             'prev_page': self.prev_page,
             'next_page': self.next_page,
@@ -139,6 +139,7 @@ class LogViewer(ChannelMixin, View):
     def render_to_response(self, context, **response_kwargs):
         response = super(LogViewer, self).render_to_response(context,
                                                              **response_kwargs)
+
         if self.request.is_ajax():
             # easily parsed with Javascript
             if self.next_page:
@@ -223,6 +224,9 @@ class DayLogViewer(LogDateMixin, LogViewer, ListView):
         self.prev_page = self.get_previous_page_link(page)
         self.next_page = self.get_next_page_link(page)
 
+        if not self.next_page:
+            self.is_current = True
+
         return paginator, page, object_list, has_other_pages
 
     def get_previous_page_link(self, page):
@@ -266,8 +270,7 @@ class DayLogViewer(LogDateMixin, LogViewer, ListView):
                 url = reverse_channel(self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
                 params['page'] = 1 # If new date, always start at page 1.
             else:
-                # If we have no more pages, we should be listening to the live feed.
-                url = reverse('log_update', kwargs={'channel_pk' : self.channel.pk})
+                return ""
         else:
             params['page']  = page.next_page_number()
 
