@@ -29,6 +29,9 @@ class Help(ChannelMixin, TemplateView):
 
 class LogDateMixin(object):
 
+    def _get_base_queryset(self):
+        return self.channel.filtered_logs()
+
     def _kwargs_with_date(self, date):
         kwargs = self.kwargs.copy()
         kwargs.update({
@@ -42,7 +45,7 @@ class LogDateMixin(object):
         """
         Find the previous day, that has content.
         """
-        qs = super(LogDateMixin, self).get_queryset().filter(timestamp__lt=self.date)
+        qs = self._get_base_queryset().filter(timestamp__lt=self.date)
         if qs.count() > 1:
             return datetime_to_date(qs[0].timestamp)
 
@@ -50,33 +53,44 @@ class LogDateMixin(object):
         """
         Find the previous day, that has content.
         """
-        qs = super(LogDateMixin, self).get_queryset().filter(timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
+        qs = self._get_base_queryset().filter(timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
         if qs.count() > 1:
             return datetime_to_date(qs[0].timestamp)
 
     def _date_query_set(self, date):
-        qs = super(LogDateMixin, self).get_queryset()
+        qs = self._get_base_queryset()
         return qs.filter(timestamp__gte=date,
             timestamp__lt=date + datetime.timedelta(days=1))
 
 
 class LogViewer(ChannelMixin, View):
     context_object_name = "message_list"
+    template_name = "logs/logs.html"
     newest_first = False
     show_timeline = True
     show_first_header = False   # Display date header above first line
 
+    def __init__(self, *args, **kwargs):
+        super(LogViewer, self).__init__(*args, **kwargs)
+        self.next_page = ""
+        self.prev_page = ""
+
     def dispatch(self, request, *args, **kwargs):
         self.form = forms.SearchForm(request.GET)
-        self.page_base_url = request.path
         self.timezone = get_current_timezone_name()
+
         if request.is_ajax():
             self.show_timeline = False
             self.template_name = 'logs/log_display.html'
+
         return super(LogViewer, self).dispatch(request, *args, **kwargs)
 
-    def get_queryset(self):
-        return self.channel.filtered_logs()
+    def get_ordered_queryset(self, queryset):
+        order = 'timestamp'
+        if self.newest_first:
+            order = '-timestamp'
+
+        return queryset.order_by(order)
 
     def get_context_data(self, **kwargs):
         context = super(LogViewer, self).get_context_data(**kwargs)
@@ -104,7 +118,8 @@ class LogViewer(ChannelMixin, View):
         return context
 
     def _timeline_context(self):
-        """Context (template) vars needed for timeline display.
+        """
+        Context (template) vars needed for timeline display.
         """
 
         timeline = self.channel.get_months_active()
@@ -163,11 +178,13 @@ class LogViewer(ChannelMixin, View):
 class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
     permanent = False
+    newest_first = True # Make sure we find the newest record.
 
     def get_redirect_url(self, **kwargs):
         params = self.request.GET.copy()
+        queryset = self.get_ordered_queryset(self.channel.filtered_logs())
         try:
-            date = datetime_to_date(self.get_queryset()[0].timestamp)
+            date = datetime_to_date(queryset[0].timestamp)
             count = self._date_query_set(date).count()
             pages = count / PAGINATE_BY
             if count % PAGINATE_BY:
@@ -183,10 +200,10 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
 class DayLogViewer(LogDateMixin, LogViewer, ListView):
     show_first_header = True
-    template_name = "logs/logs.html"
     paginate_by = PAGINATE_BY
 
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
+        self.page_base_url = request.path
         try:
             self.tz = pytz.timezone(self.request.GET.get('tz', 'UTC'))
         except (KeyError, pytz.UnknownTimeZoneError):
@@ -200,15 +217,11 @@ class DayLogViewer(LogDateMixin, LogViewer, ListView):
         except ValueError:
             raise Http404
 
-        return super(DayLogViewer, self).dispatch(*args, **kwargs)
+        return super(DayLogViewer, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-
-        order = 'timestamp'
-        if self.newest_first:
-            order = '-timestamp'
-
-        qs = super(DayLogViewer, self).get_queryset().order_by(order)
+        qs = self.channel.filtered_logs()
+        qs = self.get_ordered_queryset(qs)
         start = self.date
         end = start + datetime.timedelta(days=1)
         return qs.filter(timestamp__gte=start, timestamp__lt=end)
@@ -276,7 +289,7 @@ class DayLogViewer(LogDateMixin, LogViewer, ListView):
 
         return '{0}?{1}'.format(url, params.urlencode())
 
-class SearchLogViewer(LogViewer):
+class SearchLogViewer(LogViewer, ListView):
     show_first_header = True
     newest_first = True
     allow_empty = True
@@ -301,21 +314,14 @@ class SearchLogViewer(LogViewer):
         return self.channel.log_set.search(self.search_term)\
             .filter(self.channel.visible_commands_filter)
 
-    def paginate_queryset(self, queryset, page_size):
-        (paginator, page, object_list, has_other_pages) = (
-            self._paginate_queryset(queryset, page_size))
-        if len(object_list) == 0:
-            self.prev_page = ""
-            self.next_page = ""
-        else:
-            self.prev_page, self.next_page = self.get_page_links(object_list)
-        return paginator, page, object_list, has_other_pages
+class MissedLogViewer(LogViewer, ListView):
 
-class MissedLogViewer(LogViewer):
+    template_name = "logs/logs.html"
     show_first_header = True
+    newest_first = False
 
     def get_queryset(self):
-        queryset = super(MissedLogViewer, self).get_queryset()
+        queryset = self.channel.log_set.all()
         nick = self.kwargs['nick']
         try:
             # cover nicks in the form: nick OR nick_ OR nick|<something>
@@ -339,8 +345,7 @@ class MissedLogViewer(LogViewer):
         # Only fetch results from when the user logged out.
         self.fetch_after = (last_exit.timestamp -
             datetime.timedelta(milliseconds=1))
-        return queryset.filter(**date_filter)
-
+        return self.get_ordered_queryset(queryset.filter(**date_filter))
 
 class LogUpdate(ChannelMixin, redisqueue.RedisQueueView):
 
