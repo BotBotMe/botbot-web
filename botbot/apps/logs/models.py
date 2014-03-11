@@ -3,7 +3,8 @@ from djorm_pgfulltext.fields import VectorField
 from django.db import models
 from django.conf import settings
 from django.template.loader import render_to_string
-from botbot.apps.bots.utils import reverse_channel
+from django.core.urlresolvers import reverse
+from botbot.apps.bots.utils import channel_url_kwargs
 
 
 from . import utils
@@ -45,25 +46,22 @@ class Log(models.Model):
     class Meta:
         ordering = ('-timestamp',)
 
-    # TODO: We have to include a page to make this work
-    # @models.permalink
-    # def get_absolute_url(self):
-    #     kwargs = {
-    #         'day' : self.timestamp.day,
-    #         'month' : self.timestamp.month,
-    #         'year' : self.timestamp.year,
-    #         'bot_slug' : self.channel.chatbot.slug,
-    #         'channel_slug' : self.channel.slug
-    #     }
-    #     return "%s#%s" % (reverse_channel(self.channel, 'log_day', kwargs=kwargs), self.id)
+    def get_absolute_url(self):
+        kwargs = channel_url_kwargs(self.channel)
+        kwargs['msg_pk'] = self.pk
 
-    def as_html(self):
+        return reverse('log_message_permalink', kwargs=kwargs)
+
+    def as_html(self, live=False):
         return render_to_string("logs/log_display.html",
-                                {'message_list': [self], "highlight_pk": -1})
+                                {
+                                    'message_list': [self],
+                                    'live' : live
+                                })
 
     def notify(self):
         """Send update to Redis queue to be picked up by SSE"""
-        utils.send_event_with_id("log", self.as_html(),
+        utils.send_event_with_id("log", self.as_html(live=True),
             self.timestamp.isoformat(),
             channel="channel_update:{0}".format(self.channel_id))
 

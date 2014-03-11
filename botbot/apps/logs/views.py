@@ -1,5 +1,6 @@
-import json
 import datetime
+import json
+import math
 from urllib import urlencode
 
 from django.core.urlresolvers import reverse
@@ -19,7 +20,6 @@ from botbot.apps.bots.views import ChannelMixin
 from botbot.apps.logs.utils import datetime_to_date
 from . import forms, models
 
-PAGINATE_BY = 150
 
 class Help(ChannelMixin, TemplateView):
     """
@@ -33,12 +33,11 @@ class LogDateMixin(object):
         return self.channel.filtered_logs()
 
     def _kwargs_with_date(self, date):
-        kwargs = self.kwargs.copy()
-        kwargs.update({
+        kwargs = {
             'year' : date.year,
             'month' : date.month,
             'day' : date.day
-        })
+        }
         return kwargs
 
     def _get_previous_date(self):
@@ -69,6 +68,7 @@ class LogViewer(ChannelMixin, View):
     newest_first = False
     show_timeline = True
     show_first_header = False   # Display date header above first line
+    paginate_by = 150
 
     def __init__(self, *args, **kwargs):
         super(LogViewer, self).__init__(*args, **kwargs)
@@ -174,6 +174,26 @@ class LogViewer(ChannelMixin, View):
         response['X-Timezone'] = self.timezone
         return response
 
+    def _pages_for_queryset(self, queryset):
+        return int(math.ceil(queryset.count() / float(self.paginate_by)))
+
+class MessagePermalinkView(LogDateMixin, LogViewer, RedirectView):
+    """
+    Reverse a message id to a pagination result.
+    """
+    permanent = True
+
+    def get_redirect_url(self, **kwargs):
+        params = self.request.GET.copy()
+        line = self.channel.log_set.get(pk=self.kwargs['msg_pk'])
+        try:
+            date = datetime_to_date(line.timestamp)
+            params['page'] = self._pages_for_queryset(self._date_query_set(date))
+        except IndexError:
+            raise Http404("No logs yet.")
+        url = reverse_channel(self.channel, 'log_day',
+            kwargs=self._kwargs_with_date(date))
+        return '{0}?{1}#{2}'.format(url, params.urlencode(), line.pk)
 
 class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
@@ -185,12 +205,7 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
         queryset = self.get_ordered_queryset(self.channel.filtered_logs())
         try:
             date = datetime_to_date(queryset[0].timestamp)
-            count = self._date_query_set(date).count()
-            pages = count / PAGINATE_BY
-            if count % PAGINATE_BY:
-                pages += 1
-
-            params['page'] = pages
+            params['page'] = self._pages_for_queryset(self._date_query_set(date))
         except IndexError:
             raise Http404("No logs yet.")
         url = reverse_channel(self.channel, 'log_day',
@@ -200,7 +215,6 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
 class DayLogViewer(LogDateMixin, LogViewer, ListView):
     show_first_header = True
-    paginate_by = PAGINATE_BY
 
     def dispatch(self, request, *args, **kwargs):
         self.page_base_url = request.path
@@ -347,6 +361,7 @@ class MissedLogViewer(LogViewer, ListView):
             datetime.timedelta(milliseconds=1))
         return self.get_ordered_queryset(queryset.filter(**date_filter))
 
+
 class LogUpdate(ChannelMixin, redisqueue.RedisQueueView):
 
     @method_decorator(csrf_exempt)
@@ -365,7 +380,7 @@ class LogUpdate(ChannelMixin, redisqueue.RedisQueueView):
             try:
                 self.sse.set_event_id(missed[-1].timestamp.isoformat())
                 for line in missed:
-                    self.sse.add_message('log', line.as_html())
+                    self.sse.add_message('log', line.as_html(live=True))
                 yield
             except IndexError:
                 pass

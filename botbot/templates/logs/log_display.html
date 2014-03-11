@@ -7,7 +7,7 @@
     {% endif %}
     {% endifchanged %}
     <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{% if same_nick %}same {% endif %}{{ line.command|lower }}" data-nick="{{ line.nick }}" data-type="{% if line.command = "PRIVMSG" %}message{% else %}info{% endif %}">
-    <a href="{{ request.get_full_path }}#{{ line.pk }}" class="moment" rel="nofollow">
+    <a href="{% if live %} {{ line.get_absolute_url }} {% else %} {{ request.get_full_path }}#{{ line.pk }} {% endif %}" class="moment" rel="nofollow">
         <time datetime="{{ line.timestamp|date:"c" }}">{{ line.timestamp|date:"g:i A" }}</time>
     </a>
     {% if line.action %}
