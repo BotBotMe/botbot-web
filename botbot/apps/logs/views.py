@@ -45,7 +45,7 @@ class LogDateMixin(object):
         Find the previous day, that has content.
         """
         qs = self._get_base_queryset().filter(timestamp__lt=self.date)
-        if qs.count() > 1:
+        if qs.exists():
             return datetime_to_date(qs[0].timestamp)
 
     def _get_next_date(self):
@@ -53,7 +53,7 @@ class LogDateMixin(object):
         Find the previous day, that has content.
         """
         qs = self._get_base_queryset().filter(timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
-        if qs.count() > 1:
+        if qs.exists():
             return datetime_to_date(qs[0].timestamp)
 
     def _date_query_set(self, date):
