@@ -40,7 +40,7 @@ class Log(models.Model):
         fields=('text',),
         config='pg_catalog.english',   # this is default
         search_field='search_index',   # this is default
-        auto_update_search_field=False    # We have a db trigger that does it
+        auto_update_search_field=True
     )
 
     class Meta:
