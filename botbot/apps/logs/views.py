@@ -27,6 +27,38 @@ class Help(ChannelMixin, TemplateView):
     """
     template_name = 'logs/help.html'
 
+class PaginatorPageLinksMixin(object):
+
+    def paginate_queryset(self, queryset, page_size):
+        paginator, page, object_list, has_other_pages = super(PaginatorPageLinksMixin, self).paginate_queryset(queryset, page_size)
+
+        self.next_page = self.get_next_page_link(page)
+        self.prev_page = self.get_previous_page_link(page)
+
+        return paginator, page, object_list, has_other_pages
+
+    def get_next_page_link(self, page):
+        url = self.page_base_url
+        params = self.request.GET.copy()
+
+        if not page.has_next():
+            return ""
+        else:
+            params['page']  = page.next_page_number()
+
+        return '{0}?{1}'.format(url, params.urlencode())
+
+    def get_previous_page_link(self, page):
+        url = self.page_base_url
+        params = self.request.GET.copy()
+
+        if not page.has_previous():
+            return ""
+        else:
+            params['page']  = page.previous_page_number()
+
+        return '{0}?{1}'.format(url, params.urlencode())
+
 class LogDateMixin(object):
 
     def _get_base_queryset(self):
@@ -62,7 +94,7 @@ class LogDateMixin(object):
             timestamp__lt=date + datetime.timedelta(days=1))
 
 
-class LogViewer(ChannelMixin, View):
+class LogViewer(ChannelMixin, object):
     context_object_name = "message_list"
     template_name = "logs/logs.html"
     newest_first = False
@@ -76,6 +108,7 @@ class LogViewer(ChannelMixin, View):
         self.prev_page = ""
 
     def dispatch(self, request, *args, **kwargs):
+        self.page_base_url = request.path
         self.form = forms.SearchForm(request.GET)
         self.timezone = get_current_timezone_name()
 
@@ -213,11 +246,10 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
         return '{0}?{1}'.format(url, params.urlencode())
 
 
-class DayLogViewer(LogDateMixin, LogViewer, ListView):
+class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     show_first_header = True
 
     def dispatch(self, request, *args, **kwargs):
-        self.page_base_url = request.path
         try:
             self.tz = pytz.timezone(self.request.GET.get('tz', 'UTC'))
         except (KeyError, pytz.UnknownTimeZoneError):
@@ -246,10 +278,6 @@ class DayLogViewer(LogDateMixin, LogViewer, ListView):
 
     def paginate_queryset(self, queryset, page_size):
         paginator, page, object_list, has_other_pages = super(DayLogViewer, self).paginate_queryset(queryset, page_size)
-        # if len(object_list) == 0:
-        #     raise Http404('No matching logs for {0}'.format(self.channel))
-        self.prev_page = self.get_previous_page_link(page)
-        self.next_page = self.get_next_page_link(page)
 
         if not self.next_page:
             self.is_current = True
@@ -303,7 +331,7 @@ class DayLogViewer(LogDateMixin, LogViewer, ListView):
 
         return '{0}?{1}'.format(url, params.urlencode())
 
-class SearchLogViewer(LogViewer, ListView):
+class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
     show_first_header = True
     newest_first = True
     allow_empty = True
@@ -328,9 +356,8 @@ class SearchLogViewer(LogViewer, ListView):
         return self.channel.log_set.search(self.search_term)\
             .filter(self.channel.visible_commands_filter)
 
-class MissedLogViewer(LogViewer, ListView):
+class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
 
-    template_name = "logs/logs.html"
     show_first_header = True
     newest_first = False
 
