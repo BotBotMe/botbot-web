@@ -17,7 +17,6 @@ import pytz
 from botbot.apps.accounts import forms as accounts_forms
 from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
-from botbot.apps.logs.utils import datetime_to_date
 from . import forms, models
 
 
@@ -78,7 +77,7 @@ class LogDateMixin(object):
         """
         qs = self._get_base_queryset().filter(timestamp__lt=self.date)
         if qs.exists():
-            return datetime_to_date(qs[0].timestamp)
+            return qs[0].timestamp.date()
 
     def _get_next_date(self):
         """
@@ -86,7 +85,7 @@ class LogDateMixin(object):
         """
         qs = self._get_base_queryset().filter(timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
         if qs.exists():
-            return datetime_to_date(qs[0].timestamp)
+            return qs[0].timestamp.date()
 
     def _date_query_set(self, date):
         qs = self._get_base_queryset()
@@ -220,7 +219,7 @@ class MessagePermalinkView(LogDateMixin, LogViewer, RedirectView):
         params = self.request.GET.copy()
         line = self.channel.log_set.get(pk=self.kwargs['msg_pk'])
         try:
-            date = datetime_to_date(line.timestamp)
+            date = line.timestamp.date()
             params['page'] = self._pages_for_queryset(self._date_query_set(date))
         except IndexError:
             raise Http404("No logs yet.")
@@ -237,7 +236,7 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
         params = self.request.GET.copy()
         queryset = self.get_ordered_queryset(self.channel.filtered_logs())
         try:
-            date = datetime_to_date(queryset[0].timestamp)
+            date = queryset[0].timestamp.date()
             params['page'] = self._pages_for_queryset(self._date_query_set(date))
         except IndexError:
             raise Http404("No logs yet.")
