@@ -28,7 +28,7 @@ class Line(object):
         # Private attributes not accessible to external plugins
         self._chatbot_id = packet['ChatBotId']
         self._raw = packet['Raw']
-        self._channel_name = packet['Channel']
+        self._channel_name = packet['Channel'].strip()
         self._command = packet['Command']
         self._is_message = packet['Command'] == 'PRIVMSG'
         self._received = packet['Received']

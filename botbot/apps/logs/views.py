@@ -257,7 +257,7 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
 
 class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
-    show_first_header = True
+    show_first_header = False
     allow_empty = False
 
     def dispatch(self, request, *args, **kwargs):
@@ -378,6 +378,7 @@ class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         """
         data = super(SearchLogViewer, self).get_context_data(**kwargs)
         data['q'] = self.search_term
+        data['use_absolute_url'] = True
         return data
 
     def get_queryset(self):
@@ -396,6 +397,11 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
 
     show_first_header = True
     newest_first = False
+
+    def get_context_data(self, **kwargs):
+        data = super(MissedLogViewer, self).get_context_data(**kwargs)
+        data['use_absolute_url'] = True
+        return data
 
     def get_queryset(self):
         queryset = self.channel.log_set.all()

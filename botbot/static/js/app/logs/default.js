@@ -26,32 +26,37 @@ $$.Cache = Backbone.Model.extend({
     },
     fetch: function () {
         // Load another page into the cache
-        this.isLoading = true;
-        $.ajax({
-            url: this.url,
-            success: _.bind(function (data, textStatus, jqXHR) {
-                var serverTimezone = jqXHR.getResponseHeader('X-Timezone');
-                this.url = jqXHR.getResponseHeader(this.pageHeader);
-                if (this.url === "" || this.url === null) {
-                    this.isLoading = false;
-                    this.isFinished = true;
-                } else {
-                    if ($$.clientTimezone !== serverTimezone) {
-                        this.adjustTimezone = true;
+        if (this.url) {
+            this.isLoading = true;
+            $.ajax({
+                url: this.url,
+                success: _.bind(function (data, textStatus, jqXHR) {
+                    var serverTimezone = jqXHR.getResponseHeader('X-Timezone');
+                    this.url = jqXHR.getResponseHeader(this.pageHeader);
+                    if (this.url === "" || this.url === null) {
+                        this.isLoading = false;
+                        this.isFinished = true;
+                    } else {
+                        if ($$.clientTimezone !== serverTimezone) {
+                            this.adjustTimezone = true;
+                        }
+                        this.prepPage(data);
+                        this.isLoading = false;
+                        this.trigger('loaded', this);
                     }
-                    this.prepPage(data);
-                    this.isLoading = false;
-                    this.trigger('loaded', this);
-                }
-            }, this),
-            statusCode: {
-                404: _.bind(function () {
-                    this.isLoading = false;
-                    this.isFinished = true;
-                }, this)
-            },
-            dataType: 'html'
-        });
+                }, this),
+                statusCode: {
+                    404: _.bind(function () {
+                        this.isLoading = false;
+                        this.isFinished = true;
+                    }, this)
+                },
+                dataType: 'html'
+            });
+        } else {
+            // Nothing to load, so we can still trigger loaded.
+            this.trigger('loaded', this);
+        }
     },
     isEmpty: function () {
         return this.$el.children('li').length === 0;
