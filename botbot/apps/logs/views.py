@@ -22,15 +22,18 @@ from . import forms, models
 
 
 class Help(ChannelMixin, TemplateView):
+
     """
     Help page for a channel.
     """
     template_name = 'logs/help.html'
 
+
 class PaginatorPageLinksMixin(object):
 
     def paginate_queryset(self, queryset, page_size):
-        paginator, page, object_list, has_other_pages = super(PaginatorPageLinksMixin, self).paginate_queryset(queryset, page_size)
+        paginator, page, object_list, has_other_pages = super(
+            PaginatorPageLinksMixin, self).paginate_queryset(queryset, page_size)
 
         self.next_page = self.get_next_page_link(page)
         self.prev_page = self.get_previous_page_link(page)
@@ -44,7 +47,7 @@ class PaginatorPageLinksMixin(object):
         if not page.has_next():
             return ""
         else:
-            params['page']  = page.next_page_number()
+            params['page'] = page.next_page_number()
 
         return '{0}?{1}'.format(url, params.urlencode())
 
@@ -55,9 +58,10 @@ class PaginatorPageLinksMixin(object):
         if not page.has_previous():
             return ""
         else:
-            params['page']  = page.previous_page_number()
+            params['page'] = page.previous_page_number()
 
         return '{0}?{1}'.format(url, params.urlencode())
+
 
 class LogDateMixin(object):
 
@@ -66,9 +70,9 @@ class LogDateMixin(object):
 
     def _kwargs_with_date(self, date):
         kwargs = {
-            'year' : date.year,
-            'month' : date.month,
-            'day' : date.day
+            'year': date.year,
+            'month': date.month,
+            'day': date.day
         }
         return kwargs
 
@@ -84,14 +88,15 @@ class LogDateMixin(object):
         """
         Find the previous day, that has content.
         """
-        qs = self._get_base_queryset().filter(timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
+        qs = self._get_base_queryset().filter(
+            timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
         if qs.exists():
             return qs[0].timestamp.date()
 
     def _date_query_set(self, date):
         qs = self._get_base_queryset()
         return qs.filter(timestamp__gte=date,
-            timestamp__lt=date + datetime.timedelta(days=1))
+                         timestamp__lt=date + datetime.timedelta(days=1))
 
 
 class LogViewer(ChannelMixin, object):
@@ -168,10 +173,10 @@ class LogViewer(ChannelMixin, object):
         last_month = timeline[timeline.keyOrder[-1]].pop()
         if last_month >= last_week:
             last_month_adjusted = (last_week -
-                                    datetime.timedelta(days=1))
+                                   datetime.timedelta(days=1))
         elif last_month >= last_monday:
             last_month_adjusted = (last_monday -
-                                    datetime.timedelta(days=1))
+                                   datetime.timedelta(days=1))
         else:
             last_month_adjusted = last_month
 
@@ -210,7 +215,9 @@ class LogViewer(ChannelMixin, object):
     def _pages_for_queryset(self, queryset):
         return int(math.ceil(queryset.count() / float(self.paginate_by)))
 
+
 class MessagePermalinkView(LogDateMixin, LogViewer, RedirectView):
+
     """
     Reverse a message id to a pagination result.
     """
@@ -221,28 +228,31 @@ class MessagePermalinkView(LogDateMixin, LogViewer, RedirectView):
         line = self.channel.log_set.get(pk=self.kwargs['msg_pk'])
         try:
             date = line.timestamp.date()
-            params['page'] = self._pages_for_queryset(self._date_query_set(date))
+            params['page'] = self._pages_for_queryset(
+                self._date_query_set(date))
         except IndexError:
             raise Http404("No logs yet.")
         url = reverse_channel(self.channel, 'log_day',
-            kwargs=self._kwargs_with_date(date))
+                              kwargs=self._kwargs_with_date(date))
         return '{0}?{1}#{2}'.format(url, params.urlencode(), line.pk)
+
 
 class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
     permanent = False
-    newest_first = True # Make sure we find the newest record.
+    newest_first = True  # Make sure we find the newest record.
 
     def get_redirect_url(self, **kwargs):
         params = self.request.GET.copy()
         queryset = self.get_ordered_queryset(self.channel.filtered_logs())
         try:
             date = queryset[0].timestamp.date()
-            params['page'] = self._pages_for_queryset(self._date_query_set(date))
+            params['page'] = self._pages_for_queryset(
+                self._date_query_set(date))
         except IndexError:
             raise Http404("No logs yet.")
         url = reverse_channel(self.channel, 'log_day',
-            kwargs=self._kwargs_with_date(date))
+                              kwargs=self._kwargs_with_date(date))
         return '{0}?{1}'.format(url, params.urlencode())
 
 
@@ -260,7 +270,8 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             month = int(self.kwargs['month'])
             day = int(self.kwargs['day'])
 
-            self.date = self.tz.localize(datetime.datetime(year=year, month=month, day=day))
+            self.date = self.tz.localize(
+                datetime.datetime(year=year, month=month, day=day))
         except ValueError:
             raise Http404
 
@@ -274,14 +285,14 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             if is_empty:
                 try:
                     closet_date = queryset = self.get_ordered_queryset(self.channel.filtered_logs()
-                            .filter(timestamp__gte=self.date))[0].timestamp
+                                                                       .filter(timestamp__gte=self.date))[0].timestamp
                     url = reverse_channel(self.channel, 'log_day',
-                        kwargs=self._kwargs_with_date(closet_date))
+                                          kwargs=self._kwargs_with_date(closet_date))
                     return redirect(url)
 
                 except IndexError:
                     raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
-                        % {'class_name': self.__class__.__name__})
+                                  % {'class_name': self.__class__.__name__})
         context = self.get_context_data()
         return self.render_to_response(context)
 
@@ -297,7 +308,8 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         return self.get_paginator(qs, self.get_paginate_by(qs))
 
     def paginate_queryset(self, queryset, page_size):
-        paginator, page, object_list, has_other_pages = super(DayLogViewer, self).paginate_queryset(queryset, page_size)
+        paginator, page, object_list, has_other_pages = super(
+            DayLogViewer, self).paginate_queryset(queryset, page_size)
 
         if not self.next_page:
             self.is_current = True
@@ -324,7 +336,8 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             paginator = self._date_paginator(date)
             params['page'] = paginator.num_pages
 
-            url = reverse_channel(self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+            url = reverse_channel(
+                self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
         else:
             params['page'] = page.previous_page_number()
 
@@ -342,14 +355,16 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         if not page.has_next():
             date = self._get_next_date()
             if date:
-                url = reverse_channel(self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
-                params['page'] = 1 # If new date, always start at page 1.
+                url = reverse_channel(
+                    self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+                params['page'] = 1  # If new date, always start at page 1.
             else:
                 return ""
         else:
-            params['page']  = page.next_page_number()
+            params['page'] = page.next_page_number()
 
         return '{0}?{1}'.format(url, params.urlencode())
+
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
     show_first_header = True
@@ -375,6 +390,7 @@ class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
             self.search_term = ""
         return self.channel.log_set.search(self.search_term)\
             .filter(self.channel.visible_commands_filter)
+
 
 class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
 
@@ -405,7 +421,7 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
             date_filter = {'timestamp__gte': last_exit.timestamp}
         # Only fetch results from when the user logged out.
         self.fetch_after = (last_exit.timestamp -
-            datetime.timedelta(milliseconds=1))
+                            datetime.timedelta(milliseconds=1))
         return self.get_ordered_queryset(queryset.filter(**date_filter))
 
 
