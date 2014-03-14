@@ -6,6 +6,7 @@ from urllib import urlencode
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.timezone import get_current_timezone_name
 from django.views.generic import View, ListView, TemplateView, RedirectView
@@ -247,6 +248,7 @@ class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
 class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     show_first_header = True
+    allow_empty = False
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -263,6 +265,25 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             raise Http404
 
         return super(DayLogViewer, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        allow_empty = self.get_allow_empty()
+        if not allow_empty:
+            is_empty = not self.object_list.exists()
+            if is_empty:
+                try:
+                    closet_date = queryset = self.get_ordered_queryset(self.channel.filtered_logs()
+                            .filter(timestamp__gte=self.date))[0].timestamp
+                    url = reverse_channel(self.channel, 'log_day',
+                        kwargs=self._kwargs_with_date(closet_date))
+                    return redirect(url)
+
+                except IndexError:
+                    raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
+                        % {'class_name': self.__class__.__name__})
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
     def get_queryset(self):
         qs = self.channel.filtered_logs()
