@@ -133,7 +133,6 @@ class LogViewer(ChannelMixin, object):
     def get_context_data(self, **kwargs):
         context = super(LogViewer, self).get_context_data(**kwargs)
 
-        # message to highlight
         if self.show_timeline:
             context.update(self._timeline_context())
 

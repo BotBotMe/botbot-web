@@ -132,18 +132,7 @@ $$.Views.LogViewer = Backbone.View.extend({
             $el: $('#Log-Prep-Next')
         });
 
-        var self = this;
-        var prevLoaded = $.Deferred(function(dfd) {
-            self.prevCache.on('loaded', dfd.resolve)
-        })
-        var nextLoaded = $.Deferred(function(dfd) {
-            self.nextCache.on('loaded', dfd.resolve)
-        })
-
-        $.when(prevLoaded, nextLoaded).then(function() {
-            self.highlight()
-        })
-
+        this.highlight()
         this.createDateHeaderWaypoints();
         // scroll to the bottom of the page if these are current logs
         if (this.current) {
@@ -171,12 +160,14 @@ $$.Views.LogViewer = Backbone.View.extend({
     highlight: function(event) {
         this.$logEl.find('.highlight').removeClass('highlight');
         var highlighted = this.$logEl.find(window.location.hash);
-        highlighted.addClass('highlight')
+        if (highlighted.length > 0) {
+            highlighted.addClass('highlight')
 
-        // move to middle of element
-        $('html, body').animate({
-            scrollTop: highlighted.offset().top + highlighted.height() - this.$el.offset().top - ($(window).height() - this.$el.offset().top) / 2
-        }, 0);
+            // move to middle of element
+            $('html, body').animate({
+                scrollTop: highlighted.offset().top + highlighted.height() - this.$el.offset().top - ($(window).height() - this.$el.offset().top) / 2
+            }, 0);
+        }
     },
 
     toggleImagePreview: function (event) {
