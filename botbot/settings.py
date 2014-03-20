@@ -251,11 +251,11 @@ REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL',
                                         'redis://localhost:6379/0')
 REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL',
                                           'redis://localhost:6379/1')
-REDIS_SSE_URL = os.environ.get('REDIS_SSE',
+REDIS_SSE_URL = os.environ.get('REDIS_SSEQUEUE_URL',
                                     'redis://localhost:6379/2')
 # Life span of auth token for realtime endpoint in seconds
 TOKEN_TTL = 120
-SSE_ENDPOINT = os.environ.get('SSE_ENDPOINT', '/push/{token}')
+SSE_ENDPOINT = os.environ.get('SSE_URL', 'http://localhost:5300') + '/push/{token}'
 
 #==============================================================================
 # Third party app settings

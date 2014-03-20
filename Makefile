@@ -38,10 +38,13 @@ clean-pyc:
 ### GO SUPPORT
 
 $(LOCAL_BIN)/botbot-bot:
-	GOPATH=$(VIRTUAL_ENV) go get github.com/lincolnloop/botbot-bot
+	GOPATH=$(VIRTUAL_ENV) go get github.com/BotBotMe/botbot-bot
 
 test-bot:
-	GOPATH=$(VIRTUAL_ENV) go test github.com/lincolnloop/botbot-bot
+	GOPATH=$(VIRTUAL_ENV) go test github.com/BotBotMe/botbot-bot
+
+$(LOCAL_BIN)/botbot-eventsource:
+	GOPATH=$(VIRTUAL_ENV) go get github.com/BotBotMe/botbot-eventsource
 
 ### LOCAL LESS SUPPORT
 $(NPM_BIN):
@@ -84,7 +87,7 @@ jshint:
 local-settings: .env
 
 ### General Tasks
-dependencies: less-install pip-install local-settings $(LOCAL_BIN)/botbot-bot
+dependencies: less-install pip-install local-settings $(LOCAL_BIN)/botbot-bot $(LOCAL_BIN)/botbot-eventsource
 
 run: dependencies
 	honcho start
