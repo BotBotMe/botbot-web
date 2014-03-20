@@ -179,7 +179,7 @@ $$.Views.LogViewer = Backbone.View.extend({
             log('received'); 
             log(e);
             log(this);
-            var $el = $(JSON.parse(e.data).Html),
+            var $el = $(e.data),
                 $last = self.$logEl.find('li:last'),
                 prevDate = moment($last.find('time').attr('datetime'));
             $el.each(function (idx, el) {
