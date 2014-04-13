@@ -263,6 +263,7 @@ class SearchLogViewer(LogViewer):
             self.search_term = self.form.cleaned_data.get("q", "")
         else:
             self.search_term = ""
+        self.search_term = self.search_term.replace('%', '%%')
         return self.channel.log_set.search(self.search_term)\
             .filter(self.channel.visible_commands_filter)
 
