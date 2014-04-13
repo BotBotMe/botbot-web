@@ -269,7 +269,7 @@ class SearchLogViewer(LogViewer):
         filter_args = self.channel.visible_commands_filter
 
         # If a user is mentioned, filter those users first
-        matches = re.match(r'(\bnick:([\w\-]+)\b)', self.search_term)
+        matches = re.search(r'(\bnick:([\w\-]+)\b)', self.search_term)
         if matches:
             self.search_term = self.search_term.replace(matches.groups()[0], '')
             filter_args = filter_args & Q(nick__icontains=matches.groups()[1])

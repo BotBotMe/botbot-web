@@ -41,13 +41,44 @@ class SearchTestCase(TestCase):
         self.assertTrue(a in results)
         self.assertTrue(b in results)
 
-    def test_nick_search(self):
+    def test_nick_search_front(self):
         a = self._add_log_line("Hello World", nick="Foo")
         b = self._add_log_line("Hello World", nick="Bar")
         url = reverse('log_search', kwargs={
             'bot_slug': self.chatbot.slug,
             'channel_slug': self.public_channel.slug,
         }) + '?q=nick:Foo%20World'
+
+        response = self.client.get(url)
+        context = response.context['object_list']
+
+        self.assertEqual(len(context), 1)
+        self.assertTrue(a in context)
+        self.assertFalse(b in context)
+
+    def test_nick_search_end(self):
+        a = self._add_log_line("Hello World", nick="Foo")
+        b = self._add_log_line("Hello World", nick="Bar")
+        url = reverse('log_search', kwargs={
+            'bot_slug': self.chatbot.slug,
+            'channel_slug': self.public_channel.slug,
+        }) + '?q=World%20nick:Foo'
+
+        response = self.client.get(url)
+        context = response.context['object_list']
+
+        self.assertEqual(len(context), 1)
+        self.assertTrue(a in context)
+        self.assertFalse(b in context)
+
+
+    def test_nick_search_both(self):
+        a = self._add_log_line("Hello World", nick="Foo")
+        b = self._add_log_line("Hello World", nick="Bar")
+        url = reverse('log_search', kwargs={
+            'bot_slug': self.chatbot.slug,
+            'channel_slug': self.public_channel.slug,
+        }) + '?q=World%20nick:Foo%20Hello'
 
         response = self.client.get(url)
         context = response.context['object_list']
