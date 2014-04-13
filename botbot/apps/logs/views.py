@@ -1,5 +1,6 @@
 import json
 import datetime
+import re
 from urllib import urlencode
 
 from django.db.models import Q
@@ -264,8 +265,16 @@ class SearchLogViewer(LogViewer):
         else:
             self.search_term = ""
         self.search_term = self.search_term.replace('%', '%%')
-        return self.channel.log_set.search(self.search_term)\
-            .filter(self.channel.visible_commands_filter)
+
+        filter_args = self.channel.visible_commands_filter
+
+        # If a user is mentioned, filter those users first
+        matches = re.match(r'(\bnick:([\w\-]+)\b)', self.search_term)
+        if matches:
+            self.search_term = self.search_term.replace(matches.groups()[0], '')
+            filter_args = filter_args & Q(nick__icontains=matches.groups()[1])
+
+        return self.channel.log_set.search(self.search_term).filter(filter_args)
 
     def paginate_queryset(self, queryset, page_size):
         (paginator, page, object_list, has_other_pages) = (
