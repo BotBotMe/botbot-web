@@ -11,7 +11,6 @@ class AccountForm(forms.ModelForm):
                    'is_active', 'is_superuser', 'last_login', 'date_joined',
                    'groups', 'user_permissions')
 
-
 class TimezoneForm(forms.Form):
     CHOICES = [('', '')]
     CHOICES.extend(models.TIMEZONE_CHOICES)
@@ -22,7 +21,6 @@ class TimezoneForm(forms.Form):
         self.request = request
         self.fields['timezone'].initial = request.session.get('django_timezone',
                                                               "")
-
     def save(self):
         tz = self.cleaned_data['timezone']
         self.request.session['django_timezone'] = tz
