@@ -90,6 +90,7 @@ class Log(models.Model):
             is_new = True
         if self.nick in settings.EXCLUDE_NICKS:
             self.text = REDACTED_TEXT
+
         obj = super(Log, self).save(*args, **kwargs)
         if is_new:
             self.notify()

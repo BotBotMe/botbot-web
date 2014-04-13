@@ -1,4 +1,5 @@
  # -*- coding: utf-8 -*-
+
 from django.utils.timezone import now
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -7,6 +8,28 @@ from botbot.apps.bots import models as bot_models
 from .management.commands import redact as redact_cmd
 from . import models
 
+class BestTestEver(TestCase):
+    def test_urlize_impl_handling_with_control_chars(self):
+        """
+        The Github IRC bot puts a 'shift up' control character at the
+        end of the link, which was not removed before transforming a link
+        to a clickable HTML link.
+
+        https://github.com/BotBotMe/botbot-web/issues/8 %0F
+        """
+        from botbot.apps.logs.templatetags.logs_tags import urlize_impl
+
+        # Simple link with no control characters
+        self.assertEqual(
+            urlize_impl(u'http://www.example.com'),
+            u'<a href="http://www.example.com">http://www.example.com</a>'
+        )
+
+        # Simple link with no control characters
+        self.assertEqual(
+            urlize_impl(u'http://www.example.com\017'),
+            u'<a href="http://www.example.com">http://www.example.com</a>'
+        )
 
 class RedactTests(TestCase):
     def setUp(self):
