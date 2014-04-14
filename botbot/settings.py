@@ -26,7 +26,7 @@ LANGUAGES = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.environ['WEB_SECRET_KEY']
 AUTH_USER_MODEL = 'accounts.User'
 INSTALLED_APPS = (
     'botbot.apps.accounts',
@@ -104,8 +104,7 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_DIR, 'static'),
 )
 
-DATABASES = {'default': dj_database_url.config(
-    default='postgres://localhost:5432/botbot')}
+DATABASES = {'default': dj_database_url.config(env='STORAGE_URL')}
 # Reuse database connections
 DATABASES['default']['CONN_MAX_AGE'] = None
 
@@ -247,19 +246,18 @@ EXCLUDE_NICKS = os.environ.get('EXCLUDE_NICKS', '').split(',')
 if EXCLUDE_NICKS == ['']:
     EXCLUDE_NICKS = []
 
-REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL',
-                                        'redis://localhost:6379/0')
-REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL',
-                                          'redis://localhost:6379/1')
-REDIS_SSE_URL = os.environ.get('REDIS_SSEQUEUE_URL',
-                                    'redis://localhost:6379/2')
+REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL')
+REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL')
+REDIS_SSE_URL = os.environ.get('REDIS_SSEQUEUE_URL')
+
 # Life span of auth token for realtime endpoint in seconds
 TOKEN_TTL = 120
-SSE_ENDPOINT = os.environ.get('SSE_URL', 'http://localhost:3000') + '/push/{token}'
 
-#==============================================================================
+SSE_ENDPOINT = os.environ.get('SSE_ENDPOINT_URL') + '/push/{token}'
+
+# ==============================================================================
 # Third party app settings
-#==============================================================================
+# ==============================================================================
 
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 

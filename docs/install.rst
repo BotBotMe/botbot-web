@@ -78,6 +78,35 @@ You should now be able to access the site at ``http://localhost:8000``. Log in w
 
 See :doc:`getting_started` for instructions on configuring a bot.
 
+Environment Variables to override
+---------------------------------::
+
+    # Django (required)
+    WEB_SECRET_KEY=supersecretkeyhere
+
+    # DB Storage where channel/bot information is stored
+    STORAGE_URL=postgres://user:pass@localhost:5432/botbot
+
+    # Pipes
+    REDIS_PLUGIN_STORAGE_URL=redis://localhost:6379/1
+    REDIS_PLUGIN_QUEUE_URL=redis://localhost:6379/2
+    REDIS_SSEQUEUE_URL=redis://localhost:6379/3
+
+    # The host and port eventsource is delivering and the browser is listening
+    # for live changes.
+    SSE_ENDPOINT_URL=http://localhost:3000/
+
+    # Specific Django settings to override
+    # MEMCACHE_URL=127.0.0.1:11211
+    # STATIC_ROOT=/var/www/botbot/static
+    # MEDIA_ROOT=/var/www/botbot/uploads
+    # DEBUG=True
+    # SMTP_URL=smtp://user:pass@host:port
+    # SMTP_TLS=True
+    # ALLOWED_HOSTS=host1,host2
+    # INCLUDE_DJANGO_ADMIN=False
+    # EXCLUDE_NICKS=nick1,nick2
+
 Serving In Production
 ---------------------
 

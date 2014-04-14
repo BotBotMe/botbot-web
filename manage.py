@@ -9,8 +9,8 @@ if __name__ == "__main__":
         from psycogreen.gevent import patch_psycopg; patch_psycopg()
 
     import os
-    import dotenv
-    dotenv.read_dotenv()
+    #import dotenv
+    #dotenv.read_dotenv()
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "botbot.settings")
 
     from django.core.management import execute_from_command_line
