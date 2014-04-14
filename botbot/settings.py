@@ -254,7 +254,7 @@ REDIS_SSE_URL = os.environ.get('REDIS_SSEQUEUE_URL')
 TOKEN_TTL = 120
 
 SSE_ENDPOINT_URL = os.environ.get('SSE_ENDPOINT_URL')
-SSE_ENDPOINT = SSE_ENDPOINT_URL.endswith('/') and '' or '/' + 'push/{token}'
+SSE_ENDPOINT = SSE_ENDPOINT_URL + 'push/{token}'
 
 # ==============================================================================
 # Third party app settings
