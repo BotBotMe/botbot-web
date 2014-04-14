@@ -48,6 +48,11 @@ go get github.com/BotBotMe/botbot-bot
 go get github.com/BotBotMe/botbot-eventsource
 
 # Setup the database
+manage.py dbshell
+create extension hstore;
+CREATE EXTENSION unaccent;
+ALTER FUNCTION unaccent(text) IMMUTABLE;
+
 manage.py syncdb
 manage.py migrate
 manage.py collectstatic
