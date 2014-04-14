@@ -36,6 +36,7 @@ source bin/postactivate
 
 # Clone and install the Django part
 mkdir src
+cd src
 git clone git@github.com:BotBotMe/botbot-web.git
 pip install -e botbot-web
 pip install -r botbot-web/requirements.txt
