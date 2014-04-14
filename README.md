@@ -26,6 +26,7 @@ cdvirtualenv
 vi bin/postactivate
 
 export GOPATH=$VIRTUAL_ENV
+export WEB_SECRET_KEY=somerandomstring
 export STORAGE_URL=postgres://user:pass@localhost:5432/botbot
 export REDIS_PLUGIN_STORAGE_URL=redis://localhost:6379/0
 export REDIS_PLUGIN_QUEUE_URL=redis://localhost:6379/1
