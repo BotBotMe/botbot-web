@@ -76,6 +76,7 @@ class Channel(models.Model):
     users = models.ManyToManyField('accounts.User',
                                    through='accounts.Membership')
     is_featured = models.BooleanField(default=False)
+    fingerprint = models.CharField(max_length=36, blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -237,9 +238,13 @@ class Channel(models.Model):
         """
         Ensure that an empty slug is converted to a null slug so that it
         doesn't trip up on multiple slugs being empty.
+
+        Update the 'fingerprint' on every save, its a UUID indicating the
+        botbot-bot application that something has changed in this channel.
         """
         if not self.slug:
             self.slug = None
+        self.fingerprint = uuid.uuid4()
         super(Channel, self).save(*args, **kwargs)
 
 

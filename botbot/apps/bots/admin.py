@@ -40,6 +40,7 @@ class ChannelAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'name', 'chatbot', 'is_active', 'is_public', 'is_featured')
     list_filter = ('chatbot', 'is_active', 'is_public', 'is_featured')
     list_editable = ('is_active',)
+    readonly_fields = ('fingerprint',)
     inlines = [
             ActivePluginInline,
             MembershipInline
