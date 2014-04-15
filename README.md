@@ -32,6 +32,7 @@ export REDIS_PLUGIN_STORAGE_URL=redis://localhost:6379/0
 export REDIS_PLUGIN_QUEUE_URL=redis://localhost:6379/1
 export REDIS_SSEQUEUE_URL=redis://localhost:6379/2
 export SSE_ENDPOINT_URL=http://localhost:3000/
+export SSE_HOST=localhost:3000
 
 source bin/postactivate
 
