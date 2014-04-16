@@ -58,13 +58,18 @@ class ChannelAdmin(admin.ModelAdmin):
 def daemon_refresh():
     """
     Ask daemon to reload configuration
-    Wait until the db transaction is done and then send the REFRESH command
-    so the Go bot part will update it.
     """
+    # Wait until the db transaction is done and then send the REFRESH command
+    # so the Go bot part will update it.
+
     # THIS IS NO-OP SINCE DJANGO1.6 TRANSACTION REDESIGN
-    # See https://django-transaction-hooks.readthedocs.org/
+    # See https://django-transaction-hooks.readthedocs.org/ for a better
+    # implementation.
     if transaction.is_managed():
         transaction.commit()
+
+    from time import sleep
+    sleep(1)
 
     queue = redis.Redis(db=0)
     queue.lpush('bot', 'REFRESH')
