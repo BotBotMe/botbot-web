@@ -107,6 +107,7 @@ STATICFILES_DIRS = (
 DATABASES = {'default': dj_database_url.config(env='STORAGE_URL')}
 # Reuse database connections
 DATABASES['default']['CONN_MAX_AGE'] = None
+DATABASES['default']['OPTIONS'] = {"application_name": "django"}
 
 #==============================================================================
 # Templates
