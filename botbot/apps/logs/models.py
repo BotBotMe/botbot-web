@@ -9,6 +9,8 @@ from botbot.apps.bots.utils import channel_url_kwargs
 
 from . import utils
 
+REDACTED_TEXT = '[redacted]'
+
 MSG_TMPL = {
         u"JOIN": u"{nick} joined the channel",
         u"NICK": u"{nick} is now known as {text}",
@@ -87,7 +89,8 @@ class Log(models.Model):
         if not self.pk:
             is_new = True
         if self.nick in settings.EXCLUDE_NICKS:
-            self.text = '[redacted]'
+            self.text = REDACTED_TEXT
+
         obj = super(Log, self).save(*args, **kwargs)
         if is_new:
             self.notify()

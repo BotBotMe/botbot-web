@@ -40,9 +40,17 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
     If autoescape is True, the link text and URLs will get autoescaped.
     """
+
+    # Remove control characters form the text input. The Github IRC bot
+    # sends a "Shift Up" control character we need to strip out, so the
+    # urlify function does not grab it.
+    mpa = dict.fromkeys(range(32))
+    text = text.translate(mpa)
+
     trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_text(text))
+
     for i, word in enumerate(words):
         match = None
         if '.' in word or '@' in word or ':' in word:
@@ -84,6 +92,8 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
                     url, trimmed = escape(url), escape(trimmed)
+
+
                 #
                 # Custom stuff for us
                 #

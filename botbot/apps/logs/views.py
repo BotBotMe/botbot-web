@@ -1,24 +1,20 @@
 import datetime
-import json
 import math
-from urllib import urlencode
 
-from django.core.urlresolvers import reverse
+import re
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import redirect
-from django.utils.decorators import method_decorator
 from django.utils.timezone import get_current_timezone_name
-from django.views.generic import View, ListView, TemplateView, RedirectView
-from django.views.decorators.csrf import csrf_exempt
-from django_sse import redisqueue
+from django.views.generic import ListView, TemplateView, RedirectView
+from django.utils.translation import ugettext as _
 from django.conf import settings
 import pytz
 
 from botbot.apps.accounts import forms as accounts_forms
 from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
-from . import forms, models
+from . import forms
 
 
 class Help(ChannelMixin, TemplateView):
@@ -71,8 +67,8 @@ class LogDateMixin(object):
     def _kwargs_with_date(self, date):
         kwargs = {
             'year': date.year,
-            'month': date.month,
-            'day': date.day
+            'month': "%02d" % date.month ,
+            'day': "%02d" % date.day
         }
         return kwargs
 
@@ -388,8 +384,17 @@ class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
             self.search_term = self.form.cleaned_data.get("q", "")
         else:
             self.search_term = ""
-        return self.channel.log_set.search(self.search_term)\
-            .filter(self.channel.visible_commands_filter)
+        self.search_term = self.search_term.replace('%', '%%')
+
+        filter_args = self.channel.visible_commands_filter
+
+        # If a user is mentioned, filter those users first
+        matches = re.search(r'(\bnick:([\w\-]+)\b)', self.search_term)
+        if matches:
+            self.search_term = self.search_term.replace(matches.groups()[0], '')
+            filter_args = filter_args & Q(nick__icontains=matches.groups()[1])
+
+        return self.channel.log_set.search(self.search_term).filter(filter_args)
 
 
 class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
@@ -426,45 +431,5 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
             date_filter = {'timestamp__gte': last_exit.timestamp}
         # Only fetch results from when the user logged out.
         self.fetch_after = (last_exit.timestamp -
-                            datetime.timedelta(milliseconds=1))
-        return self.get_ordered_queryset(queryset.filter(**date_filter))
-
-
-class LogUpdate(ChannelMixin, redisqueue.RedisQueueView):
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(LogUpdate, self).dispatch(request, *args, **kwargs)
-
-    def iterator(self):
-        connection = redisqueue._connect()
-        pubsub = connection.pubsub()
-        pubsub.subscribe(self.get_redis_channel())
-        last_id = self.get_last_id()
-        # catch up with missed messages
-        if last_id:
-            missed = self.channel.filtered_logs().filter(timestamp__gt=last_id)
-            missed = list(missed)
-            try:
-                self.sse.set_event_id(missed[-1].timestamp.isoformat())
-                for line in missed:
-                    self.sse.add_message('log', line.as_html(live=True))
-                yield
-            except IndexError:
-                pass
-
-        # listen to new messages
-        for message in pubsub.listen():
-            if message['type'] == 'message':
-                try:
-                    event, data, event_id = json.loads(message['data'])
-                except ValueError:
-                    event_id = None
-                    event, data = json.loads(message['data'])
-                if event_id:
-                    self.sse.set_event_id(event_id)
-                self.sse.add_message(event, data)
-                yield
-
-    def get_redis_channel(self):
-        return 'channel_update:{0}'.format(self.channel.pk)
+            datetime.timedelta(milliseconds=1))
+        return queryset.filter(**date_filter)

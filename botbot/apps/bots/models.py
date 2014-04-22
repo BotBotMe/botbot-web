@@ -1,21 +1,24 @@
 import datetime
+import uuid
 
 from django.core.cache import cache
+from django.conf import settings
 from django.db import models
 from django.db.models import Max, Min
 from django.utils.datastructures import SortedDict
 from django_hstore import hstore
 from djorm_pgarray.fields import ArrayField
 from botbot.apps.plugins import models as plugins_models
+from botbot.apps.logs import utils as log_utils
 
 PRETTY_SLUG = {
     "chat.freenode.net": "freenode",
+    "morgan.freenode.net": "freenode",
     "irc.oftc.net": "oftc",
     "irc.mozilla.org": "mozilla",
     "irc.coldfront.net": "coldfront",
     "irc.synirc.net": "synirc",
 }
-
 
 class ChatBot(models.Model):
     is_active = models.BooleanField(default=False)
@@ -73,6 +76,7 @@ class Channel(models.Model):
     users = models.ManyToManyField('accounts.User',
                                    through='accounts.Membership')
     is_featured = models.BooleanField(default=False)
+    fingerprint = models.CharField(max_length=36, blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -83,6 +87,20 @@ class Channel(models.Model):
     def get_absolute_url(self):
         from botbot.apps.bots.utils import reverse_channel
         return reverse_channel(self, 'log_current')
+
+    def get_eventsource_url(self):
+        """
+        Provides URL for the SSE endpoint
+
+        It creates a short-lived unique token that is shared
+        with the endpoint over Redis which is used to verify the
+        user can access the channel.
+        """
+        token = uuid.uuid4().hex
+        redis_channel = 'channel_update:{0}'.format(self.pk)
+        log_utils.REDIS.setex(token, settings.TOKEN_TTL, redis_channel)
+        endpoint_url = settings.SSE_ENDPOINT.format(token=token)
+        return endpoint_url
 
     @property
     def active_plugin_slugs_cache_key(self):
@@ -220,9 +238,13 @@ class Channel(models.Model):
         """
         Ensure that an empty slug is converted to a null slug so that it
         doesn't trip up on multiple slugs being empty.
+
+        Update the 'fingerprint' on every save, its a UUID indicating the
+        botbot-bot application that something has changed in this channel.
         """
         if not self.slug:
             self.slug = None
+        self.fingerprint = uuid.uuid4()
         super(Channel, self).save(*args, **kwargs)
 
 

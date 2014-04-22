@@ -1,4 +1,5 @@
 import redis
+import json
 
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse_lazy
@@ -7,7 +8,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_admins
 from django.template.loader import render_to_string
-from django.utils import simplejson
 from django.utils.decorators import method_decorator
 from django.views.generic import DeleteView, TemplateView, View, CreateView, FormView
 
@@ -222,7 +222,7 @@ class SuggestUsers(View):
             results = [{'label': u['email'], 'value': u['pk']} for u in users]
         else:
             results = []
-        return http.HttpResponse(simplejson.dumps(results),
+        return http.HttpResponse(json.dumps(results),
             content_type='application/json')
 
 class RequestChannel(FormView):

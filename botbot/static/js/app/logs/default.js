@@ -199,16 +199,22 @@ $$.Views.LogViewer = Backbone.View.extend({
             return;
         }
         this.source = new EventSource(this.eventSourceUrl);
+        log('Creating event source'); 
         this.source.addEventListener('log', function (e) {
+            log('received'); 
+            log(e);
+            log(this);
             var $el = $(e.data),
                 $last = self.$logEl.find('li:last'),
                 prevDate = moment($last.find('time').attr('datetime'));
             $el.each(function (idx, el) {
                 prevDate = $$.changeLineTimezone($(el), prevDate);
             });
+            log('mid');
             self.checkPageSplit($last, $el.first());
             $$.imagePreviews($el);
             self.$logEl.append($el);
+            log('end');
             if ($$.isAtBottom()) {
                 // if user is within 50px of the bottom, we'll auto-scroll on new messages
                 $('html, body').animate({

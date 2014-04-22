@@ -4,7 +4,6 @@ import urlparse
 # Import global settings to make it easier to extend settings.
 from django.conf.global_settings import *   # pylint: disable=W0614,W0401
 import dj_database_url
-import dj_redis_url
 
 #==============================================================================
 # Generic Django project settings
@@ -12,7 +11,7 @@ import dj_redis_url
 
 DEBUG = ast.literal_eval(os.environ.get('DEBUG', 'True'))
 TEMPLATE_DEBUG = DEBUG
-ASSETS_DEBUG = DEBUG
+ASSETS_DEBUG = True
 
 SITE_ID = 1
 # Local time zone for this installation. Choices can be found here:
@@ -27,7 +26,7 @@ LANGUAGES = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.environ['WEB_SECRET_KEY']
 AUTH_USER_MODEL = 'accounts.User'
 INSTALLED_APPS = (
     'botbot.apps.accounts',
@@ -105,10 +104,10 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_DIR, 'static'),
 )
 
-DATABASES = {'default': dj_database_url.config(
-    default='postgres://localhost:5432/botbot')}
+DATABASES = {'default': dj_database_url.config(env='STORAGE_URL')}
 # Reuse database connections
 DATABASES['default']['CONN_MAX_AGE'] = None
+DATABASES['default']['OPTIONS'] = {"application_name": "django"}
 
 #==============================================================================
 # Templates
@@ -248,25 +247,21 @@ EXCLUDE_NICKS = os.environ.get('EXCLUDE_NICKS', '').split(',')
 if EXCLUDE_NICKS == ['']:
     EXCLUDE_NICKS = []
 
-REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL',
-                                        'redis://localhost:6379/0')
-REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL',
-                                          'redis://localhost:6379/1')
+REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL')
+REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL')
+REDIS_SSE_URL = os.environ.get('REDIS_SSEQUEUE_URL')
 
-#==============================================================================
+# Life span of auth token for realtime endpoint in seconds
+TOKEN_TTL = 120
+
+SSE_ENDPOINT_URL = os.environ.get('SSE_ENDPOINT_URL')
+SSE_ENDPOINT = SSE_ENDPOINT_URL + 'push/{token}'
+
+# ==============================================================================
 # Third party app settings
-#==============================================================================
+# ==============================================================================
 
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
-
-REDIS_SSEQUEUE = dj_redis_url.config('REDIS_SSEQUEUE_URL',
-                                     'redis://localhost:6379/2')
-
-REDIS_SSEQUEUE_CONNECTION_SETTINGS = {
-    'location': '{HOST}:{PORT}'.format(**REDIS_SSEQUEUE),
-    'password': REDIS_SSEQUEUE['PASSWORD'],
-    'db': REDIS_SSEQUEUE['DB'],
-}
 
 SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
