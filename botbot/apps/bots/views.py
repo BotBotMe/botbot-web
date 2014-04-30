@@ -1,6 +1,6 @@
-import redis
 import json
 
+import redis
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
@@ -10,7 +10,6 @@ from django.core.mail import mail_admins
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.generic import DeleteView, TemplateView, View, CreateView, FormView
-
 from django import http
 from django.db.models import Q
 
@@ -225,15 +224,21 @@ class SuggestUsers(View):
         return http.HttpResponse(json.dumps(results),
             content_type='application/json')
 
+
 class RequestChannel(FormView):
     template_name = "bots/request.html"
     form_class = forms.ChannelRequestForm
     success_url = reverse_lazy("request_channel_success")
 
     def form_valid(self, form):
-        bot, _ = models.ChatBot.objects.get_or_create(server=form.cleaned_data['server'])
-        channel = models.Channel.objects.create(name=form.cleaned_data['channel_name'],
-            chatbot=bot, is_active=False)
-        message = render_to_string('bots/emails/request.txt', {"data" : form.cleaned_data})
+        bot = form.cleaned_data['server']
+        connection = form.cleaned_data['connection']
+        if bot is None:
+            bot = models.ChatBot.objects.create(server=connection,
+                                              is_active=False)
+        models.Channel.objects.create(name=form.cleaned_data['channel_name'],
+                                      chatbot=bot, is_active=False)
+        message = render_to_string('bots/emails/request.txt',
+                                   {"data": form.cleaned_data})
         mail_admins("Channel Request", message)
         return super(RequestChannel, self).form_valid(form)
