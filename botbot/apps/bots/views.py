@@ -234,8 +234,8 @@ class RequestChannel(FormView):
         bot = form.cleaned_data['server']
         connection = form.cleaned_data['connection']
         if bot is None:
-            bot = models.ChatBot.objects.create(server=connection,
-                                              is_active=False)
+            bot, _ = models.ChatBot.objects.get_or_create(server=connection,
+                                              defaults={"is_active" : False})
         models.Channel.objects.create(name=form.cleaned_data['channel_name'],
                                       chatbot=bot, is_active=False)
         message = render_to_string('bots/emails/request.txt',

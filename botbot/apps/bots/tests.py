@@ -27,7 +27,8 @@ class BaseTestCase(TestCase):
             email="m.therese@botbot.local")
         self.chatbot = models.ChatBot.objects.create(
                 server='testserver',
-                nick='botbot')
+                nick='botbot',
+                is_active=True)
         self.public_channel = models.Channel.objects.create(
             chatbot=self.chatbot,
             name="#Test",
@@ -198,12 +199,16 @@ class UrlTests(BaseTestCase):
 
         response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "form", "name", "This field is required.")
-        self.assertFormError(response, "form", "server", "This field is required.")
-        self.assertFormError(response, "form", "channel_name", "This field is required.")
-        self.assertFormError(response, "form", "email", "This field is required.")
-        self.assertFormError(response, "form", "nick", "This field is required.")
-        self.assertFormError(response, "form", "op", "This field is required.")
+        self.assertFormError(response, "form", "name",
+                             "This field is required.")
+        self.assertFormError(response, "form", "server",
+                             "This field is required.")
+        self.assertFormError(response, "form", "channel_name",
+                             "This field is required.")
+        self.assertFormError(response, "form", "email",
+                             "This field is required.")
+        self.assertFormError(response, "form", "nick",
+                             "This field is required.")
 
     def test_request_channel_form_duplicate_channel_submission(self):
         url = reverse("request_channel")

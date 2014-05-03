@@ -1,5 +1,6 @@
 import base64
 import uuid
+from django.utils.safestring import mark_safe
 
 import re
 from django import forms
@@ -52,7 +53,14 @@ class ChannelRequestForm(forms.Form):
     name = forms.CharField(label="Your name")
     email = forms.EmailField(label="Your e-mail")
     nick = forms.CharField(label="Your IRC Nick")
-    op = forms.BooleanField(label="Are you a channel op?")
+    op = forms.BooleanField(label="Are you a channel op?", required=False,
+                            help_text=mark_safe("""
+        I am an operator (op) for this channel and agree to the
+        <a href="https://botbot.me/terms/">terms of service</a>. I will follow
+        any server guidelines for logging, eg.
+        <a href="https://freenode.net/channel_guidelines.shtml">Freenode</a>
+        requires a link to the logs in the channel topic.
+    """))
 
     def __init__(self, *args, **kwargs):
         super(ChannelRequestForm, self).__init__(*args, **kwargs)
