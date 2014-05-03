@@ -59,7 +59,7 @@ class ChannelRequestForm(forms.Form):
         self._set_server_choices()
 
     def _set_server_choices(self):
-        choices = [(c.pk, c.server) for c in ChatBot.objects.all()]
+        choices = [(c.pk, c.server) for c in ChatBot.objects.filter(is_active=True)]
         choices.insert(0, ('', '---------'))
         choices.append(("new", "Not listed."))
         self.fields['server'].choices = choices
