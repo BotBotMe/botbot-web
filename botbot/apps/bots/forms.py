@@ -45,7 +45,8 @@ class ChannelRequestForm(forms.Form):
     channel_name = forms.CharField()
     server = forms.ChoiceField(choices=[],
                                label="IRC Server")
-    connection = forms.CharField(required=False)
+    connection = forms.CharField(required=False, label="New IRC Server",
+                                 help_text="IRC Server should be specified as <url>:<port>.")
     github = forms.URLField(label="GitHub Repo URL",
                             help_text="If the channel supports a github repo, the url to the repo.",
                             required=False)
@@ -69,7 +70,7 @@ class ChannelRequestForm(forms.Form):
     def _set_server_choices(self):
         choices = [(c.pk, c.server) for c in ChatBot.objects.filter(is_active=True)]
         choices.insert(0, ('', '---------'))
-        choices.append(("new", "Not listed."))
+        choices.append(("new", "Don't see mine, let me add it."))
         self.fields['server'].choices = choices
 
     def clean_channel_name(self):
