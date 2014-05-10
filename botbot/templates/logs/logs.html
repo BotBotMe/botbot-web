@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% load channel_url assets %}
+{% load channel_url assets logs_tags%}
+
 
 {% block head_title %}Logs for {{ channel.name }} {{ block.super }}{% endblock %}
 {% block body_class %}log-view {% if big %}big{% endif %}{% endblock %}
@@ -104,4 +105,11 @@
 <style type="text/css">
   .log li[data-nick='{{ user.username }}'] .actor { color: #757500; }
 </style>
+
+{% if highlight %}
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@botbotme">
+<meta name="twitter:title" content="{{ highlight.nick }} in {{ channel.name }}">
+<meta name="twitter:description" content="{{ highlight.text|bbme_urlizetrunc:50 }}">
+{% endif %}
 {% endblock %}

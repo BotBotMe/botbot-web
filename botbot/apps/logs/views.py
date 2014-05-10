@@ -136,7 +136,17 @@ class LogViewer(ChannelMixin, object):
         context["big"] = (context["size"] >= settings.BIG_CHANNEL)
 
         if not self.request.is_ajax():
+            highlight_pk = None if not self.request.GET.get('msg') else int(
+                self.request.GET.get('msg'))
+            highlight = None
+            if highlight_pk:
+                for l in context['message_list']:
+                    if l.pk == highlight_pk:
+                        highlight = l
+                        break
+
             context.update({
+                'highlight': highlight,
                 'is_current': getattr(self, 'is_current', False),
                 'search_form': self.form,
                 'tz_form': accounts_forms.TimezoneForm(self.request),
@@ -227,9 +237,10 @@ class MessagePermalinkView(LogDateMixin, LogViewer, RedirectView):
                 self._date_query_set(date))
         except IndexError:
             raise Http404("No logs yet.")
+        params['msg'] = line.pk
         url = reverse_channel(self.channel, 'log_day',
                               kwargs=self._kwargs_with_date(date))
-        return '{0}?{1}#{2}'.format(url, params.urlencode(), line.pk)
+        return '{0}?{1}'.format(url, params.urlencode())
 
 
 class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
@@ -279,8 +290,11 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             is_empty = not self.object_list.exists()
             if is_empty:
                 try:
-                    closet_date = queryset = self.get_ordered_queryset(self.channel.filtered_logs()
-                                                                       .filter(timestamp__gte=self.date))[0].timestamp
+                    closet_date = self.get_ordered_queryset(
+                        self.channel.filtered_logs().filter(
+                            timestamp__gte=self.date)
+                    )[0].timestamp
+
                     url = reverse_channel(self.channel, 'log_day',
                                           kwargs=self._kwargs_with_date(closet_date))
                     return redirect(url)
