@@ -54,16 +54,15 @@ class Log(models.Model):
 
         return reverse('log_message_permalink', kwargs=kwargs)
 
-    def as_html(self, use_absolute_url=False):
+    def as_html(self):
         return render_to_string("logs/log_display.html",
                                 {
                                     'message_list': [self],
-                                    'use_absolute_url' : use_absolute_url
                                 })
 
     def notify(self):
         """Send update to Redis queue to be picked up by SSE"""
-        utils.send_event_with_id("log", self.as_html(use_absolute_url=True),
+        utils.send_event_with_id("log", self.as_html(),
             self.timestamp.isoformat(),
             channel="channel_update:{0}".format(self.channel_id))
 

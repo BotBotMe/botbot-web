@@ -108,8 +108,6 @@ $$.Views.LogViewer = Backbone.View.extend({
                         "messageView");
         $$.on('date:change', this.setDateHeader);
 
-        $(window).bind('hashchange', this.highlight)
-
         this.current = options.current;
         this.eventSourceUrl = options.source;
         this.newestFirst = options.newestFirst;
@@ -132,9 +130,7 @@ $$.Views.LogViewer = Backbone.View.extend({
             $el: $('#Log-Prep-Next')
         });
 
-        this.highlight()
         this.createDateHeaderWaypoints();
-        // scroll to the bottom of the page if these are current logs
         if (this.current) {
             $$.trigger('at-bottom');
             this.setupEventSource();
@@ -142,10 +138,12 @@ $$.Views.LogViewer = Backbone.View.extend({
                 scrollTop: $(document).height() - $(window).height()
             }, 0);
         }
-
         window.onscroll = this.scrollLoad;
+
+        // scroll to the bottom of the page if these are current logs
         // make sure we add more items depending on initial scroll
         this.scrollLoad();
+        this.highlight()
     },
 
     messageView: function(event) {
@@ -158,11 +156,8 @@ $$.Views.LogViewer = Backbone.View.extend({
     },
 
     highlight: function(event) {
-        this.$logEl.find('.highlight').removeClass('highlight');
-        var highlighted = this.$logEl.find(window.location.hash);
+        var highlighted = this.$logEl.find(".highlight");
         if (highlighted.length > 0) {
-            highlighted.addClass('highlight')
-
             // move to middle of element
             $('html, body').animate({
                 scrollTop: highlighted.offset().top + highlighted.height() - this.$el.offset().top - ($(window).height() - this.$el.offset().top) / 2
