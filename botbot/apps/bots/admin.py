@@ -3,14 +3,33 @@
 
 from django.contrib import admin
 from django.db import transaction
+from django.forms.models import BaseInlineFormSet
 import redis
 
 from . import models
+from botbot.apps.plugins.models import Plugin
+
+DEFAULT_PLUGINS = ["logger", "ping", "last_seen", "help"]
+
+
+class PluginFormset(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        if not kwargs['instance'].pk:
+            defaults = Plugin.objects.filter(
+                slug__in=DEFAULT_PLUGINS)
+
+            kwargs['initial'] = [{"plugin": obj.pk} for obj in defaults]
+        super(PluginFormset, self).__init__(*args, **kwargs)
 
 
 class ActivePluginInline(admin.StackedInline):
     model = models.Channel.plugins.through
-    extra = 0
+    formset = PluginFormset
+
+    def get_extra(self, request, obj=None, **kwargs):
+        if obj is None:
+            return len(DEFAULT_PLUGINS)
+        return 0
 
 
 class MembershipInline(admin.TabularInline):
@@ -53,7 +72,6 @@ class ChannelAdmin(admin.ModelAdmin):
     def delete_model(self, request, obj):
         super(ChannelAdmin, self).delete_model(request, obj)
         daemon_refresh()
-
 
 def daemon_refresh():
     """
