@@ -59,15 +59,13 @@ class Dashboard(TemplateView):
         Add the channels to the context.
         """
         data = super(Dashboard, self).get_context_data(**kwargs)
-        data['featured_channels'] = bots_models.Channel.objects\
-            .filter(is_public=True, is_featured=True)
-        data['public_not_featured_channels'] = bots_models.Channel.objects\
-            .filter(is_public=True, is_featured=False)
+        data['public_channels'] = bots_models.Channel.objects \
+            .filter(is_public=True)
         if self.request.user.is_authenticated():
-            data['admin_channels'] = bots_models.Channel.objects\
+            data['admin_channels'] = bots_models.Channel.objects \
                 .filter(membership__user=self.request.user,
-                    membership__is_admin=True)
-            data['private_channels'] = bots_models.Channel.objects\
+                        membership__is_admin=True)
+            data['private_channels'] = bots_models.Channel.objects \
                 .filter(is_public=False, membership__user=self.request.user)
         elif 'login' in self.request.GET:
             data['login_form'] = AuthenticationForm()
