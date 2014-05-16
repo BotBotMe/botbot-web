@@ -1,5 +1,7 @@
 from django.core.paginator import (Paginator, Page, PageNotAnInteger,
                                    EmptyPage)
+from django.db import connection
+
 
 class InfinitePaginator(Paginator):
     """
@@ -108,3 +110,40 @@ class InfinitePage(Page):
             return self.paginator.link_template % (self.number - 1)
         return None
 
+
+class PostgresLargeTablePaginator(Paginator):
+    """
+    Uses postgres pg_class to get a an estimated value, for the size of the
+    table. If the value is below 10,000 it will do a COUNT(*) on the table.
+
+    Also if there is a where filter on the query it will use count()
+    """
+
+    def _get_count(self):
+        """
+        Overwrite count to use custom logic of postgres.
+        """
+        if self._count is None:
+            try:
+                estimate = 0
+                if not self.object_list.query.where:
+                    try:
+                        cursor = connection.cursor()
+                        cursor.execute(
+                            "SELECT reltuples FROM pg_class WHERE relname = %s",
+                            [self.object_list.query.model._meta.db_table])
+                        estimate = int(cursor.fetchone()[0])
+                    except:
+                        pass
+                if estimate < 10000:
+                    self._count = self.object_list.count()
+                else:
+                    self._count = estimate
+            except (AttributeError, TypeError):
+                # AttributeError if object_list has no count() method.
+                # TypeError if object_list.count() requires arguments
+                # (i.e. is of type list).
+                self._count = len(self.object_list)
+        return self._count
+
+    count = property(_get_count)
