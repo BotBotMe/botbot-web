@@ -1,128 +1,158 @@
-import json
 import datetime
-import re
-from urllib import urlencode
+import math
 
+import re
 from django.db.models import Q
 from django.http import Http404
-from django.utils.decorators import method_decorator
+from django.shortcuts import redirect
 from django.utils.timezone import get_current_timezone_name
-from django.views.generic import ListView, TemplateView
-from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import ListView, TemplateView, RedirectView
+from django.utils.translation import ugettext as _
 from django.conf import settings
 import pytz
 
 from botbot.apps.accounts import forms as accounts_forms
 from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
-from botbot.core.paginator import InfinitePaginator
-from . import forms, models
+from . import forms
 
 
 class Help(ChannelMixin, TemplateView):
+
     """
     Help page for a channel.
     """
     template_name = 'logs/help.html'
 
 
-class LogViewer(ChannelMixin, ListView):
-    template_name = "logs/logs.html"
+class PaginatorPageLinksMixin(object):
+
+    def paginate_queryset(self, queryset, page_size):
+        paginator, page, object_list, has_other_pages = super(
+            PaginatorPageLinksMixin, self).paginate_queryset(queryset, page_size)
+
+        self.next_page = self.get_next_page_link(page)
+        self.prev_page = self.get_previous_page_link(page)
+
+        return paginator, page, object_list, has_other_pages
+
+    def get_next_page_link(self, page):
+        url = self.page_base_url
+        params = self.request.GET.copy()
+
+        if not page.has_next():
+            return ""
+        else:
+            params['page'] = page.next_page_number()
+
+        return '{0}?{1}'.format(url, params.urlencode())
+
+    def get_previous_page_link(self, page):
+        url = self.page_base_url
+        params = self.request.GET.copy()
+
+        if not page.has_previous():
+            return ""
+        else:
+            params['page'] = page.previous_page_number()
+
+        return '{0}?{1}'.format(url, params.urlencode())
+
+
+class LogDateMixin(object):
+
+    def _get_base_queryset(self):
+        return self.channel.filtered_logs()
+
+    def _kwargs_with_date(self, date):
+        kwargs = {
+            'year': date.year,
+            'month': "%02d" % date.month ,
+            'day': "%02d" % date.day
+        }
+        return kwargs
+
+    def _get_previous_date(self):
+        """
+        Find the previous day, that has content.
+        """
+        qs = self._get_base_queryset().filter(timestamp__lt=self.date)
+        if qs.exists():
+            return qs[0].timestamp.date()
+
+    def _get_next_date(self):
+        """
+        Find the previous day, that has content.
+        """
+        qs = self._get_base_queryset().filter(
+            timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
+        if qs.exists():
+            return qs[0].timestamp.date()
+
+    def _date_query_set(self, date):
+        qs = self._get_base_queryset()
+        return qs.filter(timestamp__gte=date,
+                         timestamp__lt=date + datetime.timedelta(days=1))
+
+
+class LogViewer(ChannelMixin, object):
     context_object_name = "message_list"
-    paginate_by = 150
-    paginator_class = InfinitePaginator
+    template_name = "logs/logs.html"
     newest_first = False
     show_timeline = True
     show_first_header = False   # Display date header above first line
-    fetch_before = None
-    fetch_after = None
+    paginate_by = 150
+
+    def __init__(self, *args, **kwargs):
+        super(LogViewer, self).__init__(*args, **kwargs)
+        self.next_page = ""
+        self.prev_page = ""
 
     def dispatch(self, request, *args, **kwargs):
-        self.form = forms.SearchForm(request.GET)
         self.page_base_url = request.path
+        self.form = forms.SearchForm(request.GET)
         self.timezone = get_current_timezone_name()
+
         if request.is_ajax():
             self.show_timeline = False
             self.template_name = 'logs/log_display.html'
+
         return super(LogViewer, self).dispatch(request, *args, **kwargs)
 
-    def get_queryset(self):
+    def get_ordered_queryset(self, queryset):
         order = 'timestamp'
         if self.newest_first:
             order = '-timestamp'
-        return self.channel.filtered_logs().order_by(order)
 
-    def _paginate_queryset(self, queryset, page_size):
-        # This logic made my head hurt.
-        # Best to draw a diagram with all the possibilities
-        # Intentionally verbose to make it easier to understand
-        fetch_before = self.request.GET.get('before', self.fetch_before)
-        fetch_after = self.request.GET.get('after', self.fetch_after)
-        if fetch_before:
-            queryset = queryset.filter(timestamp__lt=fetch_before)
-            if not self.newest_first:
-                queryset = queryset.reverse()
-        elif fetch_after:
-            queryset = queryset.filter(timestamp__gt=fetch_after)
-            if self.newest_first:
-                queryset = queryset.reverse()
-        elif not self.newest_first:
-            queryset = queryset.reverse()
-        (paginator, page, object_list, has_other_pages) = (
-            super(LogViewer, self).paginate_queryset(queryset, page_size))
-        # fix ordering after pagination if it was reversed
-        if not queryset.query.standard_ordering:
-            object_list = list(reversed(object_list))
-        return (paginator, page, object_list, has_other_pages)
-
-
-    def paginate_queryset(self, queryset, page_size):
-        (paginator, page, object_list, has_other_pages) = (
-            self._paginate_queryset(queryset, page_size))
-        if len(object_list) == 0:
-            raise Http404('No matching logs for {0}'.format(self.channel))
-        self.prev_page, self.next_page = self.get_page_links(object_list)
-        return paginator, page, object_list, has_other_pages
-
-    def get_page_links(self, message_list):
-        """Gets links to previous and next pages for current page"""
-        # coerce to list
-        if not isinstance(message_list, list):
-            message_list = list(message_list)
-        first = message_list[0].timestamp.isoformat()
-        last = message_list[-1].timestamp.isoformat()
-        prev_vars = self.request.GET.copy()
-        next_vars = self.request.GET.copy()
-        if self.newest_first:
-            prev_vars.update({'after': first})
-            next_vars.update({'before': last})
-        else:
-            next_vars.update({'after': last})
-            prev_vars.update({'before': first})
-        next_page_link = '{0}?{1}'.format(self.page_base_url,
-                                          next_vars.urlencode())
-        prev_page_link = '{0}?{1}'.format(self.page_base_url,
-                                          prev_vars.urlencode())
-        return prev_page_link, next_page_link
+        return queryset.order_by(order)
 
     def get_context_data(self, **kwargs):
-        # message to highlight
-        kwargs.update({'highlight_pk': getattr(self, 'highlight', -1)})
-        if self.show_timeline:
-            kwargs.update(self._timeline_context())
+        context = super(LogViewer, self).get_context_data(**kwargs)
 
-        kwargs["size"] = self.channel.current_size()
-        kwargs["big"] = (kwargs["size"] >= settings.BIG_CHANNEL)
+        if self.show_timeline:
+            context.update(self._timeline_context())
+
+        context["size"] = self.channel.current_size()
+        context["big"] = (context["size"] >= settings.BIG_CHANNEL)
 
         if not self.request.is_ajax():
-            kwargs.update({
+            highlight_pk = None if not self.request.GET.get('msg') else int(
+                self.request.GET.get('msg'))
+            highlight = None
+            if highlight_pk:
+                for l in context['message_list']:
+                    if l.pk == highlight_pk:
+                        highlight = l
+                        break
+
+            context.update({
+                'highlight': highlight,
                 'is_current': getattr(self, 'is_current', False),
                 'search_form': self.form,
                 'tz_form': accounts_forms.TimezoneForm(self.request),
                 'show_first_header': self.show_first_header,
                 'newest_first': self.newest_first,
             })
-        context = super(LogViewer, self).get_context_data(**kwargs)
         context.update({
             'prev_page': self.prev_page,
             'next_page': self.next_page,
@@ -131,7 +161,8 @@ class LogViewer(ChannelMixin, ListView):
         return context
 
     def _timeline_context(self):
-        """Context (template) vars needed for timeline display.
+        """
+        Context (template) vars needed for timeline display.
         """
 
         timeline = self.channel.get_months_active()
@@ -147,10 +178,10 @@ class LogViewer(ChannelMixin, ListView):
         last_month = timeline[timeline.keyOrder[-1]].pop()
         if last_month >= last_week:
             last_month_adjusted = (last_week -
-                                    datetime.timedelta(days=1))
+                                   datetime.timedelta(days=1))
         elif last_month >= last_monday:
             last_month_adjusted = (last_monday -
-                                    datetime.timedelta(days=1))
+                                   datetime.timedelta(days=1))
         else:
             last_month_adjusted = last_month
 
@@ -166,83 +197,185 @@ class LogViewer(ChannelMixin, ListView):
     def render_to_response(self, context, **response_kwargs):
         response = super(LogViewer, self).render_to_response(context,
                                                              **response_kwargs)
+
         if self.request.is_ajax():
             # easily parsed with Javascript
-            response['X-NextPage'] = self.next_page
-            response['X-PrevPage'] = self.prev_page
+            if self.next_page:
+                response['X-NextPage'] = self.next_page
+
+            if self.prev_page:
+                response['X-PrevPage'] = self.prev_page
         else:
             # Official SEO header
-            response['Link'] = ','.join([
-                '{0}; rel="prev"'.format(self.prev_page),
-                '{0}; rel="next"'.format(self.next_page),
-            ])
+            links = []
+            if self.next_page:
+                links.append('{0}; rel="prev"'.format(self.next_page))
+
+            if self.prev_page:
+                links.append('{0}; rel="prev"'.format(self.prev_page))
+            response['Link'] = ','.join(links)
         response['X-Timezone'] = self.timezone
         return response
 
+    def _pages_for_queryset(self, queryset):
+        return int(math.ceil(queryset.count() / float(self.paginate_by)))
 
-class CurrentLogViewer(LogViewer):
-    is_current = True
+
+class MessagePermalinkView(LogDateMixin, LogViewer, RedirectView):
+
+    """
+    Reverse a message id to a pagination result.
+    """
+    permanent = True
+
+    def get_redirect_url(self, **kwargs):
+        params = self.request.GET.copy()
+        line = self.channel.log_set.get(pk=self.kwargs['msg_pk'])
+        try:
+            date = line.timestamp.date()
+            params['page'] = self._pages_for_queryset(
+                self._date_query_set(date))
+        except IndexError:
+            raise Http404("No logs yet.")
+        params['msg'] = line.pk
+        url = reverse_channel(self.channel, 'log_day',
+                              kwargs=self._kwargs_with_date(date))
+        return '{0}?{1}'.format(url, params.urlencode())
 
 
-class DayLogViewer(LogViewer):
-    show_first_header = True
+class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
-    def get_queryset(self):
-        # individual page URLs will already be passed a date
-        # they don't need to use the date in the URL
-        self.page_base_url = reverse_channel(self.channel, 'log_all')
+    permanent = False
+    newest_first = True  # Make sure we find the newest record.
+
+    def get_redirect_url(self, **kwargs):
+        params = self.request.GET.copy()
+        queryset = self.get_ordered_queryset(self.channel.filtered_logs())
+        try:
+            date = queryset[0].timestamp.date()
+            params['page'] = self._pages_for_queryset(
+                self._date_query_set(date))
+        except IndexError:
+            raise Http404("No logs yet.")
+        url = reverse_channel(self.channel, 'log_day',
+                              kwargs=self._kwargs_with_date(date))
+        return '{0}?{1}'.format(url, params.urlencode())
+
+
+class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
+    show_first_header = False
+    allow_empty = False
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.tz = pytz.timezone(self.request.GET.get('tz', 'UTC'))
+        except (KeyError, pytz.UnknownTimeZoneError):
+            self.tz = pytz.utc
         try:
             year = int(self.kwargs['year'])
             month = int(self.kwargs['month'])
             day = int(self.kwargs['day'])
+
+            self.date = self.tz.localize(
+                datetime.datetime(year=year, month=month, day=day))
         except ValueError:
             raise Http404
-        try:
-            tz = pytz.timezone(self.request.GET.get('tz', 'UTC'))
-        except (KeyError, pytz.UnknownTimeZoneError):
-            tz = pytz.utc
-        self.fetch_after = tz.localize(datetime.datetime(year, month,
-                                                         day, 0, 0, 0))
-        return super(DayLogViewer, self).get_queryset()
 
+        return super(DayLogViewer, self).dispatch(request, *args, **kwargs)
 
-class MessageLogViewer(LogViewer):
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.highlight = int(kwargs['message_id'])
-        except ValueError:
-            raise Http404
-        return super(MessageLogViewer, self).dispatch(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        allow_empty = self.get_allow_empty()
+        if not allow_empty:
+            is_empty = not self.object_list.exists()
+            if is_empty:
+                try:
+                    closet_date = self.get_ordered_queryset(
+                        self.channel.filtered_logs().filter(
+                            timestamp__gte=self.date)
+                    )[0].timestamp
+
+                    url = reverse_channel(self.channel, 'log_day',
+                                          kwargs=self._kwargs_with_date(closet_date))
+                    return redirect(url)
+
+                except IndexError:
+                    raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
+                                  % {'class_name': self.__class__.__name__})
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
     def get_queryset(self):
-        self.page_base_url = reverse_channel(self.channel, 'log_all')
-        msg_id = self.kwargs['message_id']
-        half_page_count = self.paginate_by / 2
-        queryset = super(MessageLogViewer, self).get_queryset()
-        try:
-            message = queryset.get(pk=msg_id)
-            timestamp = message.timestamp
-        except models.Log.DoesNotExist:
-            raise Http404
-        # This is pretty inefficient, but it gets us the queryset we want
-        messages_before = (queryset.filter(timestamp__lt=timestamp)
-                                   .order_by('-timestamp'))
-        messages_after = (queryset.filter(timestamp__gt=timestamp)
-                                  .order_by('timestamp'))
+        qs = self.channel.filtered_logs()
+        qs = self.get_ordered_queryset(qs)
+        start = self.date
+        end = start + datetime.timedelta(days=1)
+        return qs.filter(timestamp__gte=start, timestamp__lt=end)
 
-        try:
-            first = list(messages_before[:half_page_count])[-1]
-        except IndexError:
-            first = message
-        try:
-            last = list(messages_after[:half_page_count - 1])[-1]
-        except IndexError:
-            last = message
-        return queryset.filter(timestamp__range=(first.timestamp,
-                                                 last.timestamp))
+    def _date_paginator(self, date):
+        qs = self._date_query_set(date)
+        return self.get_paginator(qs, self.get_paginate_by(qs))
+
+    def paginate_queryset(self, queryset, page_size):
+        paginator, page, object_list, has_other_pages = super(
+            DayLogViewer, self).paginate_queryset(queryset, page_size)
+
+        if not self.next_page:
+            self.is_current = True
+
+        return paginator, page, object_list, has_other_pages
+
+    def get_previous_page_link(self, page):
+        """
+        Generate a link to the next page, from the current one.
+        """
+        url = self.page_base_url
+
+        # copy, to maintain any params that came in to original request.
+        params = self.request.GET.copy()
+
+        if not page.has_previous():
+            date = self._get_previous_date()
+
+            if not date:
+                # We have no more logs!
+                return None
+
+            # Use new paginator to get dates max page number.
+            paginator = self._date_paginator(date)
+            params['page'] = paginator.num_pages
+
+            url = reverse_channel(
+                self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+        else:
+            params['page'] = page.previous_page_number()
+
+        return '{0}?{1}'.format(url, params.urlencode())
+
+    def get_next_page_link(self, page):
+        """
+        Generate a link to the next page, from the current one.
+        """
+        url = self.page_base_url
+
+        # copy, to maintain any params that came in to original request.
+        params = self.request.GET.copy()
+
+        if not page.has_next():
+            date = self._get_next_date()
+            if date:
+                url = reverse_channel(
+                    self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+                params['page'] = 1  # If new date, always start at page 1.
+            else:
+                return ""
+        else:
+            params['page'] = page.next_page_number()
+
+        return '{0}?{1}'.format(url, params.urlencode())
 
 
-class SearchLogViewer(LogViewer):
+class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
     show_first_header = True
     newest_first = True
     allow_empty = True
@@ -254,6 +387,7 @@ class SearchLogViewer(LogViewer):
         """
         data = super(SearchLogViewer, self).get_context_data(**kwargs)
         data['q'] = self.search_term
+        data['use_absolute_url'] = True
         return data
 
     def get_queryset(self):
@@ -276,21 +410,19 @@ class SearchLogViewer(LogViewer):
 
         return self.channel.log_set.search(self.search_term).filter(filter_args)
 
-    def paginate_queryset(self, queryset, page_size):
-        (paginator, page, object_list, has_other_pages) = (
-            self._paginate_queryset(queryset, page_size))
-        if len(object_list) == 0:
-            self.prev_page = ""
-            self.next_page = ""
-        else:
-            self.prev_page, self.next_page = self.get_page_links(object_list)
-        return paginator, page, object_list, has_other_pages
 
-class MissedLogViewer(LogViewer):
+class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
+
     show_first_header = True
+    newest_first = False
+
+    def get_context_data(self, **kwargs):
+        data = super(MissedLogViewer, self).get_context_data(**kwargs)
+        data['use_absolute_url'] = True
+        return data
 
     def get_queryset(self):
-        queryset = super(MissedLogViewer, self).get_queryset()
+        queryset = self.channel.log_set.all()
         nick = self.kwargs['nick']
         try:
             # cover nicks in the form: nick OR nick_ OR nick|<something>

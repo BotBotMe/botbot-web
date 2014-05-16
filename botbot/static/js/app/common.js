@@ -7,3 +7,11 @@ window.log = function () {
         console.log(Array.prototype.slice.call(arguments));
     }
 };
+
+// Prevent default hash jump in browsers
+if (location.hash) {
+    window.scrollTo(0, 0);
+    setTimeout(function() {
+        window.scrollTo(0, 0);
+    }, 0);
+}

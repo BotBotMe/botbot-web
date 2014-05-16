@@ -3,6 +3,9 @@ from djorm_pgfulltext.fields import VectorField
 from django.db import models
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.core.urlresolvers import reverse
+from botbot.apps.bots.utils import channel_url_kwargs
+
 
 from . import utils
 
@@ -39,27 +42,23 @@ class Log(models.Model):
         fields=('text',),
         config='pg_catalog.english',   # this is default
         search_field='search_index',   # this is default
-        auto_update_search_field=False    # We have a db trigger that does it
+        auto_update_search_field=True
     )
 
     class Meta:
         ordering = ('-timestamp',)
 
-    @models.permalink
     def get_absolute_url(self):
+        kwargs = channel_url_kwargs(self.channel)
+        kwargs['msg_pk'] = self.pk
 
-        if self.channel.is_public:
-            bot_slug = self.channel.chatbot.slug
-            chan_slug = self.channel.name.strip("#")
-        else:
-            bot_slug = 'private'
-            chan_slug = self.channel.slug
-
-        return ('log_message', [bot_slug, chan_slug, self.pk])
+        return reverse('log_message_permalink', kwargs=kwargs)
 
     def as_html(self):
         return render_to_string("logs/log_display.html",
-                                {'message_list': [self], "highlight_pk": -1})
+                                {
+                                    'message_list': [self],
+                                })
 
     def notify(self):
         """Send update to Redis queue to be picked up by SSE"""

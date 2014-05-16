@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% load channel_url assets %}
+{% load channel_url assets logs_tags%}
+
 
 {% block head_title %}Logs for {{ channel.name }} {{ block.super }}{% endblock %}
 {% block body_class %}log-view {% if big %}big{% endif %}{% endblock %}
@@ -10,7 +11,7 @@
             <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
         </a>
         <div class="log-title">
-          <h1><a href="{% channel_url channel 'log_all' %}">{{ channel.name }}</a></h1>
+          <h1><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></h1>
           {% if not channel.is_public %}<i class="icon icon-large icon-lock" title="This is a private channel"></i>{% endif %}
           <span class="divider">/</span>
           <h4 class="date"></h4>
@@ -82,7 +83,7 @@
               {% endfor %}
               <li><a class="jump-date" data-date="{{ last_week|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=last_week|date:"Y" month=last_week|date:"m" day=last_week|date:"d" %}"><span>Last Week</span></a></li>
               <li><a class="jump-date" data-date="{{ this_week|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=this_week|date:"Y" month=this_week|date:"m" day=this_week|date:"d" %}"><span>This Week</span></a></li>
-              <li><a class="jump-date current" data-date="99999999" href="{% channel_url channel 'log_all' %}"><span>Current</span></a></li>
+              <li><a class="jump-date current" data-date="99999999" href="{% channel_url channel 'log_current' %}"><span>Current</span></a></li>
           </ul>
         </nav>
         {% endif %}
@@ -104,4 +105,11 @@
 <style type="text/css">
   .log li[data-nick='{{ user.username }}'] .actor { color: #757500; }
 </style>
+
+{% if highlight %}
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@botbotme">
+<meta name="twitter:title" content="{{ highlight.nick }} in {{ channel.name }}">
+<meta name="twitter:description" content="{{ highlight.text|bbme_urlizetrunc:50 }}">
+{% endif %}
 {% endblock %}

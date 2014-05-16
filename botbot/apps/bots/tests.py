@@ -62,10 +62,10 @@ class UrlTests(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_log_all(self):
-        url = utils.reverse_channel(self.public_channel, "log_all")
+    def test_log_current(self):
+        url = utils.reverse_channel(self.public_channel, "log_current")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_add_channel_get(self):
         self.client.login(username=self.member.username, password="secret")
@@ -127,7 +127,7 @@ class UrlTests(BaseTestCase):
             self.assertEqual(response.status_code, 302)
             channel = models.Channel.objects.get(name="#{}".format(name))
             # Non-identifiable channel, channel name shouldn't be in url.
-            channel_url = utils.reverse_channel(channel, "log_all")
+            channel_url = utils.reverse_channel(channel, "log_current")
             if identifiable:
                 self.assertIn(name, channel_url)
             else:

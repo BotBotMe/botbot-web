@@ -26,32 +26,37 @@ $$.Cache = Backbone.Model.extend({
     },
     fetch: function () {
         // Load another page into the cache
-        this.isLoading = true;
-        $.ajax({
-            url: this.url,
-            success: _.bind(function (data, textStatus, jqXHR) {
-                var serverTimezone = jqXHR.getResponseHeader('X-Timezone');
-                this.url = jqXHR.getResponseHeader(this.pageHeader);
-                if (this.url === "" || this.url === null) {
-                    this.isLoading = false;
-                    this.isFinished = true;
-                } else {
-                    if ($$.clientTimezone !== serverTimezone) {
-                        this.adjustTimezone = true;
+        if (this.url) {
+            this.isLoading = true;
+            $.ajax({
+                url: this.url,
+                success: _.bind(function (data, textStatus, jqXHR) {
+                    var serverTimezone = jqXHR.getResponseHeader('X-Timezone');
+                    this.url = jqXHR.getResponseHeader(this.pageHeader);
+                    if (this.url === "" || this.url === null) {
+                        this.isLoading = false;
+                        this.isFinished = true;
+                    } else {
+                        if ($$.clientTimezone !== serverTimezone) {
+                            this.adjustTimezone = true;
+                        }
+                        this.prepPage(data);
+                        this.isLoading = false;
+                        this.trigger('loaded', this);
                     }
-                    this.prepPage(data);
-                    this.isLoading = false;
-                    this.trigger('loaded', this);
-                }
-            }, this),
-            statusCode: {
-                404: _.bind(function () {
-                    this.isLoading = false;
-                    this.isFinished = true;
-                }, this)
-            },
-            dataType: 'html'
-        });
+                }, this),
+                statusCode: {
+                    404: _.bind(function () {
+                        this.isLoading = false;
+                        this.isFinished = true;
+                    }, this)
+                },
+                dataType: 'html'
+            });
+        } else {
+            // Nothing to load, so we can still trigger loaded.
+            this.trigger('loaded', this);
+        }
     },
     isEmpty: function () {
         return this.$el.children('li').length === 0;
@@ -90,16 +95,19 @@ $$.Views.LogViewer = Backbone.View.extend({
     $logEl: $('#Log'),
 
     events: {
-        'click .toggle-preview': 'toggleImagePreview'
+        'click .toggle-preview': 'toggleImagePreview',
+        'click .moment' : 'messageView'
     },
 
     initialize: function (options) {
         log('LogViewer:initialize');
-        var $highlightedMessage;
         _.bindAll(this, "scrollLoad", "pageLoad",
                         "createDateHeaderWaypoints",
-                        "setDateHeader", "checkPageSplit", "insertCache");
+                        "setDateHeader", "checkPageSplit",
+                        "insertCache", "highlight",
+                        "messageView");
         $$.on('date:change', this.setDateHeader);
+
         this.current = options.current;
         this.eventSourceUrl = options.source;
         this.newestFirst = options.newestFirst;
@@ -123,15 +131,6 @@ $$.Views.LogViewer = Backbone.View.extend({
         });
 
         this.createDateHeaderWaypoints();
-        // jump to highlighted message
-        $highlightedMessage = this.$logEl.find('li.highlight');
-        if ($highlightedMessage.length) {
-            // move to middle of element
-            $('html, body').animate({
-                scrollTop: $highlightedMessage.offset().top + $highlightedMessage.height() - this.$el.offset().top - ($(window).height() - this.$el.offset().top) / 2
-            }, 0);
-        }
-        // scroll to the bottom of the page if these are current logs
         if (this.current) {
             $$.trigger('at-bottom');
             this.setupEventSource();
@@ -139,10 +138,31 @@ $$.Views.LogViewer = Backbone.View.extend({
                 scrollTop: $(document).height() - $(window).height()
             }, 0);
         }
-
         window.onscroll = this.scrollLoad;
+
+        // scroll to the bottom of the page if these are current logs
         // make sure we add more items depending on initial scroll
         this.scrollLoad();
+        this.highlight()
+    },
+
+    messageView: function(event) {
+        // Check to see if we are still on the same path
+        var href = $(event.target).parent().attr('href');
+        if (window.location.href.indexOf(href) > 0) {
+            this.highlight();
+            return false;
+        }
+    },
+
+    highlight: function(event) {
+        var highlighted = this.$logEl.find(".highlight");
+        if (highlighted.length > 0) {
+            // move to middle of element
+            $('html, body').animate({
+                scrollTop: highlighted.offset().top + highlighted.height() - this.$el.offset().top - ($(window).height() - this.$el.offset().top) / 2
+            }, 0);
+        }
     },
 
     toggleImagePreview: function (event) {
