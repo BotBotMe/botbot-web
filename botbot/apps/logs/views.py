@@ -129,20 +129,13 @@ class LogViewer(ChannelMixin, object):
         return queryset.order_by(order)
 
     def find_highlight(self, messages):
-        highlight = None
-        highlight_pk = None
-
         try:
-            highlight_pk = int(self.request.GET.get('msg'))
+            pk = int(self.request.GET.get('msg'))
+            for l in messages:
+                if l.pk == pk:
+                    return l
         except (ValueError, TypeError):
             pass
-
-        if highlight_pk:
-            for l in messages:
-                if l.pk == highlight_pk:
-                    highlight = l
-                    break
-        return highlight
 
     def get_context_data(self, **kwargs):
         context = super(LogViewer, self).get_context_data(**kwargs)
