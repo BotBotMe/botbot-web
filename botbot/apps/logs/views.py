@@ -1,10 +1,11 @@
 import datetime
 import math
 
+from django.core.cache import cache
 import re
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.utils.timezone import get_current_timezone_name
 from django.views.generic import ListView, TemplateView, RedirectView
 from django.utils.translation import ugettext as _
@@ -15,6 +16,7 @@ from botbot.apps.accounts import forms as accounts_forms
 from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
 from . import forms
+from botbot.apps.logs.models import Log
 
 
 class Help(ChannelMixin, TemplateView):
@@ -126,6 +128,17 @@ class LogViewer(ChannelMixin, object):
 
         return queryset.order_by(order)
 
+    def find_highlight(self, messeages):
+        highlight_pk = None if not self.request.GET.get('msg') else int(
+            self.request.GET.get('msg'))
+        highlight = None
+        if highlight_pk:
+            for l in messeages:
+                if l.pk == highlight_pk:
+                    highlight = l
+                    break
+        return highlight
+
     def get_context_data(self, **kwargs):
         context = super(LogViewer, self).get_context_data(**kwargs)
 
@@ -136,15 +149,7 @@ class LogViewer(ChannelMixin, object):
         context["big"] = (context["size"] >= settings.BIG_CHANNEL)
 
         if not self.request.is_ajax():
-            highlight_pk = None if not self.request.GET.get('msg') else int(
-                self.request.GET.get('msg'))
-            highlight = None
-            if highlight_pk:
-                for l in context['message_list']:
-                    if l.pk == highlight_pk:
-                        highlight = l
-                        break
-
+            highlight = self.find_highlight(self.object_list)
             context.update({
                 'highlight': highlight,
                 'is_current': getattr(self, 'is_current', False),
@@ -221,28 +226,6 @@ class LogViewer(ChannelMixin, object):
         return int(math.ceil(queryset.count() / float(self.paginate_by)))
 
 
-class MessagePermalinkView(LogDateMixin, LogViewer, RedirectView):
-
-    """
-    Reverse a message id to a pagination result.
-    """
-    permanent = True
-
-    def get_redirect_url(self, **kwargs):
-        params = self.request.GET.copy()
-        line = self.channel.log_set.get(pk=self.kwargs['msg_pk'])
-        try:
-            date = line.timestamp.date()
-            params['page'] = self._pages_for_queryset(
-                self._date_query_set(date))
-        except IndexError:
-            raise Http404("No logs yet.")
-        params['msg'] = line.pk
-        url = reverse_channel(self.channel, 'log_day',
-                              kwargs=self._kwargs_with_date(date))
-        return '{0}?{1}'.format(url, params.urlencode())
-
-
 class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
 
     permanent = False
@@ -271,13 +254,22 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             self.tz = pytz.timezone(self.request.GET.get('tz', 'UTC'))
         except (KeyError, pytz.UnknownTimeZoneError):
             self.tz = pytz.utc
-        try:
-            year = int(self.kwargs['year'])
-            month = int(self.kwargs['month'])
-            day = int(self.kwargs['day'])
 
-            self.date = self.tz.localize(
-                datetime.datetime(year=year, month=month, day=day))
+        try:
+            # Handle the case we we are trying to find a single message.
+            if 'msg_pk' in self.kwargs:
+                self.highlight_line = get_object_or_404(Log.objects, pk=self.kwargs['msg_pk'])
+                date = datetime.datetime(year=self.highlight_line.timestamp.year,
+                                month=self.highlight_line.timestamp.month,
+                                day=self.highlight_line.timestamp.day)
+                self.date = self.tz.localize(date)
+            else:
+                year = int(self.kwargs['year'])
+                month = int(self.kwargs['month'])
+                day = int(self.kwargs['day'])
+
+                self.date = self.tz.localize(
+                    datetime.datetime(year=year, month=month, day=day))
         except ValueError:
             raise Http404
 
@@ -285,6 +277,30 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
 
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
+
+        # Handle finding the page a message is located on.
+        if getattr(self, 'highlight_line', None):
+            # Maybe one day we can push this to varnish
+            url, params = cache.get(
+                self._messaage_redirect_cache_key(self.highlight_line), [None, None])
+            if not url:
+                paginator = self.get_paginator(self.object_list, self.get_paginate_by(self.object_list))
+                for n in paginator.page_range:
+                    page = paginator.page(n)
+                    if self.highlight_line in page.object_list:
+                        params = {"msg": self.highlight_line.pk, "page": n}
+                        url = reverse_channel(
+                            self.channel, 'log_day',
+                            kwargs=self._kwargs_with_date(self.date))
+                        cache.set(self._messaage_redirect_cache_key(self.highlight_line),
+                                  [url, {"msg": self.highlight_line.pk, "page": n}], None)
+                        break # Found the page.
+
+            oparams = self.request.GET.copy()
+            oparams.update(params)
+            return redirect('{0}?{1}'.format(url, oparams.urlencode()),
+                            permanent=True)
+
         allow_empty = self.get_allow_empty()
         if not allow_empty:
             is_empty = not self.object_list.exists()
@@ -373,6 +389,9 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             params['page'] = page.next_page_number()
 
         return '{0}?{1}'.format(url, params.urlencode())
+
+    def _messaage_redirect_cache_key(self, line):
+        return "line:{0}:permalink".format(line.pk)
 
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
