@@ -32,6 +32,11 @@ class ChannelMixin(object):
     """
     only_channel_owners = False
 
+    def __init__(self, *args, **kwargs):
+        super(ChannelMixin, self).__init__(*args, **kwargs)
+
+        self._channel = None
+
     def dispatch(self, request, *args, **kwargs):
         """
         Add the channel as an attribute of the view.
@@ -52,23 +57,25 @@ class ChannelMixin(object):
         Retrieve the channel from the url arguments, ensuring the user has
         permission.
         """
-        channel_pk = kwargs.get('channel_pk')
-        if channel_pk:
-            channel = get_object_or_404(models.Channel, pk=channel_pk)
+        if not self._channel:
+            channel_pk = kwargs.get('channel_pk')
+            if channel_pk:
+                channel = get_object_or_404(models.Channel, pk=channel_pk)
 
-        elif kwargs['bot_slug'] == 'private':
-            channel = get_object_or_404(
-                models.Channel, slug=kwargs['channel_slug'])
+            elif kwargs['bot_slug'] == 'private':
+                channel = get_object_or_404(
+                    models.Channel, slug=kwargs['channel_slug'])
 
-        else:
-            channel = self._get_identifiable_channel(
-                kwargs['bot_slug'], kwargs['channel_slug'])
+            else:
+                channel = self._get_identifiable_channel(
+                    kwargs['bot_slug'], kwargs['channel_slug'])
 
-        if not channel.user_can_access(
-                user, only_owners=self.only_channel_owners):
-            raise http.Http404("No permission to access this channel")
+            if not channel.user_can_access(
+                    user, only_owners=self.only_channel_owners):
+                raise http.Http404("No permission to access this channel")
+            self._channel = channel
 
-        return channel
+        return self._channel
 
     def _get_identifiable_channel(self, bot_slug, channel_slug):
         """

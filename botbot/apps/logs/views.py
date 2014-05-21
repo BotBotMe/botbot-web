@@ -290,10 +290,20 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             is_empty = not self.object_list.exists()
             if is_empty:
                 try:
-                    closet_date = self.get_ordered_queryset(
+                    # First check if there is anything in the past
+                    closet_qs = self.get_ordered_queryset(
                         self.channel.filtered_logs().filter(
-                            timestamp__gte=self.date)
-                    )[0].timestamp
+                            timestamp__lte=self.date)
+                    )
+
+                    # If not go to the future
+                    if not closet_qs.exists():
+                        closet_qs = self.get_ordered_queryset(
+                            self.channel.filtered_logs().filter(
+                                timestamp__gte=self.date)
+                        )
+
+                    closet_date = closet_qs[0].timestamp
 
                     url = reverse_channel(self.channel, 'log_day',
                                           kwargs=self._kwargs_with_date(closet_date))
