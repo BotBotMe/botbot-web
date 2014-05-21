@@ -6,7 +6,7 @@ import re
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404
-from django.utils.timezone import get_current_timezone_name
+from django.utils.timezone import get_current_timezone_name, now
 from django.views.generic import ListView, TemplateView, RedirectView
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -35,6 +35,7 @@ class PaginatorPageLinksMixin(object):
 
         self.next_page = self.get_next_page_link(page)
         self.prev_page = self.get_previous_page_link(page)
+        self.current_page = self.get_current_page_link(page)
 
         return paginator, page, object_list, has_other_pages
 
@@ -60,6 +61,12 @@ class PaginatorPageLinksMixin(object):
 
         return '{0}?{1}'.format(url, params.urlencode())
 
+
+    def get_current_page_link(self, page):
+        url = self.page_base_url
+        params = self.request.GET.copy()
+        params['page'] = page.number
+        return '{0}?{1}'.format(url, params.urlencode())
 
 class LogDateMixin(object):
 
@@ -109,6 +116,8 @@ class LogViewer(ChannelMixin, object):
         super(LogViewer, self).__init__(*args, **kwargs)
         self.next_page = ""
         self.prev_page = ""
+        self.current_page = ""
+
 
     def dispatch(self, request, *args, **kwargs):
         self.page_base_url = request.path
@@ -159,6 +168,7 @@ class LogViewer(ChannelMixin, object):
         context.update({
             'prev_page': self.prev_page,
             'next_page': self.next_page,
+            'current_page': self.current_page,
         })
 
         return context
@@ -224,25 +234,6 @@ class LogViewer(ChannelMixin, object):
         return int(math.ceil(queryset.count() / float(self.paginate_by)))
 
 
-class CurrentLogViewer(LogDateMixin, LogViewer, RedirectView):
-
-    permanent = False
-    newest_first = True  # Make sure we find the newest record.
-
-    def get_redirect_url(self, **kwargs):
-        params = self.request.GET.copy()
-        queryset = self.get_ordered_queryset(self.channel.filtered_logs())
-        try:
-            date = queryset[0].timestamp.date()
-            params['page'] = self._pages_for_queryset(
-                self._date_query_set(date))
-        except IndexError:
-            raise Http404("No logs yet.")
-        url = reverse_channel(self.channel, 'log_day',
-                              kwargs=self._kwargs_with_date(date))
-        return '{0}?{1}'.format(url, params.urlencode())
-
-
 class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     show_first_header = False
     allow_empty = False
@@ -262,12 +253,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
                                 day=self.highlight_line.timestamp.day)
                 self.date = self.tz.localize(date)
             else:
-                year = int(self.kwargs['year'])
-                month = int(self.kwargs['month'])
-                day = int(self.kwargs['day'])
-
-                self.date = self.tz.localize(
-                    datetime.datetime(year=year, month=month, day=day))
+                self.set_view_date()
         except ValueError:
             raise Http404
 
@@ -388,8 +374,30 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
 
         return '{0}?{1}'.format(url, params.urlencode())
 
+    def get_current_page_link(self, page):
+        # copy, to maintain any params that came in to original request.
+        params = self.request.GET.copy()
+        date = self.tz.localize(datetime.datetime.now())
+        url = reverse_channel(
+            self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+        params['page'] = page.number
+        return '{0}?{1}'.format(url, params.urlencode())
+
     def _messaage_redirect_cache_key(self, line):
         return "line:{0}:permalink".format(line.pk)
+
+    def set_view_date(self):
+        if all([field in self.kwargs for field in ['year', 'month', 'day']]):
+            year = int(self.kwargs['year'])
+            month = int(self.kwargs['month'])
+            day = int(self.kwargs['day'])
+
+            self.date = self.tz.localize(
+                datetime.datetime(year=year, month=month, day=day))
+        else:
+            current = now()
+            self.date = self.tz.localize(
+                datetime.datetime(year=current.year, month=current.month, day=current.day))
 
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):

@@ -33,14 +33,11 @@ class UrlTests(BaseTestCase):
     def test_current_redirects_to_today(self):
         url = reverse_channel(self.public_channel, "log_current")
         res = self.client.get(url)
-        self.assertEqual(res.status_code, 302)
-        self.assertTrue(
-            '/%s-%s-%s' % (self.log.timestamp.year, "%02d" % self.log.timestamp.month, "%02d" % self.log.timestamp.day) in res.url)
+        self.assertEqual(res.status_code, 200)
 
     def test_day_log_viewer(self):
         url = reverse_channel(self.public_channel, "log_current")
-        day_url = self.client.get(url).url
-        res = self.client.get(day_url)
+        res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
 
     def test_missed_log(self):

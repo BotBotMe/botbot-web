@@ -65,7 +65,7 @@ class UrlTests(BaseTestCase):
     def test_log_current(self):
         url = utils.reverse_channel(self.public_channel, "log_current")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
     def test_add_channel_get(self):
         self.client.login(username=self.member.username, password="secret")

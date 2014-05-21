@@ -11,6 +11,6 @@ urlpatterns = patterns('',
         name="log_message_permalink"),
     url(r'^search/$', views.SearchLogViewer.as_view(), name='log_search'),
     url(r'^help/$', views.Help.as_view(), name='help_bot'),
-    url(r'^$', views.CurrentLogViewer.as_view(),
+    url(r'^$', views.DayLogViewer.as_view(),
         name="log_current"),
 )
