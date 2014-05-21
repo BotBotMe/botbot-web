@@ -399,6 +399,9 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             self.date = self.tz.localize(
                 datetime.datetime(year=current.year, month=current.month, day=current.day))
 
+            # Use the last page.
+            self.kwargs['page'] = 'last'
+
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
     show_first_header = True
