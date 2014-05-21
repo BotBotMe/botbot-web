@@ -291,17 +291,14 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             if is_empty:
                 try:
                     # First check if there is anything in the past
-                    closet_qs = self.get_ordered_queryset(
-                        self.channel.filtered_logs().filter(
-                            timestamp__lte=self.date)
-                    )
+                    closet_qs = self.channel.filtered_logs().order_by(
+                        "-timestamp").filter(timestamp__lte=self.date)
 
                     # If not go to the future
                     if not closet_qs.exists():
-                        closet_qs = self.get_ordered_queryset(
-                            self.channel.filtered_logs().filter(
-                                timestamp__gte=self.date)
-                        )
+                        closet_qs = self.channel.filtered_logs().order_by(
+                            "timestamp").filter(
+                            timestamp__gte=self.date)
 
                     closet_date = closet_qs[0].timestamp
 
