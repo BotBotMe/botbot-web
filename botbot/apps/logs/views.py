@@ -445,7 +445,7 @@ class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
 
 
 class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
-
+    show_timeline = False
     show_first_header = True
     newest_first = False
 
@@ -455,7 +455,7 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         return data
 
     def get_queryset(self):
-        queryset = self.channel.log_set.all()
+        queryset = self.get_ordered_queryset(self.channel.log_set.all())
         nick = self.kwargs['nick']
         try:
             # cover nicks in the form: nick OR nick_ OR nick|<something>
