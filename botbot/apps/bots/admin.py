@@ -9,14 +9,11 @@ import redis
 from . import models
 from botbot.apps.plugins.models import Plugin
 
-DEFAULT_PLUGINS = ["logger", "ping", "last_seen", "help"]
-
-
 class PluginFormset(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         if not kwargs['instance'].pk:
             defaults = Plugin.objects.filter(
-                slug__in=DEFAULT_PLUGINS)
+                slug__in=models.Channel.DEFAULT_PLUGINS)
 
             kwargs['initial'] = [{"plugin": obj.pk} for obj in defaults]
         super(PluginFormset, self).__init__(*args, **kwargs)
@@ -28,7 +25,7 @@ class ActivePluginInline(admin.StackedInline):
 
     def get_extra(self, request, obj=None, **kwargs):
         if obj is None:
-            return len(DEFAULT_PLUGINS)
+            return len(models.Channel.DEFAULT_PLUGINS)
         return 0
 
 

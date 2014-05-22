@@ -122,6 +122,7 @@ class AddChannel(CreateView):
         response = super(AddChannel, self).form_valid(*args, **kwargs)
         self.object.membership_set.create(user=self.request.user,
             is_admin=True, is_owner=True)
+        self.object.create_default_plugins()
         return response
 
     def get_form_kwargs(self, *args, **kwargs):
@@ -243,8 +244,9 @@ class RequestChannel(FormView):
         if bot is None:
             bot, _ = models.ChatBot.objects.get_or_create(server=connection,
                                               defaults={"is_active" : False})
-        models.Channel.objects.create(name=form.cleaned_data['channel_name'],
+        channel = models.Channel.objects.create(name=form.cleaned_data['channel_name'],
                                       chatbot=bot, is_active=False)
+        channel.create_default_plugins()
         message = render_to_string('bots/emails/request.txt',
                                    {"data": form.cleaned_data})
         mail_admins("Channel Request", message)

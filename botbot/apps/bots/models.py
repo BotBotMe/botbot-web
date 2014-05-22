@@ -10,6 +10,7 @@ from django_hstore import hstore
 from djorm_pgarray.fields import ArrayField
 from botbot.apps.plugins import models as plugins_models
 from botbot.apps.logs import utils as log_utils
+from botbot.apps.plugins.models import Plugin, ActivePlugin
 
 PRETTY_SLUG = {
     "chat.freenode.net": "freenode",
@@ -61,6 +62,9 @@ class ChatBot(models.Model):
 
 
 class Channel(models.Model):
+    # These are the default plugin slugs.
+    DEFAULT_PLUGINS = ["logger", "ping", "last_seen", "help", "bangmotivate"]
+
     chatbot = models.ForeignKey(ChatBot)
     name = models.CharField(max_length=250,
                             help_text="IRC expects room name: #django")
@@ -101,6 +105,18 @@ class Channel(models.Model):
         log_utils.REDIS.setex(token, settings.TOKEN_TTL, redis_channel)
         endpoint_url = settings.SSE_ENDPOINT.format(token=token)
         return endpoint_url
+
+    def create_default_plugins(self):
+        """
+        Adds our default plugins to the channel.
+        :return:
+        """
+        for plugin in self.DEFAULT_PLUGINS:
+            pobj = Plugin.objects.get(slug=plugin)
+            active = ActivePlugin()
+            active.plugin = pobj
+            active.channel = self
+            active.save()
 
     @property
     def active_plugin_slugs_cache_key(self):
