@@ -278,7 +278,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
                     page = paginator.page(n)
                     if self.highlight_line in page.object_list:
                         params = {"msg": self.highlight_line.pk, "page": n}
-                        url = self.channel_date_url(date)
+                        url = self.channel_date_url()
                         cache.set(self._messaage_redirect_cache_key(self.highlight_line),
                                   [url, {"msg": self.highlight_line.pk, "page": n}], None)
                         break # Found the page.
