@@ -40,7 +40,7 @@ class PaginatorPageLinksMixin(object):
         return paginator, page, object_list, has_other_pages
 
     def get_next_page_link(self, page):
-        url = self.channel_date_url()
+        url = self.request.path
         params = self.request.GET.copy()
 
         if not page.has_next():
@@ -51,7 +51,7 @@ class PaginatorPageLinksMixin(object):
         return '{0}?{1}'.format(url, params.urlencode())
 
     def get_previous_page_link(self, page):
-        url = self.channel_date_url()
+        url = self.request.path
         params = self.request.GET.copy()
 
         if not page.has_previous():
@@ -63,7 +63,7 @@ class PaginatorPageLinksMixin(object):
 
 
     def get_current_page_link(self, page):
-        url = self.channel_date_url()
+        url = self.request.path
         params = self.request.GET.copy()
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
