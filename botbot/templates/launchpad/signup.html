@@ -42,15 +42,17 @@
         </div>
     </form>
 
-    More public channels:
+
+    <p><strong>More public channels:</strong></p>
+    <p>
+     Don't see your channel listed? If you're a channel op <a href="{% url 'request_channel' %}">request it here</a>.
+    </p>
+
     <ul class="channel-list-compact">
     {% for channel in public_not_featured_channels %}
         <li><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></li>
     {% endfor %}
     </ul>
-    {% comment %}
-    Are you a channel op? Want BotBot to log your channel? <a href="{% url 'request_channel' %}">Request it here</a>
-    {% endcomment %}
 {% endblock content %}
 {% block tail %}
 <script>
