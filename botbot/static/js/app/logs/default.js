@@ -76,7 +76,7 @@ $$.Cache = Backbone.Model.extend({
             });
         }
         if ($$.searchTerm) {
-            this.$el.find('.message').highlight($$.searchTerm);
+            this.$el.find('.message').highlight($$.searchTerm.split(" "));
         }
         $$.imagePreviews(this.$el);
 
