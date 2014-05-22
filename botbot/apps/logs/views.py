@@ -40,7 +40,7 @@ class PaginatorPageLinksMixin(object):
         return paginator, page, object_list, has_other_pages
 
     def get_next_page_link(self, page):
-        url = self.page_base_url
+        url = self.channel_date_url()
         params = self.request.GET.copy()
 
         if not page.has_next():
@@ -51,7 +51,7 @@ class PaginatorPageLinksMixin(object):
         return '{0}?{1}'.format(url, params.urlencode())
 
     def get_previous_page_link(self, page):
-        url = self.page_base_url
+        url = self.channel_date_url()
         params = self.request.GET.copy()
 
         if not page.has_previous():
@@ -63,7 +63,7 @@ class PaginatorPageLinksMixin(object):
 
 
     def get_current_page_link(self, page):
-        url = self.page_base_url
+        url = self.channel_date_url()
         params = self.request.GET.copy()
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
@@ -72,6 +72,12 @@ class LogDateMixin(object):
 
     def _get_base_queryset(self):
         return self.channel.filtered_logs()
+
+    def channel_date_url(self, date=None):
+        if not date:
+            date = self.date
+        return reverse_channel(
+            self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
 
     def _kwargs_with_date(self, date):
         kwargs = {
@@ -120,7 +126,6 @@ class LogViewer(ChannelMixin, object):
 
 
     def dispatch(self, request, *args, **kwargs):
-        self.page_base_url = request.path
         self.form = forms.SearchForm(request.GET)
         self.timezone = get_current_timezone_name()
 
@@ -273,9 +278,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
                     page = paginator.page(n)
                     if self.highlight_line in page.object_list:
                         params = {"msg": self.highlight_line.pk, "page": n}
-                        url = reverse_channel(
-                            self.channel, 'log_day',
-                            kwargs=self._kwargs_with_date(self.date))
+                        url = self.channel_date_url(date)
                         cache.set(self._messaage_redirect_cache_key(self.highlight_line),
                                   [url, {"msg": self.highlight_line.pk, "page": n}], None)
                         break # Found the page.
@@ -302,8 +305,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
 
                     closet_date = closet_qs[0].timestamp
 
-                    url = reverse_channel(self.channel, 'log_day',
-                                          kwargs=self._kwargs_with_date(closet_date))
+                    url = self.channel_date_url(closet_date)
                     return redirect(url)
 
                 except IndexError:
@@ -336,8 +338,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         """
         Generate a link to the next page, from the current one.
         """
-        url = self.page_base_url
-
+        url = self.channel_date_url()
         # copy, to maintain any params that came in to original request.
         params = self.request.GET.copy()
 
@@ -352,8 +353,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             paginator = self._date_paginator(date)
             params['page'] = paginator.num_pages
 
-            url = reverse_channel(
-                self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+            url = self.channel_date_url(date)
         else:
             params['page'] = page.previous_page_number()
 
@@ -363,7 +363,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         """
         Generate a link to the next page, from the current one.
         """
-        url = self.page_base_url
+        url = self.channel_date_url()
 
         # copy, to maintain any params that came in to original request.
         params = self.request.GET.copy()
@@ -371,8 +371,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         if not page.has_next():
             date = self._get_next_date()
             if date:
-                url = reverse_channel(
-                    self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+                url = self.channel_date_url(date)
                 params['page'] = 1  # If new date, always start at page 1.
             else:
                 return ""
@@ -385,8 +384,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         # copy, to maintain any params that came in to original request.
         params = self.request.GET.copy()
         date = self.tz.localize(datetime.datetime.now())
-        url = reverse_channel(
-            self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+        url = self.channel_date_url(date)
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
 
