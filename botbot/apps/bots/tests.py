@@ -27,7 +27,8 @@ class BaseTestCase(TestCase):
             email="m.therese@botbot.local")
         self.chatbot = models.ChatBot.objects.create(
                 server='testserver',
-                nick='botbot')
+                nick='botbot',
+                is_active=True)
         self.public_channel = models.Channel.objects.create(
             chatbot=self.chatbot,
             name="#Test",
@@ -182,7 +183,7 @@ class UrlTests(BaseTestCase):
 
         response = self.client.post(url, {
             "channel_name": "test_channel_name",
-            "server" : "irc.freenode.net:6697",
+            "server" : self.chatbot.pk,
             "name": "test_name",
             "email" : "test@example.com",
             "nick" : "test_nick",
@@ -198,38 +199,61 @@ class UrlTests(BaseTestCase):
 
         response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "form", "name", "This field is required.")
-        self.assertFormError(response, "form", "server", "This field is required.")
-        self.assertFormError(response, "form", "channel_name", "This field is required.")
-        self.assertFormError(response, "form", "email", "This field is required.")
-        self.assertFormError(response, "form", "nick", "This field is required.")
-        self.assertFormError(response, "form", "op", "This field is required.")
+        self.assertFormError(response, "form", "name",
+                             "This field is required.")
+        self.assertFormError(response, "form", "server",
+                             "This field is required.")
+        self.assertFormError(response, "form", "channel_name",
+                             "This field is required.")
+        self.assertFormError(response, "form", "email",
+                             "This field is required.")
+        self.assertFormError(response, "form", "nick",
+                             "This field is required.")
 
     def test_request_channel_form_duplicate_channel_submission(self):
         url = reverse("request_channel")
 
         response = self.client.post(url, {
             "channel_name": self.public_channel.name,
-            "server" : "irc.freenode.net:6697",
+            "server" : self.chatbot.pk,
             "name": "test_name",
             "email" : "test@example.com",
             "nick" : "test_nick",
             "op" : True
         })
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "form", "channel_name", "Sorry, this channel is already being monitored.")
+        self.assertFormError(response, "form", "channel_name",
+                             "Sorry, this channel is already being monitored.")
 
     def test_request_channel_form_invalid_formatted_server(self):
         url = reverse("request_channel")
 
         response = self.client.post(url, {
             "channel_name": "test_channel_name",
-            "server" : "irc.freenode.net",
+            "server": "new",
+            "connection": "irc.freenode.net",
             "name": "test_name",
-            "email" : "test@example.com",
-            "nick" : "test_nick",
-            "op" : True
+            "email": "test@example.com",
+            "nick": "test_nick",
+            "op": True
         })
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "form", "server", "Incorrect format, should be <url>:<port>")
+        self.assertFormError(response, "form", "connection",
+                             "Incorrect format, should be <url>:<port>")
+
+    def test_request_channel_form_require_connect_if_server_set_to_new(self):
+        url = reverse("request_channel")
+
+        response = self.client.post(url, {
+            "channel_name": "test_channel_name",
+            "server": "new",
+            "connection": "",
+            "name": "test_name",
+            "email": "test@example.com",
+            "nick": "test_nick",
+            "op": True
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, "form", "connection",
+                             "This field is required.")
 

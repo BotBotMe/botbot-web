@@ -6,10 +6,14 @@
       <legend>Channel Request</legend>
       <p>Want BotBot to log your channel, fill out this simple form to get the ball rolling.</p>
       {% for field in form %}
-        {% if field.name == "is_public" or field.name == "is_active" or field.name == "identifiable_url" %}
+        {% if field.name == "op" %}
           {% include "includes/checkbox.html" %}
         {% else %}
-          {% include "includes/field.html" %}
+          {% if field.name == "connection" %}
+            {% include "includes/field.html" with hide_optional=True %}
+          {% else %}
+            {% include "includes/field.html" %}
+          {% endif %}
         {% endif %}
       {% endfor %}
     </fieldset>
@@ -18,4 +22,22 @@
       <button type="submit" class="btn btn-primary">Send Request</button>
     </p>
   </form>
+{% endblock %}
+
+{% block tail %}
+<script type="text/javascript">
+  var $connection = $("#id_connection").parents('.field');
+  var $server = $('#id_server');
+  $server.change(function () {
+    if ($(this).val() === "new") {
+      $connection.show();
+    } else {
+      $connection.hide();
+    }
+  });
+
+  if ($server.val() !== "new") {
+    $connection.hide()
+  }
+</script>
 {% endblock %}
