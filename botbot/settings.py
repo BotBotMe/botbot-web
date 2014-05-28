@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'launchpad',
     'social.apps.django_app.default',
     'django_assets',
+    'django_statsd',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,8 +132,10 @@ TEMPLATE_CONTEXT_PROCESSORS += (
 #==============================================================================
 # Middleware
 #==============================================================================
-
-MIDDLEWARE_CLASSES += (
+MIDDLEWARE_CLASSES = (
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
+) + MIDDLEWARE_CLASSES + (
     'botbot.core.middleware.TimezoneMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
 )
@@ -280,3 +283,12 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.load_extra_data',
     'social.pipeline.user.user_details'
 )
+
+
+# Statsd
+STATSD_CLIENT = 'django_statsd.clients.normal'
+
+STATSD_PATCHES = [
+    'django_statsd.patches.db',
+    'django_statsd.patches.cache',
+]

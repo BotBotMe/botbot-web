@@ -5,6 +5,7 @@ pytz
 psycopg2==2.5.2
 dj-database-url==0.2.2
 django-hstore==1.2.1
+django-statsd-mozilla==0.3.12
 markdown==2.3.1
 redis==2.9.1
 webassets==0.9.0
