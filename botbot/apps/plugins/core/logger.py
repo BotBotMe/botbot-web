@@ -14,10 +14,9 @@ class Plugin(BasePlugin):
         # If the Channel do not startswtih "#" that means the message
         # is part of a /query
         if line._channel_name.startswith("#"):
-            timestamp = convert_nano_timestamp(line._received)
             Log.objects.create(
                 channel_id=line._channel.pk,
-                timestamp=timestamp,
+                timestamp=line._received,
                 nick=line.user,
                 text=line.full_text,
                 room=line._channel,

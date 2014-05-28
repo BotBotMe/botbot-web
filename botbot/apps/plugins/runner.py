@@ -1,7 +1,9 @@
 # pylint: disable=W0212
 import json
 import logging
+from datetime import datetime
 
+from django.utils.timezone import utc
 import re
 import redis
 import botbot_plugins.plugins
@@ -11,6 +13,7 @@ from django.utils.importlib import import_module
 from django_statsd.clients import statsd
 
 from botbot.apps.bots import models as bots_models
+from botbot.apps.plugins.utils import convert_nano_timestamp
 from .plugin import RealPluginMixin
 
 
@@ -32,7 +35,8 @@ class Line(object):
         self._channel_name = packet['Channel'].strip()
         self._command = packet['Command']
         self._is_message = packet['Command'] == 'PRIVMSG'
-        self._received = packet['Received']
+
+        self._received = convert_nano_timestamp(packet['Received'])
 
         self.is_direct_message = self.check_direct_message()
 
@@ -164,6 +168,12 @@ class PluginRunner(object):
                 _, val = val
                 LOG.debug('Recieved: %s', val)
                 line = Line(json.loads(val), self)
+
+                # Calculate the transport latency between go and the plugins.
+                delta = datetime.utcnow().replace(tzinfo=utc) - line._received
+                statsd.timing(".".join(["plugins", "latency"]),
+                             delta.total_seconds() * 1000)
+
                 self.dispatch(line)
 
     def dispatch(self, line):
