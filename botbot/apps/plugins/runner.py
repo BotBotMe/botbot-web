@@ -1,17 +1,18 @@
 # pylint: disable=W0212
 import json
 import logging
-import re
 
+import re
+import redis
+import botbot_plugins.plugins
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.importlib import import_module
-import redis
+from django_statsd.clients import statsd
 
 from botbot.apps.bots import models as bots_models
-import botbot_plugins.plugins
-
 from .plugin import RealPluginMixin
+
 
 CACHE_TIMEOUT_2H = 7200
 LOG = logging.getLogger('botbot.plugin_runner')
@@ -153,10 +154,17 @@ class PluginRunner(object):
     def listen(self):
         """Listens for incoming messages on the Redis queue"""
         while 1:
-            _, val = self.bot_bus.blpop('q')
-            LOG.debug('Recieved: %s', val)
-            line = Line(json.loads(val), self)
-            self.dispatch(line)
+            val = self.bot_bus.blpop('q', 1)
+
+            # Track q length
+            ql = self.bot_bus.llen('q')
+            statsd.gauge(".".join(["plugins", "q"]), ql)
+
+            if val:
+                _, val = val
+                LOG.debug('Recieved: %s', val)
+                line = Line(json.loads(val), self)
+                self.dispatch(line)
 
     def dispatch(self, line):
         """Given a line, dispatch it to the right plugins & functions."""
@@ -168,13 +176,17 @@ class PluginRunner(object):
             for _, func, plugin in self.firehose_router[plugin_slug]:
                 # firehose gets everything, no rule matching
                 LOG.info('Match: %s.%s', plugin_slug, func.__name__)
-                channel_plugin = self.setup_plugin_for_channel(
-                    plugin.__class__, line)
-                new_func = getattr(channel_plugin, func.__name__)
-                if hasattr(self, 'gevent'):
-                    self.gevent.Greenlet.spawn(new_func, line)
-                else:
-                    new_func(line)
+
+                with statsd.timer(".".join(["plugins", plugin_slug])):
+                    # FIXME: This will not have correct timing if go back to
+                    # gevent.
+                    channel_plugin = self.setup_plugin_for_channel(
+                        plugin.__class__, line)
+                    new_func = getattr(channel_plugin, func.__name__)
+                    if hasattr(self, 'gevent'):
+                        self.gevent.Greenlet.spawn(new_func, line)
+                    else:
+                        new_func(line)
 
         # pass line to other routers
         if line._is_message:
