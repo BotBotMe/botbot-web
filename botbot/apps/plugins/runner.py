@@ -186,7 +186,6 @@ class PluginRunner(object):
             for _, func, plugin in self.firehose_router[plugin_slug]:
                 # firehose gets everything, no rule matching
                 LOG.info('Match: %s.%s', plugin_slug, func.__name__)
-
                 with statsd.timer(".".join(["plugins", plugin_slug])):
                     # FIXME: This will not have correct timing if go back to
                     # gevent.
@@ -224,19 +223,22 @@ class PluginRunner(object):
                 match = re.match(rule, line.text, re.IGNORECASE)
                 if match:
                     LOG.info('Match: %s.%s', plugin_slug, func.__name__)
-                    # Instantiate a plugin specific to this channel
-                    channel_plugin = self.setup_plugin_for_channel(
-                        plugin.__class__, line)
-                    # get the method from the channel-specific plugin
-                    new_func = getattr(channel_plugin, func.__name__)
-                    if hasattr(self, 'gevent'):
-                        grnlt = self.gevent.Greenlet(new_func, line,
-                                                     **match.groupdict())
-                        grnlt.link_value(channel_plugin.greenlet_respond)
-                        grnlt.start()
-                    else:
-                        channel_plugin.respond(new_func(line,
-                                                        **match.groupdict()))
+                    with statsd.timer(".".join(["plugins", plugin_slug])):
+                        # FIXME: This will not have correct timing if go back to
+                        # gevent.
+                        # Instantiate a plugin specific to this channel
+                        channel_plugin = self.setup_plugin_for_channel(
+                            plugin.__class__, line)
+                        # get the method from the channel-specific plugin
+                        new_func = getattr(channel_plugin, func.__name__)
+                        if hasattr(self, 'gevent'):
+                            grnlt = self.gevent.Greenlet(new_func, line,
+                                                         **match.groupdict())
+                            grnlt.link_value(channel_plugin.greenlet_respond)
+                            grnlt.start()
+                        else:
+                            channel_plugin.respond(new_func(line,
+                                                            **match.groupdict()))
 
 
 def start_plugins(*args, **kwargs):
