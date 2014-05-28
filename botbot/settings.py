@@ -292,3 +292,5 @@ STATSD_PATCHES = [
     'django_statsd.patches.db',
     'django_statsd.patches.cache',
 ]
+
+STATSD_PREFIX = "bbme"
