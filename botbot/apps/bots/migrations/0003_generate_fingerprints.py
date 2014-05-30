@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import uuid
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
@@ -14,6 +15,7 @@ class Migration(DataMigration):
 
         # Resave every channel so a new fingerprint is created
         for obj in orm.Channel.objects.all():
+            obj.fingerprint = uuid.uuid4()
             obj.save()
 
 
