@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db import models
 from django.db.models import Max, Min
+from django.utils.text import slugify
 from django.utils.datastructures import SortedDict
 from django_hstore import hstore
 from djorm_pgarray.fields import ArrayField
@@ -35,6 +36,7 @@ class ChatBot(models.Model):
             blank=True,
             null=True,
             help_text="IRC server password - PASS command. Optional")
+    server_identifier = models.CharField(max_length=164)
 
     nick = models.CharField(max_length=64)
     password = models.CharField(
@@ -60,6 +62,13 @@ class ChatBot(models.Model):
     @property
     def date_cache_key(self):
         return 'dc:{0}'.format(self.pk)
+
+    def save(self, *args, **kwargs):
+        self.server_identifier = u"%s.%s" % (
+            slugify(unicode(self.server.replace(":", " ").replace(".", " "))),
+            slugify(unicode(self.nick))
+        )
+        return super(ChatBot, self).save(*args, **kwargs)
 
 
 class Channel(TimeStampedModel):
