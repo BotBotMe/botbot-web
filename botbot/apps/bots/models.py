@@ -272,6 +272,11 @@ class Channel(TimeStampedModel):
         if not self.slug:
             self.slug = None
         self.fingerprint = uuid.uuid4()
+
+        # If a room is active, it can't be pending.
+        if self.is_active:
+            self.is_pending = False
+
         super(Channel, self).save(*args, **kwargs)
 
 
