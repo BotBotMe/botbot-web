@@ -54,10 +54,10 @@ class ChatBotAdmin(admin.ModelAdmin):
 
 class ChannelAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'name', 'chatbot', 'is_active',
-                    'is_public', 'is_featured', 'is_pending')
+                    'is_public', 'is_featured', 'is_pending', 'updated')
     list_filter = ('chatbot', 'is_active', 'is_public', 'is_featured', 'is_pending')
     list_editable = ('is_active',)
-    readonly_fields = ('fingerprint',)
+    readonly_fields = ('fingerprint', 'created', 'updated')
     search_fields = ('name', 'chatbot__server')
     inlines = [
             ActivePluginInline,

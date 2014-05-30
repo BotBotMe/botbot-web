@@ -11,6 +11,7 @@ from djorm_pgarray.fields import ArrayField
 from botbot.apps.plugins import models as plugins_models
 from botbot.apps.logs import utils as log_utils
 from botbot.apps.plugins.models import Plugin, ActivePlugin
+from botbot.core.models import TimeStampedModel
 
 PRETTY_SLUG = {
     "chat.freenode.net": "freenode",
@@ -61,7 +62,7 @@ class ChatBot(models.Model):
         return 'dc:{0}'.format(self.pk)
 
 
-class Channel(models.Model):
+class Channel(TimeStampedModel):
     # These are the default plugin slugs.
     DEFAULT_PLUGINS = ["logger", "ping", "last_seen", "help", "bangmotivate"]
 
