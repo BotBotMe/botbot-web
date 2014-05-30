@@ -73,6 +73,7 @@ class Channel(models.Model):
                                 help_text="Password (mode +k) if the channel requires one")
     is_public = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    is_pending = models.BooleanField(default=False)
 
     plugins = models.ManyToManyField('plugins.Plugin',
                                      through='plugins.ActivePlugin')
