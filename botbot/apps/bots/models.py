@@ -187,18 +187,18 @@ class Channel(TimeStampedModel):
         Limits to certain IRC commands (including some more for
         private channels).
         """
-        qfilter = models.Q(command__in=['PRIVMSG', 'NICK', 'NOTICE',
-                                        'TOPIC', 'ACTION', 'SHUTDOWN'])
-        if not self.is_public:
-            # Private channels we want to see people arrive and leave too.
-            qfilter = (qfilter |
-                        models.Q(command__in=['JOIN', 'QUIT',
-                                                'PART', 'AWAY']))
-        else:
-            qfilter = (qfilter |
-                        models.Q(command__in=['JOIN', 'QUIT'],
-                                nick=self.chatbot.nick))
-        return qfilter
+        return models.Q(
+            command__in=['PRIVMSG',
+                         'NICK',
+                         'NOTICE',
+                         'TOPIC',
+                         'ACTION',
+                         'SHUTDOWN',
+                         'JOIN',
+                         'QUIT',
+                         'PART',
+                         'AWAY'
+            ])
 
     def filtered_logs(self):
         return (self.log_set.filter(self.visible_commands_filter)
