@@ -78,7 +78,11 @@ class Channel(TimeStampedModel):
     chatbot = models.ForeignKey(ChatBot)
     name = models.CharField(max_length=250,
                             help_text="IRC expects room name: #django")
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True, null=True,
+                            help_text="If a slug is given the url will be "
+                                      "/private/[slug] hiding all details "
+                                      "about the channel name or server it "
+                                      "is hosted on.")
     password = models.CharField(max_length=250, blank=True, null=True,
                                 help_text="Password (mode +k) if the channel requires one")
     is_public = models.BooleanField(default=False)
