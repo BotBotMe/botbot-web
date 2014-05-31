@@ -190,7 +190,8 @@ class UrlTests(BaseTestCase):
             "name": "test_name",
             "email" : "test@example.com",
             "nick" : "test_nick",
-            "op" : True
+            "op" : True,
+            "description" : "This is a test"
         })
         self.assertRedirects(response, reverse('request_channel_success'))
         channel = models.Channel.objects.get(name="test_channel_name")

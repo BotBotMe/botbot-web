@@ -63,6 +63,9 @@ class ChannelRequestForm(forms.Form):
         requires a link to the logs in the channel topic.
     """))
 
+    description = forms.CharField(label="What is this channel for?",
+                                  widget=forms.Textarea, required=True)
+
     def __init__(self, *args, **kwargs):
         super(ChannelRequestForm, self).__init__(*args, **kwargs)
         self._set_server_choices()
