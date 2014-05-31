@@ -22,7 +22,7 @@ urlpatterns = patterns('',
     (r'^accounts/', include('botbot.apps.accounts.urls')),
     url(r'^_suggest_users/$', SuggestUsers.as_view(), name='suggest_users'),
 
-    url(r'^(?P<bot_slug>[\-\w\:\.]+(\@[\w]+)?)/(?P<channel_slug>[\-\w]+)/',
+    url(r'^(?P<bot_slug>[\-\w\:\.]+(\@[\w]+)?)/(?P<channel_slug>[\-\w\.]+)/',
         include(channel_patterns)),
 )
 
