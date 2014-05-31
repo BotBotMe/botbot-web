@@ -82,6 +82,9 @@ class ChannelRequestForm(forms.Form):
             raise forms.ValidationError(
                 "Sorry, this channel is already being monitored.")
 
+        if not channel_name.startswith("#"):
+            channel_name = "#" + channel_name
+
         return channel_name
 
     def clean_connection(self):

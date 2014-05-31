@@ -185,16 +185,34 @@ class UrlTests(BaseTestCase):
         url = reverse("request_channel")
 
         response = self.client.post(url, {
-            "channel_name": "test_channel_name",
-            "server" : self.chatbot.pk,
+            "channel_name": "#test_channel_name",
+            "server": self.chatbot.pk,
             "name": "test_name",
-            "email" : "test@example.com",
-            "nick" : "test_nick",
-            "op" : True,
-            "description" : "This is a test"
+            "email": "test@example.com",
+            "nick": "test_nick",
+            "op": True,
+            "description": "This is a test"
         })
         self.assertRedirects(response, reverse('request_channel_success'))
-        channel = models.Channel.objects.get(name="test_channel_name")
+        channel = models.Channel.objects.get(name="#test_channel_name")
+        self.assertFalse(channel.is_active)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_request_channel_form_submission_channel_with_missing_pound_sign(self):
+        url = reverse("request_channel")
+
+        response = self.client.post(url, {
+            "channel_name": "test_channel_name",
+            "server": self.chatbot.pk,
+            "name": "test_name",
+            "email": "test@example.com",
+            "nick": "test_nick",
+            "op": True,
+            "description": "This is a test"
+        })
+        self.assertRedirects(response, reverse('request_channel_success'))
+        # make sure wer saved it with a pound sign.
+        channel = models.Channel.objects.get(name="#test_channel_name")
         self.assertFalse(channel.is_active)
         self.assertEqual(len(mail.outbox), 1)
 
