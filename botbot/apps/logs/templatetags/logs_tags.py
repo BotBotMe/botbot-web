@@ -103,7 +103,12 @@ def build_html_attrs(html_attrs):
     result = ""
     for key, value in html_attrs.iteritems():
         if isinstance(value, (list, tuple)):
-            value = " ".join(value)
+            if value:
+                value = " ".join(map(str, value))
+            else:
+                value = None
+        if not value:
+            continue
 
         result += ' {0}="{1}"'.format(key, value)
 
@@ -201,7 +206,7 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 if 'href' not in html_attrs:
                     html_attrs['href'] = urlparse.urlunparse(url)
 
-                middle = "<a {attrs}>{text}</a>".format(
+                middle = "<a{attrs}>{text}</a>".format(
                     attrs=build_html_attrs(html_attrs), text=trimmed)
 
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
