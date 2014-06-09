@@ -100,17 +100,17 @@ def build_html_attrs(html_attrs):
     :param html_attrs:
     :return:
     """
-    result = ""
+    result = u""
     for key, value in html_attrs.iteritems():
         if isinstance(value, (list, tuple)):
             if value:
-                value = " ".join(map(str, value))
+                value = u" ".join(map(unicode, value))
             else:
                 value = None
         if not value:
             continue
 
-        result += ' {0}="{1}"'.format(key, value)
+        result += u' {0}="{1}"'.format(key, value)
 
     return result
 
@@ -176,9 +176,6 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
             if autoescape and not safe_input:
                 lead, trail = escape(lead), escape(trail)
-                middle, trimmed = escape(middle), escape(trim_url(middle))
-            else:
-                trimmed = trim_url(middle)
 
             # Make URL we want to point to.
             url = parse_url(middle)
@@ -206,7 +203,9 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 if 'href' not in html_attrs:
                     html_attrs['href'] = urlparse.urlunparse(url)
 
-                middle = "<a{attrs}>{text}</a>".format(
+
+                trimmed = trim_url(middle)
+                middle = u"<a{attrs}>{text}</a>".format(
                     attrs=build_html_attrs(html_attrs), text=trimmed)
 
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
