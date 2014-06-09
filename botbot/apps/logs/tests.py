@@ -164,6 +164,12 @@ class TemplateTagTestCase(TestCase):
             u'<a href="http://www.example.com">http://www.example.com</a>'
         )
 
+        # Test with a unicode char
+        self.assertEqual(
+            urlize_impl(u'https://forge.puppetlabs.com/modules?utf-8=✓&sort=latest_release&supported=yes'),
+            u'<a href="https://forge.puppetlabs.com/modules?utf-8=%E2%9C%93&sort=latest_release&supported=yes">https://forge.puppetlabs.com/modules?utf-8=✓&sort=latest_release&supported=yes</a>'
+        )
+
         # Test image
         self.assertEqual(
             urlize_impl(u'http://www.example.com/image.png'),
