@@ -1,4 +1,6 @@
 """Near duplicate of Django's `urlizetrunc` with support for image classes"""
+import urlparse
+
 from django.template.base import Library
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe, SafeData
@@ -9,7 +11,13 @@ from django.utils.html import (TRAILING_PUNCTUATION, WRAPPING_PUNCTUATION,
                                word_split_re, simple_url_re, smart_urlquote,
                                simple_url_2_re, simple_email_re, escape)
 
+
 register = Library()
+
+image_file_types = [".png", ".jpg", ".jpeg", ".gif"]
+IMAGE = 1
+YOUTUBE = 2
+
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
@@ -22,6 +30,97 @@ def bbme_urlizetrunc(value, limit, autoescape=None):
     """
     return mark_safe(urlize_impl(value, trim_url_limit=int(limit), nofollow=True,
                             autoescape=autoescape))
+
+
+def is_embeddable(url):
+    """
+    Given a url can we embed a vidoe or an image
+    :param url: The url of the content
+    :return: Type of content, bool if possible.
+    """
+    # Check if path ends with a image file type
+    if any([url.path.endswith(ending) for ending in image_file_types]):
+        return IMAGE, True
+
+    elif url.hostname in ['www.youtube.com'] and \
+            url.path.startswith('/watch') and \
+                    'v' in urlparse.parse_qs(url.query, False):
+        return YOUTUBE, True
+
+    return None, False
+
+
+def parse_url(word):
+    """
+    If word is url, return a parsed version of it.
+    :param word: string
+    :return: None or parsed url
+    """
+    url = None
+    if simple_url_re.match(word):
+        url = smart_urlquote(word)
+    elif simple_url_2_re.match(word):
+        url = smart_urlquote('http://%s' % word)
+    elif not ':' in word and simple_email_re.match(word):
+        local, domain = word.rsplit('@', 1)
+        try:
+            domain = domain.encode('idna').decode('ascii')
+        except UnicodeError:
+            return
+
+        url = 'mailto:%s@%s' % (local, domain)
+
+    if url:
+        return urlparse.urlparse(url)
+
+
+def embed_image(url):
+    """
+    Returns two urls, one for display and other where to source the image. This also
+    handles cases like drobox where you need to use another hostname.
+
+    :param url: Url parts as returned from urlparse
+    :return: two urls
+    """
+    if url.hostname in ["www.dropbox.com", "dropbox.com"]:
+        src = urlparse.urlunparse((url.scheme, "dl.dropboxusercontent.com",
+                                   url.path, url.params, url.query,
+                                   url.fragment))
+        link = urlparse.urlunparse(url)
+
+        return link, src
+
+    else:
+        return urlparse.urlunparse(url), urlparse.urlunparse(url)
+
+
+def build_html_attrs(html_attrs):
+    """
+    Builds a string from a dict of html attributes
+    :param html_attrs:
+    :return:
+    """
+    result = ""
+    for key, value in html_attrs.iteritems():
+        if isinstance(value, (list, tuple)):
+            value = " ".join(value)
+
+        result += ' {0}="{1}"'.format(key, value)
+
+    return result
+
+
+def embed_youtube(url):
+    """
+    Generates two urls, one for display, and another to embed the content.
+    :param url:
+    :return: display link, src
+    """
+    video_id = urlparse.parse_qs(url.query)['v'][0]
+
+    return urlparse.urlunparse(
+        url), "http://www.youtube.com/embed/{id}".format(id=video_id)
+
 
 def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
@@ -70,42 +169,41 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
 
-            # Make URL we want to point to.
-            url = None
-            nofollow_attr = ' rel="nofollow"' if nofollow else ''
-            if simple_url_re.match(middle):
-                url = smart_urlquote(middle)
-            elif simple_url_2_re.match(middle):
-                url = smart_urlquote('http://%s' % middle)
-            elif not ':' in middle and simple_email_re.match(middle):
-                local, domain = middle.rsplit('@', 1)
-                try:
-                    domain = domain.encode('idna').decode('ascii')
-                except UnicodeError:
-                    continue
-                url = 'mailto:%s@%s' % (local, domain)
-                nofollow_attr = ''
-
-            # Make link.
-            if url:
+            if autoescape and not safe_input:
+                lead, trail = escape(lead), escape(trail)
+                middle, trimmed = escape(middle), escape(trim_url(middle))
+            else:
                 trimmed = trim_url(middle)
-                if autoescape and not safe_input:
-                    lead, trail = escape(lead), escape(trail)
-                    url, trimmed = escape(url), escape(trimmed)
 
+            # Make URL we want to point to.
+            url = parse_url(middle)
+            if url:
+                html_attrs = {'class': []}
 
-                #
-                # Custom stuff for us
-                #
-                lowered = url.lower()
-                is_image = (lowered.endswith('.jpg') or lowered.endswith('.gif')
-                            or lowered.endswith('.png'))
-                class_attr = is_image and ' class="image"' or ''
-                middle = '<a href="%s"%s%s>%s</a>' % (url, nofollow_attr,
-                                                      class_attr, trimmed)
-                #
-                # End custom stuff
-                #
+                if not url.scheme == "mailto" and nofollow:
+                    html_attrs['rel'] = 'nofollow'
+
+                _type, embeddable = is_embeddable(url)
+                if embeddable:
+                    link, src = None, None
+                    if _type == IMAGE:
+                        link, src = embed_image(url)
+                        html_attrs['class'].append('image')
+                        html_attrs['data-type'] = "image"
+                    elif _type == YOUTUBE:
+                        link, src = embed_youtube(url)
+                        html_attrs['class'].append('image')
+                        html_attrs['data-type'] = "youtube"
+
+                    html_attrs['href'] = link
+                    html_attrs['data-src'] = src
+
+                if 'href' not in html_attrs:
+                    html_attrs['href'] = urlparse.urlunparse(url)
+
+                middle = "<a {attrs}>{text}</a>".format(
+                    attrs=build_html_attrs(html_attrs), text=trimmed)
+
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
             else:
                 if safe_input:
