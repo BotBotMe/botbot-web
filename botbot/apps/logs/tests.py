@@ -173,7 +173,7 @@ class TemplateTagTestCase(TestCase):
         # Test youtube video
         self.assertEqual(
             urlize_impl(u'https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
-            u'<a data-src="http://www.youtube.com/embed/dQw4w9WgXcQ" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" data-type="youtube" class="image">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>'
+            u'<a data-src="//www.youtube.com/embed/dQw4w9WgXcQ" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" data-type="youtube" class="image">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>'
         )
 
         # Test invalid youtube link

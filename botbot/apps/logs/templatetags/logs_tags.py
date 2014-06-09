@@ -124,7 +124,7 @@ def embed_youtube(url):
     video_id = urlparse.parse_qs(url.query)['v'][0]
 
     return urlparse.urlunparse(
-        url), "http://www.youtube.com/embed/{id}".format(id=video_id)
+        url), "//www.youtube.com/embed/{id}".format(id=video_id)
 
 
 def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
