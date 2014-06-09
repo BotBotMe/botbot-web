@@ -159,10 +159,33 @@ class TemplateTagTestCase(TestCase):
             u'<a href="http://www.example.com">http://www.example.com</a>'
         )
 
-        # Simple link with no control characters
         self.assertEqual(
             urlize_impl(u'http://www.example.com\017'),
             u'<a href="http://www.example.com">http://www.example.com</a>'
+        )
+
+        # Test image
+        self.assertEqual(
+            urlize_impl(u'http://www.example.com/image.png'),
+            u'<a data-src="http://www.example.com/image.png" href="http://www.example.com/image.png" data-type="image" class="image">http://www.example.com/image.png</a>'
+        )
+
+        # Test youtube video
+        self.assertEqual(
+            urlize_impl(u'https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+            u'<a data-src="http://www.youtube.com/embed/dQw4w9WgXcQ" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" data-type="youtube" class="image">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>'
+        )
+
+        # Test invalid youtube link
+        self.assertEqual(
+            urlize_impl(u'https://www.youtube.com/watch'),
+            u'<a href="https://www.youtube.com/watch">https://www.youtube.com/watch</a>'
+        )
+
+        # Test dropbox
+        self.assertEqual(
+            urlize_impl(u'https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png'),
+            u'<a data-src="https://dl.dropboxusercontent.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png" href="https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png" data-type="image" class="image">https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png</a>'
         )
 
 
