@@ -3,7 +3,7 @@ $$.Templates = {
         '<h3 id="date-<%= flatDate %>" data-date="<%= flatDate %>"><span><%= dateString %></span></h3>'
     ),
     ImagePreview: _.template(
-        '<a class="preview-img" href="<%= link %>"><img src="<%= link %>" height="200" /></a>'
+        '<a class="preview-img" href="<%= link %>"><img src="<%= link %>"/></a>'
     ),
     ImageToggle: _.template(
         '<a href="<%= link %>" data-type="<%= type %>" class="toggle-preview" title="Preview"><i class="icon-zoom-in icon-large"></i></a>'

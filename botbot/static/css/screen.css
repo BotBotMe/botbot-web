@@ -4295,6 +4295,9 @@ body.log-view .misc-links {
   display: block;
   margin: 4px 0 0;
 }
+.preview-img img {
+  max-height: 200px;
+}
 /*
     Small Log Styles
 */

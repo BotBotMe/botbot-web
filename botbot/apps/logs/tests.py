@@ -194,6 +194,12 @@ class TemplateTagTestCase(TestCase):
             u'<a data-src="https://dl.dropboxusercontent.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png" href="https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png" data-type="image" class="image">https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png</a>'
         )
 
+        # Test cloudapp
+        self.assertEqual(
+            urlize_impl(u'http://cl.ly/image/1Y0A1C3l370z'),
+            u'<a data-src="http://cl.ly/1Y0A1C3l370z/content" href="http://cl.ly/image/1Y0A1C3l370z" data-type="image" class="image">http://cl.ly/image/1Y0A1C3l370z</a>'
+        )
+
 
 class RedactTests(TestCase):
     def setUp(self):

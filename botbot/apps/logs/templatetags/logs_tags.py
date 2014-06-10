@@ -10,6 +10,7 @@ from django.utils import six
 from django.utils.html import (TRAILING_PUNCTUATION, WRAPPING_PUNCTUATION,
                                word_split_re, simple_url_re, smart_urlquote,
                                simple_url_2_re, simple_email_re, escape)
+import re
 
 
 register = Library()
@@ -46,6 +47,9 @@ def is_embeddable(url):
             url.path.startswith('/watch') and \
                     'v' in urlparse.parse_qs(url.query, False):
         return YOUTUBE, True
+
+    elif url.hostname == "cl.ly":
+        return IMAGE, True
 
     return None, False
 
@@ -90,8 +94,17 @@ def embed_image(url):
 
         return link, src
 
-    else:
-        return urlparse.urlunparse(url), urlparse.urlunparse(url)
+    elif url.hostname in "cl.ly":
+        match = re.match(r"^/image/(?P<image_id>[\-\w\.]+)", url.path)
+        if match:
+            image_id  = match.group('image_id')
+
+            src = urlparse.urlunparse((
+            url.scheme, url.hostname, "/{}/content".format(image_id),
+            url.params, url.query, url.fragment))
+            return urlparse.urlunparse(url), src
+
+    return urlparse.urlunparse(url), urlparse.urlunparse(url)
 
 
 def build_html_attrs(html_attrs):
@@ -125,7 +138,6 @@ def embed_youtube(url):
 
     return urlparse.urlunparse(
         url), "//www.youtube.com/embed/{id}".format(id=video_id)
-
 
 def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
