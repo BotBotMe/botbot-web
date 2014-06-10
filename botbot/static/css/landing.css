@@ -5498,3 +5498,136 @@ article {
 #Site-Footer .copyright {
   float: none;
 }
+strong {
+  color: #ee632a;
+  font-size: 20px;
+}
+p {
+  font-size: 17px;
+}
+#Site-Footer .support h5 {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+#Site-Footer .support a {
+  font-size: 17px;
+  margin-bottom: 40px;
+}
+/* Begin responsive homepage styles */
+@media (max-width: 850px) {
+  .logo-standalone {
+    float: none;
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom: 60px;
+  }
+  .container {
+    margin: 60px auto;
+    width: 550px;
+    text-align: center;
+  }
+  .tag-line {
+    font-size: 44px;
+    margin: 0 auto;
+    margin-bottom: 50px;
+    width: 350px;
+  }
+  article {
+    margin-left: 0;
+  }
+  .teaser-form {
+    margin: 0 auto;
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+  strong {
+    font-size: 22px;
+    color: #ee632a;
+  }
+  p {
+    font-size: 17px;
+    line-height: 38px;
+  }
+  #Site-Footer .support h5 {
+    font-size: 19px;
+    margin-bottom: 15px;
+  }
+  #Site-Footer .support a {
+    font-size: 16px;
+    margin-bottom: 40px;
+  }
+  .disclaimer {
+    margin-bottom: 20px;
+  }
+  .strong-input {
+    font-size: 18px;
+  }
+}
+@media (max-width: 630px) {
+  .logo-standalone {
+    float: none;
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom: 30px;
+    width: 250px;
+  }
+  .logo-standalone.wiggler {
+    width: 100px;
+    height: 100px;
+  }
+  .container {
+    margin: 30px auto;
+    text-align: center;
+    width: 275px;
+  }
+  .tag-line {
+    font-size: 28px;
+    margin: 0 auto;
+    margin-bottom: 50px;
+    line-height: 46px;
+    width: 250px;
+  }
+  .teaser-form {
+    margin: 0 auto;
+    margin-top: 60px;
+    margin-bottom: 60px;
+    width: 230px;
+  }
+  .teaser-form .field input {
+    margin-bottom: 25px;
+    margin-left: 5px;
+    text-align: center;
+    width: 210px;
+  }
+  h2 {
+    font-size: 24px;
+    margin: auto;
+    margin-bottom: 15px;
+  }
+  strong {
+    font-size: 20px;
+    color: #ee632a;
+  }
+  p {
+    font-size: 16px;
+    line-height: 32px;
+  }
+  #Site-Footer .support h5 {
+    font-size: 17px;
+  }
+  #Site-Footer .support a {
+    display: block;
+    margin-bottom: 20px;
+  }
+  .wicon:first-of-type {
+    margin-top: 30px;
+  }
+  .misc-links {
+    margin-top: 20px;
+  }
+  .strong-input {
+    font-size: 16px;
+  }
+}
