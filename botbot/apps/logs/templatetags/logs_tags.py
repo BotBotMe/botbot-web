@@ -96,8 +96,11 @@ def embed_image(url):
 
     elif url.hostname in "cl.ly":
         match = re.match(r"^/image/(?P<image_id>[\-\w\.]+)", url.path)
+        if not match:
+            match = re.match(r"^/(?P<image_id>[\-\w\.]+)", url.path)
+
         if match:
-            image_id  = match.group('image_id')
+            image_id = match.group('image_id')
 
             src = urlparse.urlunparse((
             url.scheme, url.hostname, "/{}/content".format(image_id),
