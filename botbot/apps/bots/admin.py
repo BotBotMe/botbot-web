@@ -1,6 +1,5 @@
 """Django admin configuration for the bot objects.
 """
-
 from django.contrib import admin
 from django.db import transaction
 from django.forms.models import BaseInlineFormSet
@@ -43,12 +42,14 @@ class ChatBotAdmin(admin.ModelAdmin):
     # Disable bulk delete, because it doesn't call delete, so skips REFRESH
     actions = None
 
-    def save_related(self, request, form, formsets, change):
-        super(ChatBotAdmin, self).save_related(request, form, formsets, change)
+    def save_model(self, request, obj, form, change):
+        super(ChatBotAdmin, self).save_model(request, form, form, change)
+        transaction.commit()
         daemon_refresh()
 
     def delete_model(self, request, obj):
         super(ChatBotAdmin, self).delete_model(request, obj)
+        transaction.commit()
         daemon_refresh()
 
 
@@ -64,30 +65,27 @@ class ChannelAdmin(admin.ModelAdmin):
             MembershipInline
         ]
 
-    def save_related(self, request, form, formsets, change):
-        super(ChannelAdmin, self).save_related(request, form, formsets, change)
+    def save_model(self, request, obj, form, change):
+        """
+        Given a model instance save it to the database.
+        """
+        super(ChannelAdmin, self).save_model(request, obj, form, change)
+        transaction.commit()
         daemon_refresh()
 
     def delete_model(self, request, obj):
+        """
+        Given a model instance delete it from the database.
+        """
         super(ChannelAdmin, self).delete_model(request, obj)
+        transaction.commit()
         daemon_refresh()
+        
 
 def daemon_refresh():
     """
     Ask daemon to reload configuration
     """
-    # Wait until the db transaction is done and then send the REFRESH command
-    # so the Go bot part will update it.
-
-    # THIS IS NO-OP SINCE DJANGO1.6 TRANSACTION REDESIGN
-    # See https://django-transaction-hooks.readthedocs.org/ for a better
-    # implementation.
-    if transaction.is_managed():
-        transaction.commit()
-
-    from time import sleep
-    sleep(10)
-
     queue = redis.Redis(db=0)
     queue.lpush('bot', 'REFRESH')
 
