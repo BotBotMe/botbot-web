@@ -86,7 +86,7 @@ def daemon_refresh():
         transaction.commit()
 
     from time import sleep
-    sleep(1)
+    sleep(10)
 
     queue = redis.Redis(db=0)
     queue.lpush('bot', 'REFRESH')
