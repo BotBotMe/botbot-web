@@ -25,6 +25,8 @@ Postgresql with hStore extension
 Go
 ~~
 
+`botbot-bot` requires a go version greater than 1.2 
+
 * **OS X**: ``brew install go``
 * **Ubuntu**: ``apt-get install golang-go``
 
