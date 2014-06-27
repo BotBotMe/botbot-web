@@ -103,7 +103,7 @@ $$.Cache = Backbone.Model.extend({
             this.$el.find('.message').highlight($$.searchTerm.split(" "));
         }
         $$.imagePreviews(this.$el);
-        $$.applyFilter(this.$el);
+        $$.applyFilter(this.$el)
         // check timezone again on next fetch
         this.adjustTimezone = false;
     },
@@ -177,7 +177,7 @@ $$.Views.LogViewer = Backbone.View.extend({
     filterChanged: function (event) {
         onlyChat = event.target.checked;
         setToLocalStorage('onlyChat', onlyChat.toString())
-        $$.applyFilter(this.$logEl, onlyChat);
+        $$.applyFilter(this.$logEl);
     },
 
 
@@ -250,7 +250,7 @@ $$.Views.LogViewer = Backbone.View.extend({
             log('mid');
             self.checkPageSplit($last, $el.first());
             $$.imagePreviews($el);
-            self.applyFilter($el);
+            $$.applyFilter($el);
             self.$logEl.append($el);
             log('end');
             if ($$.isAtBottom()) {
@@ -367,7 +367,6 @@ $$.Views.LogViewer = Backbone.View.extend({
         // Finally, refill the cache
         log('LogViewer:Insert', cache.direction);
         var height;
-        this.applyFilter(cache.$el);
         if (cache.direction === 'prev') {
             // if there isn't already a date header at the top
             // see if we need to add one
@@ -378,6 +377,7 @@ $$.Views.LogViewer = Backbone.View.extend({
             // dump prep into real log and scroll back to where we were
             cache.$el.width(this.$logEl.width());
             height = cache.$el.height();
+            log(height)
             cache.$el.children().prependTo(this.$logEl);
             window.scrollBy(0, height);
         } else {
@@ -527,11 +527,12 @@ $$.imagePreviews = function ($el) {
     });
 };
 
-$$.applyFilter = function ($el, onlyChat) {
+$$.applyFilter = function ($el) {
     log('applyFilter');
+    onlyChat = getFromLocalStorage('onlyChat', "true") === "true"
     var filters = ['join', 'part', 'quit']
     var elements = $el.find("." + filters.join(", ."));
-
+    log($el, onlyChat)
     if (elements.length === 0) {
         $.each(filters, function () {
             if ($el.hasClass(this)) {
@@ -541,17 +542,9 @@ $$.applyFilter = function ($el, onlyChat) {
     }
 
     if (onlyChat) {
-        if (elements.is(":visible")) {
-            elements.slideUp();
-        } else {
-            elements.hide();
-        }
+        elements.addClass('hidden')
     } else {
-        if (elements.is(":visible")) {
-            elements.slideDown();
-        } else {
-            elements.show();
-        }
+        elements.removeClass('hidden')
     }
 }
 
