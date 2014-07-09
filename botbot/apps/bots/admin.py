@@ -35,11 +35,10 @@ class MembershipInline(admin.TabularInline):
 
 
 class ChatBotAdmin(admin.ModelAdmin):
-    exclude = ('connection', )
+    exclude = ('connection', 'server_identifier')
     list_display = ('__unicode__', 'is_active')
     list_editable = ('is_active',)
     list_filter = ('is_active',)
-    readonly_fields = ('server_identifier', )
 
     # Disable bulk delete, because it doesn't call delete, so skips REFRESH
     actions = None
