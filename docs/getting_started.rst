@@ -42,21 +42,21 @@ Now that your bot is connected to a network or server, you can start having it j
 
 1. Go to ``http://localhost:8000/admin/bots/channel/add/``
 2. Select your bot from the dropdown
-3. **Channel**: ``#botbot-test``
+3. **Channel**: ``#botbot-warmup``
 4. Select **'Is public'**
-5. In the **Active Plugins** section click *Add another Active Plugin* and select **Ping**.
+5. Several useful plugins will already be configured. At a minimum, ``ping`` and ``logger`` will be helpful for testing the bot.
 6. Save. In the ``honcho`` console output you should see messages similar to::
 
     12:14:42 bot.1     | 2013/09/19 12:14:42 Command:  REFRESH
     12:14:42 bot.1     | 2013/09/19 12:14:42 Reloading configuration from database
-    12:14:42 bot.1     | 2013/09/19 12:14:42 config.Channel: [#botbot-test ]
-    12:14:42 bot.1     | 2013/09/19 12:14:42 [RAW1] -->JOIN #botbot-test
+    12:14:42 bot.1     | 2013/09/19 12:14:42 config.Channel: [#botbot-warmup ]
+    12:14:42 bot.1     | 2013/09/19 12:14:42 [RAW1] -->JOIN #botbot-warmup
 
-7. In your IRC client, join `#botbot-test <irc://irc.freenode.net:6667/botbot-test>`_. Try issuing a `ping` command (using your bot's nick in place of "mybot"). The bot should respond with a friendly message.
+7. In your IRC client, join `#botbot-warmup <irc://irc.freenode.net:6667/botbot-warmup>`_. Try issuing a `ping` command (using your bot's nick in place of "mybot"). The bot should respond with a friendly message.
 8. Go back to the home page ``http://localhost:8000``, you should see the channel listed as a public channel.
 9. **Add another Active Plugin** and this time select **Logger**.
 10. **Save**.  Your ``honcho`` console should once again show a refresh
-11. In your IRC client, go to `#botbot-test <irc:irc.freenode.net:6667/botbot-test>`_ and post a message. You should now have a log available at ``http://localhost:8000/freenode/botbot-test``. Each message you post in the channel shows up in the ``honcho`` console.
+11. In your IRC client, go to `#botbot-warmup <irc:irc.freenode.net:6667/botbot-warmup>`_ and post a message. You should now have a log available at ``http://localhost:8000/freenode/botbot-warmup``. Each message you post in the channel shows up in the ``honcho`` console.
 
 
 .. warning:
