@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 import sys
+import dotenv
+
+
+dotenv.read_dotenv()
+
 
 if __name__ == "__main__":
     if (len(sys.argv) > 1 and
