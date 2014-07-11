@@ -2,7 +2,7 @@
 {% load logs_tags %}
 {% load cache %}
 {% for line in message_list %}
-    {% ifchanged line.timestamp|date:"d" %}
+    {% ifchanged line.timestamp|date:"Ymd" %}
     {% if show_first_header or not forloop.first %}
       <h3 class="utc" id="date-{{ line.timestamp|date:"Ymd" }}" data-date="{{ line.timestamp|date:"Ymd" }}"><span>{{ line.timestamp|date:"F jS, Y" }}</span></h3>
     {% endif %}

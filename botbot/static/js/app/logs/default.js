@@ -3,10 +3,13 @@ $$.Templates = {
         '<h3 id="date-<%= flatDate %>" data-date="<%= flatDate %>"><span><%= dateString %></span></h3>'
     ),
     ImagePreview: _.template(
-        '<a class="preview-img" href="<%= link %>"><img src="<%= link %>" height="200" /></a>'
+        '<a class="preview-img" href="<%= link %>"><img src="<%= link %>"/></a>'
     ),
     ImageToggle: _.template(
-        '<a href="<%= link %>" class="toggle-preview" title="Preview"><i class="icon-zoom-in icon-large"></i></a>'
+        '<a href="<%= link %>" data-type="<%= type %>" class="toggle-preview" title="Preview"><i class="icon-zoom-in icon-large"></i></a>'
+    ),
+    YoutubePreview: _.template(
+        '<iframe id="ytplayer" class="preview-img" type="text/html" width="640" height="390" src = "<%= link %>?autoplay=0&" frameborder = "0" / >'
     )
 };
 $$.Cache = Backbone.Model.extend({
@@ -178,7 +181,14 @@ $$.Views.LogViewer = Backbone.View.extend({
             $target.addClass('expand').removeClass('collapse');
             $target.find('.icon-zoom-out').removeClass('icon-zoom-out').addClass('icon-zoom-in');
         } else {
-            $imgEl = $message.append($$.Templates.ImagePreview({link: href})).find('.preview-img');
+            var data = $target.data();
+
+            var template = $$.Templates.ImagePreview;
+            if (data.type === "youtube") {
+                template = $$.Templates.YoutubePreview;
+            }
+
+            $imgEl = $message.append(template({link: href})).find('.preview-img');
             $target.data('preview', $imgEl);
             $target.addClass('collapse').removeClass('expand');
             $target.find('.icon-zoom-in').removeClass('icon-zoom-in').addClass('icon-zoom-out');
@@ -478,7 +488,8 @@ $$.checkForDateHeader = function ($el, thisDate, prevDate) {
 $$.imagePreviews = function ($el) {
     // sets up toggler for images
     $el.find('a.image').each(function (idx, el) {
-        $(el).after('&nbsp;' + $$.Templates.ImageToggle({link: el.href}));
+        var data = $(el).data()
+        $(el).after('&nbsp;' + $$.Templates.ImageToggle({link: data.src, type: data.type}));
     });
 };
 

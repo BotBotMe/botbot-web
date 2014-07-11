@@ -25,7 +25,7 @@ Postgresql with hStore extension
 Go
 ~~
 
-Version 1.3 or higher required
+Version 1.2 or higher required
 
 * **OS X**: ``brew install go``
 * **Ubuntu**: ``apt-get install golang-go``
