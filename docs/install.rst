@@ -51,7 +51,7 @@ Run in a terminal:
     make dependencies
 
     # Adjust ``.env`` file if necessary. Defaults are chosen for local debug environments.
-    # If your Postgres server requires a password, you'll need to override DATABASE_URL
+    # If your Postgres server requires a password, you'll need to override STORAGE_URL
     # The default database name is 'botbot'
     $EDITOR .env
 
@@ -121,7 +121,7 @@ Example upstart scripts
 
     respawn
     env LANG=en_US.UTF-8
-    env DATABASE_URL=postgres://yourdburl
+    env STORAGE_URL=postgres://yourdburl
     env REDIS_PLUGIN_QUEUE_URL=redis://localhost:6379/0
 
     exec /srv/botbot/bin/botbot-bot
