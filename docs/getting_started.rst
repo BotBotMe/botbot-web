@@ -42,21 +42,30 @@ Now that your bot is connected to a network or server, you can start having it j
 
 1. Go to ``http://localhost:8000/admin/bots/channel/add/``
 2. Select your bot from the dropdown
-3. **Channel**: ``#botbot-warmup``
-4. Select **'Is public'**
+3. **Channel**: ``#botbot-warmup``. This is a channel commonly used for testing IRC bots.
+4. If you'd like the channel to be listed on the site home page, Select **'Is public'**
 5. Several useful plugins will already be configured. At a minimum, ``ping`` and ``logger`` will be helpful for testing the bot.
 6. Save. In the ``honcho`` console output you should see messages similar to::
+7. On the Channel list view, select your channel. From the ``Actions`` dropdown select "Reload botbot-bot configuration" and press "Go". You should see something similar in the ``honcho`` console output (edited for brevity)::
 
-    12:14:42 bot.1     | 2013/09/19 12:14:42 Command:  REFRESH
-    12:14:42 bot.1     | 2013/09/19 12:14:42 Reloading configuration from database
-    12:14:42 bot.1     | 2013/09/19 12:14:42 config.Channel: [#botbot-warmup ]
-    12:14:42 bot.1     | 2013/09/19 12:14:42 [RAW1] -->JOIN #botbot-warmup
+    14:15:07 bot.1      | I0711 14:15:07.557470 61493 botbot.go:67] Command:  REFRESH
+    14:15:07 bot.1      | I0711 14:15:07.557546 61493 botbot.go:124] HandleCommand: REFRESH
+    14:15:07 bot.1      | I0711 14:15:07.557557 61493 botbot.go:153] Reloading configuration from database
+    14:15:07 bot.1      | I0711 14:15:07.557564 61493 network.go:49] Entering in NetworkManager.RefreshChatbots
+    14:15:07 bot.1      | I0711 14:15:07.558013 61493 storage.go:121] config.Id: 1
+    14:15:07 bot.1      | I0711 14:15:07.558753 61493 storage.go:145] config.Channel: [#botbot-warmup]
+    ...
+    14:15:07 bot.1      | I0711 14:15:07.559072 61493 irc.go:460] [Info] The channels the bot is connected to need to be updated
+    14:15:07 bot.1      | I0711 14:15:07.559083 61493 irc.go:473] [Info] Joining new channel:  #botbot-warmup
+    14:15:07 bot.1      | I0711 14:15:07.559096 61493 network.go:98] Exiting NetworkManager.RefreshChatbots
+    14:15:07 bot.1      | I0711 14:15:07.559111 61493 irc.go:228] [RAW thahslkd334558 on chat.freenode.net:6667 (0xc208028750) ] --> JOIN #botbot-warmup
 
-7. In your IRC client, join `#botbot-warmup <irc://irc.freenode.net:6667/botbot-warmup>`_. Try issuing a `ping` command (using your bot's nick in place of "mybot"). The bot should respond with a friendly message.
-8. Go back to the home page ``http://localhost:8000``, you should see the channel listed as a public channel.
-9. **Add another Active Plugin** and this time select **Logger**.
-10. **Save**.  Your ``honcho`` console should once again show a refresh
-11. In your IRC client, go to `#botbot-warmup <irc:irc.freenode.net:6667/botbot-warmup>`_ and post a message. You should now have a log available at ``http://localhost:8000/freenode/botbot-warmup``. Each message you post in the channel shows up in the ``honcho`` console.
+
+8. In your IRC client, join `#botbot-warmup <irc://irc.freenode.net:6667/botbot-warmup>`_. Try issuing a `ping` command (using your bot's nick in place of "mybot"). The bot should respond with a friendly message.
+9. Go back to the home page ``http://localhost:8000``, you should see the channel listed as a public channel.
+10. **Add another Active Plugin** and this time select **Logger**.
+11. **Save**.  Your ``honcho`` console should once again show a refresh
+12. In your IRC client, go to `#botbot-warmup <irc:irc.freenode.net:6667/botbot-warmup>`_ and post a message. You should now have a log available at ``http://localhost:8000/freenode/botbot-warmup``. Each message you post in the channel shows up in the ``honcho`` console.
 
 
 .. warning:
