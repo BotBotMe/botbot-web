@@ -293,4 +293,4 @@ STATSD_PATCHES = [
     'django_statsd.patches.cache',
 ]
 
-STATSD_PREFIX = "bbme"
+STATSD_PREFIX = os.environ.get('STATSD_PREFIX', 'bbme')
