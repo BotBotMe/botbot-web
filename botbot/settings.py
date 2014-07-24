@@ -295,4 +295,4 @@ STATSD_PATCHES = [
 
 STATSD_PREFIX = os.environ.get('STATSD_PREFIX', 'bbme')
 
-DJANGO_HSTORE_GLOBAL_REGISTER = False # Get around ProgrammingError: can't adapt type 'HStoreDict'
+DJANGO_HSTORE_ADAPTER_REGISTRATION = 'connection'
