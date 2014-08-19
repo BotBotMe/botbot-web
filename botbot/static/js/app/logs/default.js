@@ -20,6 +20,11 @@ function setToLocalStorage(key, value) {
     }
 }
 
+function localStorageKey(name) {
+    var path = window.location.pathname
+    return path + name
+}
+
 $$.Templates = {
     DateHeader: _.template(
         '<h3 id="date-<%= flatDate %>" data-date="<%= flatDate %>"><span><%= dateString %></span></h3>'
@@ -90,6 +95,7 @@ $$.Cache = Backbone.Model.extend({
     prepPage: function (html) {
         log('Cache:prepPage');
         var prevDate;
+
         if (html) {
             this.$el.html(html);
         }
@@ -134,7 +140,8 @@ $$.Views.LogViewer = Backbone.View.extend({
 
         var $filterEl = $('#filter');
         $filterEl.change(this.filterChanged);
-        $filterEl.prop('checked', getFromLocalStorage('onlyChat', "true") === "true");
+        $filterEl.prop('checked', getFromLocalStorage(localStorageKey('onlyChat'),
+            "true") === "true");
 
         this.current = options.current;
         this.eventSourceUrl = options.source;
@@ -176,7 +183,7 @@ $$.Views.LogViewer = Backbone.View.extend({
 
     filterChanged: function (event) {
         onlyChat = event.target.checked;
-        setToLocalStorage('onlyChat', onlyChat.toString())
+        setToLocalStorage(localStorageKey('onlyChat'), onlyChat.toString())
         $$.applyFilter(this.$logEl);
     },
 
@@ -241,7 +248,7 @@ $$.Views.LogViewer = Backbone.View.extend({
             log('received');
             log(e);
             log(this);
-            var $el = $(e.data),
+            var $el = $(e.data).hide(),
                 $last = self.$logEl.find('li:last'),
                 prevDate = moment($last.find('time').attr('datetime'));
             $el.each(function (idx, el) {
@@ -367,7 +374,8 @@ $$.Views.LogViewer = Backbone.View.extend({
         // Finally, refill the cache
         log('LogViewer:Insert', cache.direction);
         var height;
-        this.applyFilter(cache.$el);
+        cache.$el.find('li').hide()
+        $$.applyFilter(cache.$el);
         if (cache.direction === 'prev') {
             // if there isn't already a date header at the top
             // see if we need to add one
@@ -530,32 +538,30 @@ $$.imagePreviews = function ($el) {
 
 $$.applyFilter = function ($el) {
     log('applyFilter');
-    onlyChat = getFromLocalStorage('onlyChat', "true") === "true"
-    var filters = ['join', 'part', 'quit']
-    var elements = $el.find("." + filters.join(", ."));
-    log($el, onlyChat)
-    if (elements.length === 0) {
-        $.each(filters, function () {
-            if ($el.hasClass(this)) {
-                elements = $el
-            }
-        })
+    onlyChat = getFromLocalStorage(localStorageKey('onlyChat'), "true") === "true"
+    is_status = function ($row) {
+        return !!($row.hasClass('join') ||
+            $row.hasClass('part') ||
+            $row.hasClass('quit'));
+    };
+    log($el, onlyChat);
+
+    var $rows;
+    if ($el.is('li')) {
+        $rows = $([$el])
+    } else {
+        $rows = $el.find('li')
     }
 
-    if (onlyChat) {
-        if (elements.is(":visible")) {
-            elements.slideUp();
+    $.each($rows, function (index, row) {
+        var $row = $(row);
+        if (is_status($row) && onlyChat) {
+            $row.hide();
         } else {
-            elements.hide();
+            $row.show();
         }
-    } else {
-        if (elements.is(":visible")) {
-            elements.slideDown();
-        } else {
-            elements.show();
-        }
-    }
-}
+    });
+};
 
 $(document).ready(function () {
     var serverSideTz = $('#Log').data('timezone'),
