@@ -367,6 +367,7 @@ $$.Views.LogViewer = Backbone.View.extend({
         // Finally, refill the cache
         log('LogViewer:Insert', cache.direction);
         var height;
+        this.applyFilter(cache.$el);
         if (cache.direction === 'prev') {
             // if there isn't already a date header at the top
             // see if we need to add one
@@ -542,9 +543,17 @@ $$.applyFilter = function ($el) {
     }
 
     if (onlyChat) {
-        elements.addClass('hidden')
+        if (elements.is(":visible")) {
+            elements.slideUp();
+        } else {
+            elements.hide();
+        }
     } else {
-        elements.removeClass('hidden')
+        if (elements.is(":visible")) {
+            elements.slideDown();
+        } else {
+            elements.show();
+        }
     }
 }
 
