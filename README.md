@@ -71,4 +71,4 @@ manage.py run_plugins
 ```
 
 Go to http://127.0.0.1:8000/admin/ and setup a bot and a channel.
-Finally ppen http://127.0.0.1:8000/.
+Finally open http://127.0.0.1:8000/.

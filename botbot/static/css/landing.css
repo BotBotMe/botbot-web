@@ -5419,13 +5419,15 @@ textarea {
   font-family: "Droid Serif", Georgia, serif;
   color: #ee632a;
 }
-p {
-  text-shadow: 0 1px 0 #fff;
-}
 .introduction {
   font-size: 20px;
   line-height: 28px;
   margin-top: 0;
+}
+.op {
+  display: inline-block;
+  margin: 10px 0 20px 0;
+  font-weight: bold;
 }
 .teaser-form {
   -webkit-border-radius: 12px;
@@ -5519,6 +5521,23 @@ p {
   font-size: 17px;
   margin-bottom: 40px;
 }
+.request-here {
+  float: right;
+  margin: -60px 90px 0 0;
+  padding: 13px 18px;
+  background: #ee632a;
+  border-radius: 2px;
+  color: white;
+  font-weight: bold;
+}
+.request-here:hover {
+  text-decoration: none;
+  background: #67a81d;
+  color: white;
+}
+.contain-request {
+  margin-bottom: 40px;
+}
 /* Begin responsive homepage styles */
 @media (max-width: 850px) {
   .logo-standalone {
@@ -5568,6 +5587,10 @@ p {
   }
   .strong-input {
     font-size: 18px;
+  }
+  .request-here {
+    float: none;
+    margin: 0;
   }
 }
 @media (max-width: 630px) {
@@ -5635,5 +5658,9 @@ p {
   }
   .strong-input {
     font-size: 16px;
+  }
+  .request-here {
+    float: none;
+    margin: 0;
   }
 }

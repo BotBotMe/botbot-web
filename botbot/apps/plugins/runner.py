@@ -59,7 +59,7 @@ class Line(object):
             cache_key = 'channel:{0}'.format(self._channel_name)
             channel = cache.get(cache_key)
             if not channel and self._channel_name.startswith("#"):
-                channel = bots_models.Channel.objects.get(
+                channel = self._chatbot.channel_set.get(
                     name=self._channel_name)
                 cache.set(cache_key, channel, CACHE_TIMEOUT_2H)
             self._channel_cache = channel
