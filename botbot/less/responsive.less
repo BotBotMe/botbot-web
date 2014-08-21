@@ -1,6 +1,6 @@
-/* We really only have problems on small tables in portrait 
+/* We really only have problems on small tables in portrait
    mode, so tackle anything smaller than that */
-@media only screen 
+@media only screen
 and (max-width: 768px) {
 	.context-help,
 	.timeline-navigation,
@@ -9,15 +9,15 @@ and (max-width: 768px) {
 
 	#Content { padding: 0 10px; }
 
-	#Log-Header { 
+	#Log-Header {
 		#gradient > .vertical(@darkContrast, #424749); // XXX - Use variables
     	border-bottom: 1px solid @darkContrast2;
 
 		padding: 4px 10px 4px 90px;
 		top: 0; height: 50px;
 
-		.brand-btn { 
-			display: inline-block; 
+		.brand-btn {
+			display: inline-block;
 		}
 
 		h1 { font-size: 18px; color: #fff; }
@@ -28,16 +28,16 @@ and (max-width: 768px) {
 		.mobile-nav { display: block; float: right; }
 	}
 
-	.nav-toggle { 
+	.nav-toggle {
 		.border-radius(4px);
 		.box-shadow(inset 0 0 2px @darkContrast);
 		#gradient > .vertical(#424749, #464C4F);
 
-		outline: 0; 
-		border: 1px solid; 
-		display: inline-block; 
+		outline: 0;
+		border: 1px solid;
+		display: inline-block;
 		vertical-align: middle;
-		height: 40px; 
+		height: 40px;
 		width: 40px;
 		line-height: 40px;
 		margin-left: 10px;
@@ -52,8 +52,8 @@ and (max-width: 768px) {
 	}
 
 	.channel-nav {
-		a { color: #A9C6C1; }
-		a:hover { color: #fff; }
+		a, label { color: #A9C6C1; }
+		a:hover, label:hover { color: #fff; }
 	}
 
 	#Search {
@@ -84,7 +84,7 @@ and (max-width: 768px) {
 			& > ul { padding: 0; margin: 0; }
 
 			// first anchor should have more padding so we don't mess with the header
-			& > ul > .year:first-of-type > a { padding-top: 30px; } 
+			& > ul > .year:first-of-type > a { padding-top: 30px; }
 
 			li { border-bottom: 1px solid #636363; }
 			.year > a { font-weight: bold; }
@@ -92,21 +92,21 @@ and (max-width: 768px) {
 
 			li:before, .month:before { display: none; }
 
-			a { 
+			a {
 				.border-radius(0);
-				display: block; 
+				display: block;
 				background: @darkContrast;
-				color: #fff; 
-				text-shadow: none; 
-				padding: 10px 10px 10px 20px; 
-				font-size: 16px; 
-				line-height: 24px; 
+				color: #fff;
+				text-shadow: none;
+				padding: 10px 10px 10px 20px;
+				font-size: 16px;
+				line-height: 24px;
 			}
 
-			.active a { 
-				.border-radius(0); 
-				background: @highlight1; 
-				
+			.active a {
+				.border-radius(0);
+				background: @highlight1;
+
 				span { background: none; }
 			}
 		}
@@ -115,7 +115,7 @@ and (max-width: 768px) {
 	}
 
 	#Log-Nav:target { display: block; }
-	#Site-Footer { 
+	#Site-Footer {
 		margin-right: 0;
 
 		.support { margin-bottom: 10px; float: none; }
@@ -127,8 +127,8 @@ and (max-width: 768px) {
 
 @media only screen
 and (max-width: 480px) {
-	.log { 
-		background: none; 
+	.log {
+		background: none;
 
 		li { background: #fff; border: 1px solid #eee; margin-bottom: 10px; padding: 6px; }
 		li:hover .message { background: none; }

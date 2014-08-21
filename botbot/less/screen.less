@@ -11,8 +11,8 @@
 
 html, body { height: 100%; }
 
-body { 
-    background: @backgroundColor url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQImWP48uXLfwYkAOfDGOgKcAtgaEVWAAAd8yK0HBWm1wAAAABJRU5ErkJggg==); 
+body {
+    background: @backgroundColor url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQImWP48uXLfwYkAOfDGOgKcAtgaEVWAAAd8yK0HBWm1wAAAABJRU5ErkJggg==);
 }
 
 .hidden { display: none   }
@@ -30,7 +30,7 @@ input[type=checkbox], input[type=radio] { margin-right: 2px; }
 .page-header .nav { margin-bottom: 0; }
 .page-header h1 ~ .nav { margin-left: 20px; }
 
-[class^="icon-"], [class*=" icon-"] { 
+[class^="icon-"], [class*=" icon-"] {
     vertical-align: middle; // Underp Twitter Bootstrap
 
     &:hover { text-decoration: none; }
@@ -46,8 +46,8 @@ object[type='image/svg+xml'] { vertical-align: middle; }
 
 .logo-standalone {
     .border-radius(12px);
-    background: @darkContrast2; 
-    padding: 14px 16px; 
+    background: @darkContrast2;
+    padding: 14px 16px;
     margin-bottom: 20px;
 }
 
@@ -60,8 +60,8 @@ object[type='image/svg+xml'] { vertical-align: middle; }
     &:hover { background-color: @highlight1; }
 }
 
-.introduction { 
-    margin: 20px 0; 
+.introduction {
+    margin: 20px 0;
     font-size: 18px; line-height: 26px;
 }
 
@@ -88,7 +88,7 @@ object[type='image/svg+xml'] { vertical-align: middle; }
     }
 }
 
-.channel-list { 
+.channel-list {
     margin: 0 0 20px;
 
     li { list-style: none; display: inline-block; vertical-align: middle; margin-right: 10px; }
@@ -117,16 +117,16 @@ object[type='image/svg+xml'] { vertical-align: middle; }
 
 #Site-Header .mobile-nav-cta { display: none; }
 
-.brand-btn { 
+.brand-btn {
     .border-radius(12px);
-    
+
     background: @darkContrast2 url(../img/logo.svg) no-repeat center center;
     text-indent: -999em;
 
     outline: 1px solid transparent; // removes the jaggies when rotating, son
-    
-    position: absolute; 
-    border: 4px solid #fff; 
+
+    position: absolute;
+    border: 4px solid #fff;
     top: 4px;
     left: 20px;
 
@@ -164,12 +164,12 @@ object[type='image/svg+xml'] { vertical-align: middle; }
     overflow: hidden;
 
     ul { margin: 0; padding: 0; }
-    
+
 
     li:before {
         content: "";
         position: absolute;
-        
+
         height: 100%;
 
         width: 2px;
@@ -200,29 +200,29 @@ object[type='image/svg+xml'] { vertical-align: middle; }
         bottom: 50%;
     }
 
-    a { 
+    a {
         background: url(../img/timeline-circle-large.svg) no-repeat left center;
         background-size: 16px 16px;
         display: inline-block;
         vertical-align: middle;
-        font-size: 15px; 
+        font-size: 15px;
         line-height: 2;
         padding: 2px 6px 2px 22px;
         text-shadow: 0 1px 0 #fff;
     }
 
-    .active { 
-        a {     
+    .active {
+        a {
             background-image: url(../img/timeline-circle-selected-large.svg);
-            font-weight: 600; 
+            font-weight: 600;
 
             &:hover { text-decoration: none; }
         }
 
-        span { 
+        span {
             .border-radius(4px);
 
-            background: @currentColor; 
+            background: @currentColor;
             color: #fff;
             padding: 2px 6px;
             text-shadow: none;
@@ -253,7 +253,7 @@ object[type='image/svg+xml'] { vertical-align: middle; }
     ----------
 */
 
-body.log-view { 
+body.log-view {
     #Content { margin-top: 40px; margin-bottom: 20px; }
     #Site-Footer { margin-top: 0; }
     .misc-links { float: right; }
@@ -266,7 +266,7 @@ body.log-view {
     border-bottom: 1px solid #ddd;
     position: fixed;
     z-index: 100;
-    
+
     padding: 20px 20px 6px;
     width: 100%;
 
@@ -275,7 +275,7 @@ body.log-view {
     .log-title { float: left; }
     .log-title .icon-lock { color: @highlight1; position: relative; top: 2px; } // XXX - gross alignment
 
-    h1 { 
+    h1 {
         font-size: 24px;
 
         a { color: @highlight2; }
@@ -292,20 +292,37 @@ body.log-view {
     .divider { font-size: 22px; margin: 0 10px; color: @lightColor; }
 }
 
-.channel-nav { 
-    display: inline-block; 
-    vertical-align: middle; 
-    float: right; 
+.channel-nav {
+    display: inline-block;
+    vertical-align: middle;
+    float: right;
     line-height: 32px;
     margin-right: 20px;
 
-    a { margin-left: 10px; }
+    a, label { margin-left: 10px; }
+}
+
+.noise-toggler {
+  display: inline-block;
+  vertical-align: middle;
+  font-weight: normal;
+  text-decoration: none;
+  color: @linkColor;
+  cursor: pointer;
+}
+
+.noise-toggler:hover {
+  color: @linkColorHover;
+
+  span {
+    text-decoration: underline;
+  }
 }
 
 .mobile-nav { display: none; }
 
-#Search { 
-    float: right; margin-bottom: 0; 
+#Search {
+    float: right; margin-bottom: 0;
     .icon-large:before { font-size: 1.8em; }
     input { margin-bottom: 0; width: 12em; }
 }
@@ -343,9 +360,9 @@ body.log-view {
 
     margin-bottom: 0;
 
-    h3 { 
-        margin: 20px 0; 
-        text-align: center; 
+    h3 {
+        margin: 20px 0;
+        text-align: center;
         font-size: 20px; // XXX - Should take @baseFontSize into consideration
         line-height: 28px;
         position: relative;
@@ -353,23 +370,23 @@ body.log-view {
         color: @darkContrast2;
 
         span {
-            background: #fff;  
-            padding: 0 20px; 
-            position: relative;  
+            background: #fff;
+            padding: 0 20px;
+            position: relative;
             z-index: 5;
         }
     }
 
     h3:before {
-        content: "";  
-        display: block;  
-        border-top: solid 1px #f3f3f3;  
+        content: "";
+        display: block;
+        border-top: solid 1px #f3f3f3;
         width: 80%;
         left: 10%;
-        height: 1px;  
-        position: absolute;  
-        top: 50%;  
-        z-index: 1;  
+        height: 1px;
+        position: absolute;
+        top: 50%;
+        z-index: 1;
     }
 
     h3:first-child { margin-top: 0; }
@@ -384,8 +401,8 @@ body.log-view {
             .message, .moment, .info { background: #EFEFFC; }
         }
 
-        &.highlight .moment { 
-            color: #777; 
+        &.highlight .moment {
+            color: #777;
 
             &:hover { color: #222; }
         }
@@ -485,7 +502,7 @@ body.log-view {
 /* 404 */
 .error-view {
 
-    header { 
+    header {
         position: relative;
         padding-top: 118px;
         float: left; margin-right: 40px;
@@ -500,7 +517,7 @@ body.log-view {
         z-index: 10;
     }
 
-    h1 { 
+    h1 {
         .border-radius(12px);
         .rotate(-5deg);
 
@@ -519,16 +536,16 @@ body.log-view {
         color: #fff;
     }
 
-    h2 { 
+    h2 {
         color: @highlight2;
-        font-size: 32px; line-height: 40px; margin-bottom: 20px; 
+        font-size: 32px; line-height: 40px; margin-bottom: 20px;
     }
 
     section { padding-top: 100px; }
     .explanatory { font-size: 26px; line-height: 34px; }
 
-    #Site-Footer { 
-        margin-right: 0; 
+    #Site-Footer {
+        margin-right: 0;
         margin-top: 20px;
         margin-left: 334px;
         position: static;
@@ -559,7 +576,7 @@ body.log-view {
     50% {-moz-transform:rotate(-4deg);}
     100% {-moz-transform:rotate(4deg);}
 }
- 
+
 /* anyone brave enough to implement the ideal method */
 @keyframes wiggler {
     0% {transform:rotate(4deg);}

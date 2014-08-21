@@ -4148,8 +4148,23 @@ body.log-view .misc-links {
   line-height: 32px;
   margin-right: 20px;
 }
-.channel-nav a {
+.channel-nav a,
+.channel-nav label {
   margin-left: 10px;
+}
+.noise-toggler {
+  display: inline-block;
+  vertical-align: middle;
+  font-weight: normal;
+  text-decoration: none;
+  color: #0088cc;
+  cursor: pointer;
+}
+.noise-toggler:hover {
+  color: #005580;
+}
+.noise-toggler:hover span {
+  text-decoration: underline;
 }
 .mobile-nav {
   display: none;
@@ -5163,7 +5178,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #458521;
 }
 /* Responsive stuff is always last */
-/* We really only have problems on small tables in portrait 
+/* We really only have problems on small tables in portrait
    mode, so tackle anything smaller than that */
 @media only screen and (max-width: 768px) {
   .context-help,
@@ -5242,10 +5257,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     color: #fff;
     text-decoration: none;
   }
-  .channel-nav a {
+  .channel-nav a,
+  .channel-nav label {
     color: #A9C6C1;
   }
-  .channel-nav a:hover {
+  .channel-nav a:hover,
+  .channel-nav label:hover {
     color: #fff;
   }
   #Search {
