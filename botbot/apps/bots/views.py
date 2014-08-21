@@ -72,7 +72,7 @@ class ChannelMixin(object):
 
             elif kwargs['bot_slug'] == 'private':
                 channel = get_object_or_404(
-                    models.Channel, slug=kwargs['channel_slug'])
+                    models.Channel, private_slug=kwargs['channel_slug'])
 
             else:
                 channel = self._get_identifiable_channel(
@@ -91,15 +91,8 @@ class ChannelMixin(object):
 
         If no matching channel is found, raises 404.
         """
-        # IRC channel names start with # or ##, check for all variants.
-        names = (channel_slug, u'#{}'.format(channel_slug),
-                 u'##{}'.format(channel_slug))
-        # Need case insensitive lookup so '__in' won't work. This builds up a
-        # Q filter: http://stackoverflow.com/a/897884/116042
-        name_in_q = reduce(lambda q, name: q | Q(name__iexact=name),
-                           names, Q())
         candidates = models.Channel.objects\
-            .filter(name_in_q).filter(Q(is_public=True) | Q(slug=None))\
+            .filter(slug=channel_slug, is_public=True)\
             .select_related('chatbot')
 
         # Return first channel that has a bot matching the current bot_slug.
