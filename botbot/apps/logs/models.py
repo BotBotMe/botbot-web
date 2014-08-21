@@ -47,6 +47,9 @@ class Log(models.Model):
 
     class Meta:
         ordering = ('-timestamp',)
+        index_together = [
+            ['channel', 'timestamp'],
+        ]
 
     def get_absolute_url(self):
         kwargs = channel_url_kwargs(self.channel)
