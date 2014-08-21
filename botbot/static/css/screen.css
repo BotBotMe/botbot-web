@@ -5401,6 +5401,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     display: none;
   }
 }
+@media only screen and (max-width: 536px) {
+  .channel-nav .noise-toggler {
+    display: none;
+  }
+}
 @media only screen and (max-width: 1096px) {
   body.log-view #Site-Footer .misc-links {
     float: none;
