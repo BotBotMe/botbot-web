@@ -101,8 +101,8 @@ class ChannelMixin(object):
             if channel.chatbot.slug == bot_slug:
                 return channel
             elif channel.chatbot.legacy_slug == bot_slug:
-                kwargs = {'bot_slug': channel.chatbot.slug,
-                          'channel_slug': channel_slug}
+                kwargs = self.request.resolver_match.kwargs.copy()
+                kwargs['bot_slug'] = channel.chatbot.slug
                 raise self.LegacySlugUsage(reverse_lazy(
                     self.request.resolver_match.url_name,
                     kwargs=kwargs
