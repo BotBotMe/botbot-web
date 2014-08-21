@@ -266,6 +266,7 @@ SSE_ENDPOINT = SSE_ENDPOINT_URL + 'push/{token}'
 # ==============================================================================
 
 SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
+SOUTH_TESTS_MIGRATE = False
 
 SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
