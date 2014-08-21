@@ -21,6 +21,7 @@ class PluginFormset(BaseInlineFormSet):
 class ActivePluginInline(admin.StackedInline):
     model = models.Channel.plugins.through
     formset = PluginFormset
+    readonly_fields = ["variables"]
 
     def get_extra(self, request, obj=None, **kwargs):
         if obj is None:
@@ -37,7 +38,7 @@ class ChatBotAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'is_active')
     list_editable = ('is_active',)
     list_filter = ('is_active',)
-    readonly_fields = ('connection', 'server_identifier')
+    readonly_fields = ('server_identifier',)
 
     # Disable bulk delete, because it doesn't call delete, so skips REFRESH
     actions = None

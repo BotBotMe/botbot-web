@@ -26,9 +26,6 @@ PRETTY_SLUG = {
 
 class ChatBot(models.Model):
     is_active = models.BooleanField(default=False)
-    connection = hstore.DictionaryField(
-        default={"is": "not used"},
-        help_text="Not used")
 
     server = models.CharField(
             max_length=100, help_text="Format: irc.example.net:6697")
@@ -48,8 +45,6 @@ class ChatBot(models.Model):
     real_name = models.CharField(
             max_length=250,
             help_text="Usually a URL with information about this bot.")
-
-    objects = hstore.HStoreManager()
 
     @property
     def slug(self):
@@ -161,7 +156,7 @@ class Channel(TimeStampedModel):
             try:
                 active_plugin = self.activeplugin_set.get(
                     plugin__slug=plugin_slug)
-                cached_config = active_plugin.variables
+                cached_config = active_plugin.configuration
             except plugins_models.ActivePlugin.DoesNotExist:
                 cached_config = {}
             cache.set(cache_key, cached_config)
