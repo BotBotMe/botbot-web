@@ -21,7 +21,6 @@ class PluginFormset(BaseInlineFormSet):
 class ActivePluginInline(admin.StackedInline):
     model = models.Channel.plugins.through
     formset = PluginFormset
-    readonly_fields = ["variables"]
 
     def get_extra(self, request, obj=None, **kwargs):
         if obj is None:

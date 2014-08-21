@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models import Max, Min
 from django.utils.text import slugify
 from django.utils.datastructures import SortedDict
-from django_hstore import hstore
 from djorm_pgarray.fields import ArrayField
 from botbot.apps.plugins import models as plugins_models
 from botbot.apps.logs import utils as log_utils

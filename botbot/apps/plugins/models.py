@@ -3,8 +3,6 @@ from django.contrib.admindocs.utils import trim_docstring
 from django.db import models
 from django.utils.importlib import import_module
 
-from django_hstore import hstore
-
 from botbot.core.fields import JSONField
 
 
@@ -32,15 +30,10 @@ class ActivePlugin(models.Model):
     """An active plugin for a ChatBot"""
     plugin = models.ForeignKey('plugins.Plugin')
     channel = models.ForeignKey('bots.Channel')
-    variables = hstore.DictionaryField(
-        null=True, blank=True,
-        help_text="This field is deprecated in favor of configuration")
     configuration =  JSONField(
             blank=True, default="{}",
             help_text="User-specified attributes for this plugin " +
             '{"username": "joe", "api-key": "foo"}')
-
-    objects = hstore.HStoreManager()
 
     def save(self, *args, **kwargs):
         obj = super(ActivePlugin, self).save(*args, **kwargs)
