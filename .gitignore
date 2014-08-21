@@ -3,3 +3,4 @@ botbot.egg-info
 .pip-timestamp
 docs/_build
 *.pyc
+settings_debug.py
