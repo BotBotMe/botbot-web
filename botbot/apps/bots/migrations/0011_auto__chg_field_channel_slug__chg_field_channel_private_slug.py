@@ -1,4 +1,4 @@
-    # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -8,21 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'ActivePlugin.configuration'
-        db.add_column(u'plugins_activeplugin', 'configuration',
-                      self.gf('botbot.core.fields.JSONField')(default='{}', blank=True),
-                      keep_default=False)
 
-        # # Removing index on 'ActivePlugin', fields ['variables']
-        # db.delete_index(u'plugins_activeplugin', ['variables'])
-
+        # Changing field 'Channel.slug'
+        db.alter_column(u'bots_channel', 'slug', self.gf('django.db.models.fields.SlugField')(default='', max_length=50))
 
     def backwards(self, orm):
-        # Adding index on 'ActivePlugin', fields ['variables']
-        db.create_index(u'plugins_activeplugin', ['variables'])
 
-        # Deleting field 'ActivePlugin.configuration'
-        db.delete_column(u'plugins_activeplugin', 'configuration')
+        # Changing field 'Channel.slug'
+        db.alter_column(u'bots_channel', 'slug', self.gf('django.db.models.fields.SlugField')(max_length=50, null=True))
 
 
     models = {
@@ -68,7 +61,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         u'bots.channel': {
-            'Meta': {'ordering': "('name',)", 'object_name': 'Channel'},
+            'Meta': {'ordering': "('name',)", 'unique_together': "(('slug', 'chatbot'),)", 'object_name': 'Channel'},
             'chatbot': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['bots.ChatBot']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'fingerprint': ('django.db.models.fields.CharField', [], {'max_length': '36', 'null': 'True', 'blank': 'True'}),
@@ -80,12 +73,14 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
             'plugins': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['plugins.Plugin']", 'through': u"orm['plugins.ActivePlugin']", 'symmetrical': 'False'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '50', 'unique': 'True', 'null': 'True', 'blank': 'True'}),
+            'private_slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '50'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['accounts.User']", 'through': u"orm['accounts.Membership']", 'symmetrical': 'False'})
         },
         u'bots.chatbot': {
             'Meta': {'object_name': 'ChatBot'},
+            'connection': (u'django_hstore.fields.DictionaryField', [], {'default': "{'is': 'not used'}"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'nick': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
@@ -94,6 +89,13 @@ class Migration(SchemaMigration):
             'server': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'server_identifier': ('django.db.models.fields.CharField', [], {'max_length': '164'}),
             'server_password': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
+        },
+        u'bots.usercount': {
+            'Meta': {'object_name': 'UserCount'},
+            'channel': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['bots.Channel']"}),
+            'counts': ('djorm_pgarray.fields.ArrayField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'dt': ('django.db.models.fields.DateField', [], {}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         u'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
@@ -107,8 +109,7 @@ class Migration(SchemaMigration):
             'channel': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['bots.Channel']"}),
             'configuration': ('botbot.core.fields.JSONField', [], {'default': "'{}'", 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'plugin': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['plugins.Plugin']"}),
-            'variables': (u'django_hstore.fields.DictionaryField', [], {'null': 'True', 'blank': 'True'})
+            'plugin': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['plugins.Plugin']"})
         },
         u'plugins.plugin': {
             'Meta': {'object_name': 'Plugin'},
@@ -118,4 +119,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['plugins']
+    complete_apps = ['bots']

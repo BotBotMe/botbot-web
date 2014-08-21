@@ -33,6 +33,7 @@ class BaseTestCase(TestCase):
         self.public_channel = models.Channel.objects.create(
             chatbot=self.chatbot,
             name="#Test",
+            slug="test",
             is_public=True)
         logs_models.Log.objects.create(
             channel=self.public_channel,
@@ -114,11 +115,11 @@ class UrlTests(BaseTestCase):
         self.client.login(username=self.member.username, password="secret")
         url = reverse("add_channel")
 
-        for public, identifiable, name in (
-                    (True, True, 'open'),
-                    (True, False, 'obfuscated'),
-                    (False, True, 'members_only'),
-                    (False, False, 'top_secret'),
+        for public, name in (
+                    (True, 'open'),
+                    (True, 'obfuscated'),
+                    (False,'members_only'),
+                    (False, 'top_secret'),
                 ):
 
             response = self.client.post(url, {
@@ -127,13 +128,12 @@ class UrlTests(BaseTestCase):
                 "cb-chatbot": self.chatbot.pk,
                 "cb-name": "#{}".format(name),
                 "cb-plugins": [],
-                "cb-identifiable_url": identifiable,
             })
             self.assertEqual(response.status_code, 302)
             channel = models.Channel.objects.get(name="#{}".format(name))
             # Non-identifiable channel, channel name shouldn't be in url.
             channel_url = utils.reverse_channel(channel, "log_current")
-            if identifiable:
+            if public:
                 self.assertIn(name, channel_url)
             else:
                 self.assertNotIn(name, channel_url)
@@ -172,10 +172,6 @@ class UrlTests(BaseTestCase):
         self.assertEqual(models.Channel.objects.count(), channel_count - 1)
         with self.assertRaises(models.Channel.DoesNotExist):
             models.Channel.objects.get(id=self.private_channel.id)
-
-    def test_save_empty_slugs(self):
-        self.chatbot.channel_set.create(name="#test1", slug="")
-        self.chatbot.channel_set.create(name="#test2", slug="")
 
     def test_show_channel_request_form(self):
         url = reverse('request_channel')

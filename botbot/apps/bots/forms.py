@@ -1,5 +1,6 @@
 import base64
 import uuid
+from django.template.defaultfilters import slugify
 from django.utils.safestring import mark_safe
 
 import re
@@ -14,30 +15,13 @@ connection_regex = re.compile(r"^[\w\-\.]*\:\d*$")
 
 
 class ChannelForm(forms.ModelForm):
-    identifiable_url = forms.BooleanField(
-        required=False, initial=True, help_text="Identifiable URLs may leak "
-                                                "channel information as part of the referrer details if when URL "
-                                                "is clicked from the logs")
 
     class Meta:
         model = models.Channel
         fields = ('chatbot', 'name', 'password', 'is_public', 'is_active')
 
     def save(self, *args, **kwargs):
-        """
-        If it's an identifiable url, set the slug to ``None``.
-
-        If it's not an identifiable url, set the slug to a random value if it
-        is not already set.
-        """
-        if self.cleaned_data['identifiable_url']:
-            self.instance.slug = None
-        elif not self.instance.slug:
-            channels = models.Channel.objects.all()
-            while not self.instance.slug or \
-                    channels.filter(slug=self.instance.slug).exists():
-                self.instance.slug = base64.b32encode(uuid.uuid4().bytes)[:4] \
-                    .lower()
+        self.instance.slug = slugify(self.cleaned_data['name'])
         return super(ChannelForm, self).save(*args, **kwargs)
 
 

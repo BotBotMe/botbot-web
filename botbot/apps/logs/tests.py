@@ -22,6 +22,7 @@ class BaseTestCase(TestCase):
         self.public_channel = Channel.objects.create(
             chatbot=self.chatbot,
             name="#Test",
+            slug="test",
             is_public=True)
         self.log = log_models.Log.objects.create(
             channel=self.public_channel,
@@ -214,6 +215,7 @@ class RedactTests(TestCase):
             nick='botbot')
         self.public_channel = bot_models.Channel.objects.create(
             chatbot=self.chatbot,
+            slug="test",
             name="#Test",
             is_public=True)
 

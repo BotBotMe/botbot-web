@@ -57,6 +57,9 @@ class ChannelAdmin(admin.ModelAdmin):
                     'is_public', 'is_featured', 'is_pending', 'updated')
     list_filter = ('chatbot', 'is_active', 'is_public',
                    'is_featured', 'is_pending')
+    prepopulated_fields = {
+        'slug': ('name',)
+    }
     list_editable = ('is_active',)
     readonly_fields = ('fingerprint', 'created', 'updated')
     search_fields = ('name', 'chatbot__server')
