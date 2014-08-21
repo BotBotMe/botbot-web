@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.hashers import make_password
-from django.utils.text import slugify
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
@@ -20,9 +18,9 @@ class Migration(DataMigration):
             if channel.slug:
                 channel.private_slug = channel.slug
             else:
-                channel.private_slug = slugify(channel.name)
+                channel.private_slug = channel.name.lstrip('#').lower()
 
-            channel.slug = slugify(channel.name)
+            channel.slug = channel.name.lstrip('#').lower()
             channel.save()
 
     def backwards(self, orm):

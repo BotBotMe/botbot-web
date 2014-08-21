@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -13,8 +13,8 @@ class Migration(SchemaMigration):
                       self.gf('botbot.core.fields.JSONField')(default='{}', blank=True),
                       keep_default=False)
 
-        # Removing index on 'ActivePlugin', fields ['variables']
-        db.delete_index(u'plugins_activeplugin', ['variables'])
+        # # Removing index on 'ActivePlugin', fields ['variables']
+        # db.delete_index(u'plugins_activeplugin', ['variables'])
 
 
     def backwards(self, orm):

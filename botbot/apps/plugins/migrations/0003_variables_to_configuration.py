@@ -9,7 +9,7 @@ class Migration(DataMigration):
     def forwards(self, orm):
         "Copy the data from variables (hstore) to a configuration (JSONField)"
         for ap in orm.ActivePlugin.objects.all():
-            ap.configuration = ap.variables
+            ap.configuration = ap.variables or "{}"
             ap.save()
 
     def backwards(self, orm):
