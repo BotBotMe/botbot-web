@@ -14,15 +14,11 @@ from botbot.apps.logs import utils as log_utils
 from botbot.apps.plugins.models import Plugin, ActivePlugin
 from botbot.core.models import TimeStampedModel
 
-PRETTY_SLUG = {
-    "chat.freenode.net": "freenode",
-    "morgan.freenode.net": "freenode",
-    "dickson.freenode.net": "freenode",
-    "irc.oftc.net": "oftc",
-    "irc.mozilla.org": "mozilla",
-    "irc.coldfront.net": "coldfront",
-    "irc.synirc.net": "synirc",
-}
+def pretty_slug(server):
+    parts = server.split('.')
+    if len(parts) == 3:
+        return parts[1]
+    return server
 
 class ChatBot(models.Model):
     is_active = models.BooleanField(default=False)
@@ -53,9 +49,12 @@ class ChatBot(models.Model):
 
     @property
     def slug(self):
-
         server = self.server.split(':')[0]
-        return PRETTY_SLUG.get(server, server)
+        return pretty_slug(server)
+
+    @property
+    def legacy_slug(self):
+        return self.server.split(':')[0]
 
     def __unicode__(self):
         return u'{server} ({nick})'.format(server=self.server, nick=self.nick)
