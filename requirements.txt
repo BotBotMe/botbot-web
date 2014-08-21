@@ -4,6 +4,7 @@ south==0.8.4
 pytz
 psycopg2==2.5.2
 dj-database-url==0.2.2
+# TODO (yml): Remove hstore when we squash the migration
 django-hstore==1.2.5
 # django-statsd-mozilla==0.3.12
 git+https://github.com/vbabiy/django-statsd.git@request-aggregation

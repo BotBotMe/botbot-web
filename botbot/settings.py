@@ -35,7 +35,6 @@ INSTALLED_APPS = (
     'botbot.apps.plugins',
     'botbot.core',
 
-    'django_hstore',
     'south',
     'launchpad',
     'social.apps.django_app.default',
