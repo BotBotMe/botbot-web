@@ -1,5 +1,6 @@
 """Django admin configuration for the bot objects.
 """
+from django.conf import settings
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 import redis
@@ -47,7 +48,7 @@ def botbot_refresh(modeladmin, request, queryset):
     """
     Ask daemon to reload configuration
     """
-    queue = redis.Redis(db=0)
+    queue = redis.from_url(settings.REDIS_PLUGIN_QUEUE_URL)
     queue.lpush('bot', 'REFRESH')
 botbot_refresh.short_description = "Reload botbot-bot configuration"
 
