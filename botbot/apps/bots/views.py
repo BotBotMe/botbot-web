@@ -31,6 +31,11 @@ class ChannelMixin(object):
     """
     only_channel_owners = False
 
+    class LegacySlugUsage(Exception):
+
+        def __init__(self, url):
+            self.url = url
+
     def __init__(self, *args, **kwargs):
         super(ChannelMixin, self).__init__(*args, **kwargs)
 
@@ -40,7 +45,11 @@ class ChannelMixin(object):
         """
         Add the channel as an attribute of the view.
         """
-        self.channel = self.get_channel(user=request.user, **kwargs)
+        try:
+            self.channel = self.get_channel(user=request.user, **kwargs)
+        except self.LegacySlugUsage, e:
+            return http.HttpResponsePermanentRedirect(e.url)
+
         return super(ChannelMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -97,6 +106,14 @@ class ChannelMixin(object):
         for channel in candidates:
             if channel.chatbot.slug == bot_slug:
                 return channel
+            elif channel.chatbot.legacy_slug == bot_slug:
+                kwargs = {'bot_slug': channel.chatbot.slug,
+                          'channel_slug': channel_slug}
+                raise self.LegacySlugUsage(reverse_lazy(
+                    self.request.resolver_match.url_name,
+                    kwargs=kwargs
+                ))
+
 
         raise http.Http404("No such channel / network combination")
 

@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 import pytz
 
 from botbot.apps.accounts import models as account_models
+from botbot.apps.bots.models import pretty_slug
 from botbot.apps.logs import models as logs_models
 from . import models, utils
 
@@ -279,3 +280,18 @@ class UrlTests(BaseTestCase):
         self.assertFormError(response, "form", "connection",
                              "This field is required.")
 
+
+class PrettySlugTestCase(TestCase):
+    def test_pretty_slug(self):
+        original = {
+            "chat.freenode.net": "freenode",
+            "morgan.freenode.net": "freenode",
+            "dickson.freenode.net": "freenode",
+            "irc.oftc.net": "oftc",
+            "irc.mozilla.org": "mozilla",
+            "irc.coldfront.net": "coldfront",
+            "irc.synirc.net": "synirc",
+        }
+
+        for server, slug in original.iteritems():
+            self.assertEqual(pretty_slug(server), slug)
