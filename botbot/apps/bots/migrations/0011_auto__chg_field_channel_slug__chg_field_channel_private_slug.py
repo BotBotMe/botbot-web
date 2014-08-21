@@ -1,31 +1,22 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
 
-        Channel = orm['bots.Channel']
-
-        for channel in Channel.objects.all():
-            if not channel.is_public:
-                if channel.slug:
-                    channel.private_slug = channel.slug
-                else:
-                    channel.private_slug = channel.name.lstrip('#').lower()
-
-            channel.slug = channel.name.lstrip('#').lower()
-            channel.save()
+        # Changing field 'Channel.slug'
+        db.alter_column(u'bots_channel', 'slug', self.gf('django.db.models.fields.SlugField')(default='', max_length=50))
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+
+        # Changing field 'Channel.slug'
+        db.alter_column(u'bots_channel', 'slug', self.gf('django.db.models.fields.SlugField')(max_length=50, null=True))
+
 
     models = {
         u'accounts.membership': {
@@ -82,8 +73,8 @@ class Migration(DataMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '250', 'null': 'True', 'blank': 'True'}),
             'plugins': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['plugins.Plugin']", 'through': u"orm['plugins.ActivePlugin']", 'symmetrical': 'False'}),
-            'private_slug': ('django.db.models.fields.SlugField', [], {'max_length': '50', 'unique': 'True', 'null': 'True', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
+            'private_slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '50'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['accounts.User']", 'through': u"orm['accounts.Membership']", 'symmetrical': 'False'})
         },
@@ -116,9 +107,9 @@ class Migration(DataMigration):
         u'plugins.activeplugin': {
             'Meta': {'object_name': 'ActivePlugin'},
             'channel': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['bots.Channel']"}),
+            'configuration': ('botbot.core.fields.JSONField', [], {'default': "'{}'", 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'plugin': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['plugins.Plugin']"}),
-            'variables': (u'django_hstore.fields.DictionaryField', [], {'null': 'True', 'blank': 'True'})
+            'plugin': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['plugins.Plugin']"})
         },
         u'plugins.plugin': {
             'Meta': {'object_name': 'Plugin'},
@@ -129,4 +120,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['bots']
-    symmetrical = True

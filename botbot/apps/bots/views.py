@@ -1,4 +1,5 @@
 import json
+from django.utils.text import slugify
 
 import redis
 from django.core.exceptions import PermissionDenied
@@ -254,8 +255,10 @@ class RequestChannel(FormView):
         if bot is None:
             bot, _ = models.ChatBot.objects.get_or_create(server=connection,
                                               defaults={"is_active" : False})
+        slug = slugify(form.cleaned_data['channel_name'])
         channel = models.Channel.objects.create(name=form.cleaned_data['channel_name'],
-                                      chatbot=bot, is_active=False, is_pending=True)
+                                      chatbot=bot, slug=slug, private_slug=slug,
+                                      is_active=False, is_pending=True)
         channel.create_default_plugins()
         message = render_to_string('bots/emails/request.txt',
                                    {"data": form.cleaned_data})

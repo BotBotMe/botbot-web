@@ -74,7 +74,7 @@ class Channel(TimeStampedModel):
     chatbot = models.ForeignKey(ChatBot)
     name = models.CharField(max_length=250,
                             help_text="IRC expects room name: #django")
-    slug = models.SlugField(blank=True, null=True)
+    slug = models.SlugField()
     private_slug = models.SlugField(unique=True, blank=True, null=True,
                                     help_text="Slug used for private rooms")
 
@@ -100,6 +100,10 @@ class Channel(TimeStampedModel):
         unique_together = (
             ('slug', 'chatbot')
         )
+
+    @classmethod
+    def generate_private_slug(cls):
+        return "".join([random.choice(string.ascii_letters) for _ in xrange(8)])
 
     def get_absolute_url(self):
         from botbot.apps.bots.utils import reverse_channel
@@ -271,6 +275,9 @@ class Channel(TimeStampedModel):
         Update the 'fingerprint' on every save, its a UUID indicating the
         botbot-bot application that something has changed in this channel.
         """
+        if not self.is_public and not self.private_slug:
+            self.private_slug = self.generate_private_slug()
+
         self.fingerprint = uuid.uuid4()
 
         # If a room is active, it can't be pending.
