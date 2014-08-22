@@ -3,9 +3,11 @@
 from django.conf import settings
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
+from django import forms
 import redis
 
 from . import models
+
 from botbot.apps.plugins.models import Plugin
 
 
@@ -53,7 +55,15 @@ def botbot_refresh(modeladmin, request, queryset):
 botbot_refresh.short_description = "Reload botbot-bot configuration"
 
 
+class ChannelForm(forms.ModelForm):
+    class Meta:
+        model = models.Channel
+
+    def clean_private_slug(self):
+        return self.cleaned_data['private_slug'] or None
+
 class ChannelAdmin(admin.ModelAdmin):
+    form = ChannelForm
     list_display = ('__unicode__', 'name', 'chatbot', 'is_active',
                     'is_public', 'is_featured', 'is_pending', 'updated')
     list_filter = ('chatbot', 'is_active', 'is_public',
