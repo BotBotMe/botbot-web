@@ -13,7 +13,7 @@ from django.utils.importlib import import_module
 from django_statsd.clients import statsd
 
 from botbot.apps.bots import models as bots_models
-from botbot.apps.plugins.utils import convert_nano_timestamp
+from botbot.apps.plugins.utils import convert_nano_timestamp, log_on_error
 from .plugin import RealPluginMixin
 
 
@@ -103,6 +103,12 @@ class Line(object):
             return True
         return False
 
+    def __str__(self):
+        return self.full_text
+
+    def __repr__(self):
+        return str(self)
+
 
 class PluginRunner(object):
     """
@@ -191,7 +197,8 @@ class PluginRunner(object):
                     # gevent.
                     channel_plugin = self.setup_plugin_for_channel(
                         plugin.__class__, line)
-                    new_func = getattr(channel_plugin, func.__name__)
+                    new_func = log_on_error(LOG, getattr(channel_plugin,
+                                                         func.__name__))
                     if hasattr(self, 'gevent'):
                         self.gevent.Greenlet.spawn(new_func, line)
                     else:
@@ -230,7 +237,8 @@ class PluginRunner(object):
                         channel_plugin = self.setup_plugin_for_channel(
                             plugin.__class__, line)
                         # get the method from the channel-specific plugin
-                        new_func = getattr(channel_plugin, func.__name__)
+                        new_func = log_on_error(LOG, getattr(channel_plugin,
+                                                             func.__name__))
                         if hasattr(self, 'gevent'):
                             grnlt = self.gevent.Greenlet(new_func, line,
                                                          **match.groupdict())
