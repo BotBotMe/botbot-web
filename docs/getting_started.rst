@@ -64,7 +64,7 @@ Now that your bot is connected to a network or server, you can start having it j
 8. In your IRC client, join `#botbot-warmup <irc://irc.freenode.net:6667/botbot-warmup>`_. Try issuing a `ping` command (using your bot's nick in place of "mybot"). The bot should respond with a friendly message.
 9. Go back to the home page ``http://localhost:8000``, you should see the channel listed as a public channel.
 10. **Add another Active Plugin** and this time select **Logger**.
-11. **Save**.  Your ``honcho`` console should once again show a refresh
+11. **Save** and "Reload botbot-bot configuration" as before.  Your ``honcho`` console should once again show a refresh
 12. In your IRC client, go to `#botbot-warmup <irc:irc.freenode.net:6667/botbot-warmup>`_ and post a message. You should now have a log available at ``http://localhost:8000/freenode/botbot-warmup``. Each message you post in the channel shows up in the ``honcho`` console.
 
 
