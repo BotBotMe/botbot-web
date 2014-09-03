@@ -47,16 +47,27 @@ If you'd like to make use of the ``.env`` file, you can still start services ind
     honcho start plugins  # Starts plugin runner
     honcho start realtime # Starts event source (SSE)
 
-If you'd prefer not to have Honcho in the mix and would like to work with the services directly::
+If you would prefer not to use Honcho, you'll need to manage the environment variables. Many developers use the virtualenv ``postactivate`` feature to set required environment variables whenever a virtualenv is activated. An alternative approach could be to attempt to set variables directly from the ``.env`` file. As an example, you could put the following into a ``set_env.sh`` file::
+
+    export $(cat .env | grep -v ^# | xargs)
+
+Then you could invoke commands and individual services like::
 
     source set_env.sh && manage.py runserver
     source set_env.sh && botbot-bot
     source set_env.sh && botbot-eventsource
     source set_env.sh && manage.py run_plugins
 
+If you've explicitly set the environment through your own methods, services can be invoked like usual::
+
+    manage.py runserver
+    botbot-bot
+    botbot-eventsource
+    manage.py run_plugins
+
 
 Go IRC Client (bot)
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 Execution starts in main.go, in function "main". That starts the chatbots (via NetworkManager), the goroutine which listens for commands from Redis, and the mainLoop goroutine, then waits for a Ctrl-C or kill to quit.
 
@@ -83,12 +94,27 @@ And now, in ASCII art::
 
 
 Django Site
-------------
+~~~~~~~~~~~~
 
-TODO running Django management commands
+You can run commands within the Honcho environment using the ``run`` command::
+
+    honcho run manage.py dbshell
+    honcho run manage.py syncdb
+
+If you're using the ``set_env`` method::
+
+    source set_env.sh && manage.py dbshell
+    source set_env.sh && manage.py syncdb
+
+If you've explicitly set the environment variables, run commands like usual::
+
+    manage.py dbshell
+    manage.py syncdb
+
+
 
 Working with LESS
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 LESS requires Node.js. There are shortcuts in the Makefile for installing everything necessary:
 
@@ -105,7 +131,9 @@ From this point forward, if you need to compile LESS run:
 To automatically compile whenever you save a change:
 
 .. code-block:: bash
+
     make less-watch
+
 
 Plugins
 --------
