@@ -3,9 +3,11 @@
 from django.conf import settings
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
+from django import forms
 import redis
 
 from . import models
+
 from botbot.apps.plugins.models import Plugin
 
 
@@ -39,6 +41,7 @@ class ChatBotAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'is_active')
     list_editable = ('is_active',)
     list_filter = ('is_active',)
+    readonly_fields = ('server_identifier',)
 
     # Disable bulk delete, because it doesn't call delete, so skips REFRESH
     actions = None
@@ -53,11 +56,22 @@ def botbot_refresh(modeladmin, request, queryset):
 botbot_refresh.short_description = "Reload botbot-bot configuration"
 
 
+class ChannelForm(forms.ModelForm):
+    class Meta:
+        model = models.Channel
+
+    def clean_private_slug(self):
+        return self.cleaned_data['private_slug'] or None
+
 class ChannelAdmin(admin.ModelAdmin):
+    form = ChannelForm
     list_display = ('__unicode__', 'name', 'chatbot', 'is_active',
                     'is_public', 'is_featured', 'is_pending', 'updated')
     list_filter = ('chatbot', 'is_active', 'is_public',
                    'is_featured', 'is_pending')
+    prepopulated_fields = {
+        'slug': ('name',)
+    }
     list_editable = ('is_active',)
     readonly_fields = ('fingerprint', 'created', 'updated')
     search_fields = ('name', 'chatbot__server')

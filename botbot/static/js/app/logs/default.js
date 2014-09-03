@@ -1,3 +1,30 @@
+function getFromLocalStorage(key, default_value) {
+    try {
+        var value = localStorage.getItem(key);
+        if (value === null) {
+            return default_value;
+        } else {
+            return value;
+        }
+    } catch (e) {
+        log("No localStorage");
+        return true;
+    }
+}
+
+function setToLocalStorage(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch (e) {
+        log("No localStorage");
+    }
+}
+
+function localStorageKey(name) {
+    var path = window.location.pathname
+    return path + name
+}
+
 $$.Templates = {
     DateHeader: _.template(
         '<h3 id="date-<%= flatDate %>" data-date="<%= flatDate %>"><span><%= dateString %></span></h3>'
@@ -67,8 +94,8 @@ $$.Cache = Backbone.Model.extend({
 
     prepPage: function (html) {
         log('Cache:prepPage');
-        var prevDate,
-            self = this;
+        var prevDate;
+
         if (html) {
             this.$el.html(html);
         }
@@ -82,7 +109,7 @@ $$.Cache = Backbone.Model.extend({
             this.$el.find('.message').highlight($$.searchTerm.split(" "));
         }
         $$.imagePreviews(this.$el);
-
+        $$.applyFilter(this.$el)
         // check timezone again on next fetch
         this.adjustTimezone = false;
     },
@@ -108,8 +135,13 @@ $$.Views.LogViewer = Backbone.View.extend({
                         "createDateHeaderWaypoints",
                         "setDateHeader", "checkPageSplit",
                         "insertCache", "highlight",
-                        "messageView");
+                        "messageView", "filterChanged");
         $$.on('date:change', this.setDateHeader);
+
+        var $filterEl = $('#filter');
+        $filterEl.change(this.filterChanged);
+        $filterEl.prop('checked', getFromLocalStorage(localStorageKey('onlyChat'),
+            "true") === "true");
 
         this.current = options.current;
         this.eventSourceUrl = options.source;
@@ -149,6 +181,13 @@ $$.Views.LogViewer = Backbone.View.extend({
         this.highlight()
     },
 
+    filterChanged: function (event) {
+        onlyChat = event.target.checked;
+        setToLocalStorage(localStorageKey('onlyChat'), onlyChat.toString())
+        $$.applyFilter(this.$logEl);
+    },
+
+
     messageView: function(event) {
         // Check to see if we are still on the same path
         var href = $(event.target).parent().attr('href');
@@ -158,7 +197,7 @@ $$.Views.LogViewer = Backbone.View.extend({
         }
     },
 
-    highlight: function(event) {
+    highlight: function() {
         var highlighted = this.$logEl.find(".highlight");
         if (highlighted.length > 0) {
             // move to middle of element
@@ -204,12 +243,12 @@ $$.Views.LogViewer = Backbone.View.extend({
             return;
         }
         this.source = new EventSource(this.eventSourceUrl);
-        log('Creating event source'); 
+        log('Creating event source');
         this.source.addEventListener('log', function (e) {
-            log('received'); 
+            log('received');
             log(e);
             log(this);
-            var $el = $(e.data),
+            var $el = $(e.data).hide(),
                 $last = self.$logEl.find('li:last'),
                 prevDate = moment($last.find('time').attr('datetime'));
             $el.each(function (idx, el) {
@@ -218,6 +257,7 @@ $$.Views.LogViewer = Backbone.View.extend({
             log('mid');
             self.checkPageSplit($last, $el.first());
             $$.imagePreviews($el);
+            $$.applyFilter($el);
             self.$logEl.append($el);
             log('end');
             if ($$.isAtBottom()) {
@@ -334,21 +374,24 @@ $$.Views.LogViewer = Backbone.View.extend({
         // Finally, refill the cache
         log('LogViewer:Insert', cache.direction);
         var height;
+        cache.$el.find('li').hide()
+        $$.applyFilter(cache.$el);
         if (cache.direction === 'prev') {
             // if there isn't already a date header at the top
             // see if we need to add one
             if (this.$logEl.children()[0].nodeName !== 'H3') {
                 this.checkPageSplit(cache.$el.find('li:last'),
-                                    this.$logEl.find('li:first'));
+                    this.$logEl.find('li:first'));
             }
             // dump prep into real log and scroll back to where we were
             cache.$el.width(this.$logEl.width());
             height = cache.$el.height();
+            log(height)
             cache.$el.children().prependTo(this.$logEl);
             window.scrollBy(0, height);
         } else {
             this.checkPageSplit(this.$logEl.find('li:last'),
-                                cache.$el.find('li:first'));
+                cache.$el.find('li:first'));
             cache.$el.children().appendTo(this.$logEl);
         }
         cache.refetch();
@@ -490,6 +533,33 @@ $$.imagePreviews = function ($el) {
     $el.find('a.image').each(function (idx, el) {
         var data = $(el).data()
         $(el).after('&nbsp;' + $$.Templates.ImageToggle({link: data.src, type: data.type}));
+    });
+};
+
+$$.applyFilter = function ($el) {
+    log('applyFilter');
+    onlyChat = getFromLocalStorage(localStorageKey('onlyChat'), "true") === "true"
+    is_status = function ($row) {
+        return !!($row.hasClass('join') ||
+            $row.hasClass('part') ||
+            $row.hasClass('quit'));
+    };
+    log($el, onlyChat);
+
+    var $rows;
+    if ($el.is('li')) {
+        $rows = $([$el])
+    } else {
+        $rows = $el.find('li')
+    }
+
+    $.each($rows, function (index, row) {
+        var $row = $(row);
+        if (is_status($row) && onlyChat) {
+            $row.hide();
+        } else {
+            $row.show();
+        }
     });
 };
 

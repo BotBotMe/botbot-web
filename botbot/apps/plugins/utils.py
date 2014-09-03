@@ -1,4 +1,5 @@
 import datetime
+from functools import wraps
 
 from django.template import Template, Context
 from django.template.defaultfilters import urlize
@@ -30,3 +31,13 @@ def convert_nano_timestamp(nano_timestamp):
     micro_timestamp = datetime.datetime.strptime(
         rfc3339micro, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=utc)
     return micro_timestamp
+
+
+def log_on_error(Log, method):
+    @wraps(method)
+    def wrap(*args, **kwargs):
+        try:
+            return method(*args, **kwargs)
+        except Exception:
+            Log.error("Plugin failed [%s]", method.__name__, exc_info=True)
+    return wrap

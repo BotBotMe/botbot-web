@@ -42,10 +42,14 @@
           </a>
           {% endcomment %}
 
-          <a href="{% channel_url channel 'help_bot' %}" class="wicon">
+          <a href="{% channel_url channel 'help_bot' %}" class="wicon" title="A list of commands for BotBot in this channel">
             <i class="icon-book icon-large"></i>
             <span>Channel Docs</span>
           </a>
+          <label class="noise-toggler extra" title="Hides parts and joins">
+            <input id="filter" value="true" type="checkbox" name="only_chat" />
+            <span>Hide joins/parts</span>
+          </label>
         </nav>
     </header>
 

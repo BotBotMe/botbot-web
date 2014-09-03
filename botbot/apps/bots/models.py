@@ -1,4 +1,6 @@
 import datetime
+import random
+import string
 import uuid
 
 from django.core.cache import cache
@@ -7,27 +9,20 @@ from django.db import models
 from django.db.models import Max, Min
 from django.utils.text import slugify
 from django.utils.datastructures import SortedDict
-from django_hstore import hstore
 from djorm_pgarray.fields import ArrayField
 from botbot.apps.plugins import models as plugins_models
 from botbot.apps.logs import utils as log_utils
 from botbot.apps.plugins.models import Plugin, ActivePlugin
 from botbot.core.models import TimeStampedModel
 
-PRETTY_SLUG = {
-    "chat.freenode.net": "freenode",
-    "morgan.freenode.net": "freenode",
-    "irc.oftc.net": "oftc",
-    "irc.mozilla.org": "mozilla",
-    "irc.coldfront.net": "coldfront",
-    "irc.synirc.net": "synirc",
-}
+def pretty_slug(server):
+    parts = server.split('.')
+    if len(parts) == 3:
+        return parts[1]
+    return server
 
 class ChatBot(models.Model):
     is_active = models.BooleanField(default=False)
-    connection = hstore.DictionaryField(
-        default={"is": "not used"},
-        help_text="Not used")
 
     server = models.CharField(
             max_length=100, help_text="Format: irc.example.net:6697")
@@ -48,13 +43,14 @@ class ChatBot(models.Model):
             max_length=250,
             help_text="Usually a URL with information about this bot.")
 
-    objects = hstore.HStoreManager()
-
     @property
     def slug(self):
-
         server = self.server.split(':')[0]
-        return PRETTY_SLUG.get(server, server)
+        return pretty_slug(server)
+
+    @property
+    def legacy_slug(self):
+        return self.server.split(':')[0]
 
     def __unicode__(self):
         return u'{server} ({nick})'.format(server=self.server, nick=self.nick)
@@ -78,11 +74,10 @@ class Channel(TimeStampedModel):
     chatbot = models.ForeignKey(ChatBot)
     name = models.CharField(max_length=250,
                             help_text="IRC expects room name: #django")
-    slug = models.SlugField(unique=True, blank=True, null=True,
-                            help_text="If a slug is given the url will be "
-                                      "/private/[slug] hiding all details "
-                                      "about the channel name or server it "
-                                      "is hosted on.")
+    slug = models.SlugField()
+    private_slug = models.SlugField(unique=True, blank=True, null=True,
+                                    help_text="Slug used for private rooms")
+
     password = models.CharField(max_length=250, blank=True, null=True,
                                 help_text="Password (mode +k) if the channel requires one")
     is_public = models.BooleanField(default=False)
@@ -102,6 +97,13 @@ class Channel(TimeStampedModel):
 
     class Meta:
         ordering = ('name',)
+        unique_together = (
+            ('slug', 'chatbot')
+        )
+
+    @classmethod
+    def generate_private_slug(cls):
+        return "".join([random.choice(string.ascii_letters) for _ in xrange(8)])
 
     def get_absolute_url(self):
         from botbot.apps.bots.utils import reverse_channel
@@ -160,7 +162,7 @@ class Channel(TimeStampedModel):
             try:
                 active_plugin = self.activeplugin_set.get(
                     plugin__slug=plugin_slug)
-                cached_config = active_plugin.variables
+                cached_config = active_plugin.configuration
             except plugins_models.ActivePlugin.DoesNotExist:
                 cached_config = {}
             cache.set(cache_key, cached_config)
@@ -187,18 +189,18 @@ class Channel(TimeStampedModel):
         Limits to certain IRC commands (including some more for
         private channels).
         """
-        qfilter = models.Q(command__in=['PRIVMSG', 'NICK', 'NOTICE',
-                                        'TOPIC', 'ACTION', 'SHUTDOWN'])
-        if not self.is_public:
-            # Private channels we want to see people arrive and leave too.
-            qfilter = (qfilter |
-                        models.Q(command__in=['JOIN', 'QUIT',
-                                                'PART', 'AWAY']))
-        else:
-            qfilter = (qfilter |
-                        models.Q(command__in=['JOIN', 'QUIT'],
-                                nick=self.chatbot.nick))
-        return qfilter
+        return models.Q(
+            command__in=['PRIVMSG',
+                         'NICK',
+                         'NOTICE',
+                         'TOPIC',
+                         'ACTION',
+                         'SHUTDOWN',
+                         'JOIN',
+                         'QUIT',
+                         'PART',
+                         'AWAY'
+            ])
 
     def filtered_logs(self):
         return (self.log_set.filter(self.visible_commands_filter)
@@ -273,8 +275,9 @@ class Channel(TimeStampedModel):
         Update the 'fingerprint' on every save, its a UUID indicating the
         botbot-bot application that something has changed in this channel.
         """
-        if not self.slug:
-            self.slug = None
+        if not self.is_public and not self.private_slug:
+            self.private_slug = self.generate_private_slug()
+
         self.fingerprint = uuid.uuid4()
 
         # If a room is active, it can't be pending.

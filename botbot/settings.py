@@ -35,7 +35,6 @@ INSTALLED_APPS = (
     'botbot.apps.plugins',
     'botbot.core',
 
-    'django_hstore',
     'south',
     'launchpad',
     'social.apps.django_app.default',
@@ -107,8 +106,11 @@ STATICFILES_DIRS = (
 
 DATABASES = {'default': dj_database_url.config(env='STORAGE_URL')}
 # Reuse database connections
-DATABASES['default']['CONN_MAX_AGE'] = None
-DATABASES['default']['OPTIONS'] = {"application_name": "django"}
+DATABASES['default'].update({
+    'CONN_MAX_AGE': None,
+    'ATOMIC_REQUESTS': True,
+    'OPTIONS': {"application_name": "django"},
+})
 
 #==============================================================================
 # Templates
@@ -137,7 +139,6 @@ MIDDLEWARE_CLASSES = (
     'django_statsd.middleware.GraphiteMiddleware',
 ) + MIDDLEWARE_CLASSES + (
     'botbot.core.middleware.TimezoneMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
 )
 
 #==============================================================================
@@ -293,4 +294,6 @@ STATSD_PATCHES = [
     'django_statsd.patches.cache',
 ]
 
-STATSD_PREFIX = "bbme"
+STATSD_PREFIX = os.environ.get('STATSD_PREFIX', 'bbme')
+
+DJANGO_HSTORE_ADAPTER_REGISTRATION = 'connection'
