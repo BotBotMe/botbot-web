@@ -12,6 +12,8 @@ Several loosely coupled pieces make up the whole of BotBot:
 3. **botbot-web:** A web site for managing bots/channels as well as a beautiful public interface for channel logs. (Python/Django)
 4. **botbot-eventsource:** A basic SSE provider that the web site can connect to for real-time logs. (Go)
 
+.. image:: /images/botbot-architecture.png
+
 Configuration / Environment Variables
 -------------------------------------
 
