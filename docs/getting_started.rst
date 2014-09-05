@@ -45,7 +45,7 @@ Now that your bot is connected to a network or server, you can start having it j
 3. **Channel**: ``#botbot-warmup``. This is a channel where we test channel bots.
 4. If you'd like the channel to be listed on the site home page, Select **'Is public'**
 5. Several useful plugins will already be configured. At a minimum, ``ping`` and ``logger`` will be helpful for testing the bot.
-6. Save. In the ``honcho`` console output you should see messages similar to::
+6. Save your channel. You should be directed back to the Channel list view.
 7. On the Channel list view, select your channel. From the ``Actions`` dropdown select "Reload botbot-bot configuration" and press "Go". You should see something similar in the ``honcho`` console output (edited for brevity)::
 
     14:15:07 bot.1      | I0711 14:15:07.557470 61493 botbot.go:67] Command:  REFRESH
