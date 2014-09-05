@@ -42,7 +42,7 @@ Now that your bot is connected to a network or server, you can start having it j
 
 1. Go to ``http://localhost:8000/admin/bots/channel/add/``
 2. Select your bot from the dropdown
-3. **Channel**: ``#botbot-warmup``. This is a channel commonly used for testing IRC bots.
+3. **Channel**: ``#botbot-warmup``. This is a channel where we test channel bots.
 4. If you'd like the channel to be listed on the site home page, Select **'Is public'**
 5. Several useful plugins will already be configured. At a minimum, ``ping`` and ``logger`` will be helpful for testing the bot.
 6. Save. In the ``honcho`` console output you should see messages similar to::
