@@ -227,7 +227,7 @@ class LogViewer(ChannelMixin, object):
             # Official SEO header
             links = []
             if self.next_page:
-                links.append('{0}; rel="prev"'.format(self.next_page))
+                links.append('{0}; rel="next"'.format(self.next_page))
 
             if self.prev_page:
                 links.append('{0}; rel="prev"'.format(self.prev_page))
