@@ -29,6 +29,10 @@ class JSONField(models.TextField):
     def get_db_prep_save(self, value, *args, **kwargs):
         if value == "":
             return None
+
+        if value == "{}":
+            value = {}
+
         if isinstance(value, dict) or isinstance(value, list):
             value = json.dumps(value, cls=DjangoJSONEncoder)
             return super(JSONField, self).get_db_prep_save(value, *args, **kwargs)
