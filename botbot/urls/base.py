@@ -2,7 +2,8 @@ from django.conf.urls import patterns, url, include
 from django.conf import settings
 
 from botbot.apps.accounts.views import Dashboard
-from botbot.apps.bots.views import AddChannel, SuggestUsers, RequestChannel
+from botbot.apps.bots.views import AddChannel, SuggestUsers, RequestChannel, \
+    ChannelList
 from botbot.apps.preview.views import LandingPage
 
 channel_patterns = patterns('',
@@ -24,6 +25,7 @@ urlpatterns = patterns('',
 
     url(r'^(?P<bot_slug>[\-\w\:\.]+(\@[\w]+)?)/(?P<channel_slug>[\-\w\.]+)/',
         include(channel_patterns)),
+    url(r'^(?P<network_slug>[\-\w\.]+)/$', ChannelList.as_view())
 )
 
 urlpatterns += patterns('django.shortcuts',

@@ -43,10 +43,7 @@ class ChatBot(models.Model):
             max_length=250,
             help_text="Usually a URL with information about this bot.")
 
-    @property
-    def slug(self):
-        server = self.server.split(':')[0]
-        return pretty_slug(server)
+    slug = models.CharField(max_length=50, db_index=True)
 
     @property
     def legacy_slug(self):
@@ -64,6 +61,11 @@ class ChatBot(models.Model):
             slugify(unicode(self.server.replace(":", " ").replace(".", " "))),
             slugify(unicode(self.nick))
         )
+
+        if not self.slug:
+            server = self.server.split(':')[0]
+            self.slug = pretty_slug(server)
+
         return super(ChatBot, self).save(*args, **kwargs)
 
 

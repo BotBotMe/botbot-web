@@ -1,5 +1,7 @@
 import json
+from django.http.response import Http404
 from django.utils.text import slugify
+from django.views.generic.list import ListView
 
 import redis
 from django.core.exceptions import PermissionDenied
@@ -264,3 +266,23 @@ class RequestChannel(FormView):
                                    {"data": form.cleaned_data})
         mail_admins("Channel Request", message)
         return super(RequestChannel, self).form_valid(form)
+
+
+class ChannelList(ListView):
+    model = models.Channel
+    template_name = "accounts/anon_dashboard.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(ChannelList, self).get_queryset(*args, **kwargs)
+        return qs.filter(chatbot__slug=self.kwargs['network_slug'], is_public=True,
+                  is_active=True)
+
+    def get_context_data(self, **kwargs):
+        data = super(ChannelList, self).get_context_data(**kwargs)
+
+        if not self.object_list:
+            raise Http404()
+
+        data['public_channels'] = self.object_list
+
+        return data
