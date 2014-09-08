@@ -28,8 +28,8 @@ class RealPluginMixin(object):
     def store(self, key, value):
         """Saves a key,value to Redis"""
         ukey = self.unique_key(key)
-        LOG.info('Storing: %s=%s', ukey, value.encode('utf-8'))
-        self.app.storage.set(ukey, value.encode('utf-8'))
+        LOG.info('Storing: %s=%s', ukey, value)
+        self.app.storage.set(ukey, value)
 
     def retrieve(self, key):
         """Retrieves the value for a key from Redis"""
