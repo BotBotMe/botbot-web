@@ -164,23 +164,26 @@ class PluginRunner(object):
     def listen(self):
         """Listens for incoming messages on the Redis queue"""
         while 1:
-            val = self.bot_bus.blpop('q', 1)
+            try:
+                val = self.bot_bus.blpop('q', 1)
 
-            # Track q length
-            ql = self.bot_bus.llen('q')
-            statsd.gauge(".".join(["plugins", "q"]), ql)
+                # Track q length
+                ql = self.bot_bus.llen('q')
+                statsd.gauge(".".join(["plugins", "q"]), ql)
 
-            if val:
-                _, val = val
-                LOG.debug('Recieved: %s', val)
-                line = Line(json.loads(val), self)
+                if val:
+                    _, val = val
+                    LOG.debug('Recieved: %s', val)
+                    line = Line(json.loads(val), self)
 
-                # Calculate the transport latency between go and the plugins.
-                delta = datetime.utcnow().replace(tzinfo=utc) - line._received
-                statsd.timing(".".join(["plugins", "latency"]),
-                             delta.total_seconds() * 1000)
+                    # Calculate the transport latency between go and the plugins.
+                    delta = datetime.utcnow().replace(tzinfo=utc) - line._received
+                    statsd.timing(".".join(["plugins", "latency"]),
+                                 delta.total_seconds() * 1000)
 
-                self.dispatch(line)
+                    self.dispatch(line)
+            except Exception:
+                LOG.error("Line Dispatch Failed", exc_info=True)
 
     def dispatch(self, line):
         """Given a line, dispatch it to the right plugins & functions."""
