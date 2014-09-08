@@ -31,7 +31,7 @@ class ActivePlugin(models.Model):
     plugin = models.ForeignKey('plugins.Plugin')
     channel = models.ForeignKey('bots.Channel')
     configuration =  JSONField(
-            blank=True, default="{}",
+            blank=True, default={},
             help_text="User-specified attributes for this plugin " +
             '{"username": "joe", "api-key": "foo"}')
 
