@@ -4277,7 +4277,6 @@ body.log-view .misc-links {
 }
 .log .message .highlight {
   background: yellow;
-  padding: 3px;
 }
 .log .actor {
   -webkit-box-sizing: 'border-box';
