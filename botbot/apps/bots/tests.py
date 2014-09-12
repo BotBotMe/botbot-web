@@ -48,9 +48,6 @@ class BaseTestCase(TestCase):
             user=self.member, channel=self.private_channel, is_owner=True,
             is_admin=True)
 
-        for plugin in models.Channel.DEFAULT_PLUGINS:
-            models.Plugin.objects.create(name=plugin, slug=plugin)
-
 
 class ModelTests(BaseTestCase):
 
