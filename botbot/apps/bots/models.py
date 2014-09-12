@@ -131,6 +131,7 @@ class Channel(TimeStampedModel):
         :return:
         """
         for plugin in self.DEFAULT_PLUGINS:
+            import ipdb; ipdb.set_trace() # FIXME: !!REMOVE DEBUG!!
             pobj = Plugin.objects.get(slug=plugin)
             active = ActivePlugin()
             active.plugin = pobj

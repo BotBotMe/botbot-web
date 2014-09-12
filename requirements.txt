@@ -1,6 +1,5 @@
-django==1.6.5
+django==1.7
 
-south==0.8.4
 pytz
 psycopg2==2.5.2
 dj-database-url==0.2.2

@@ -35,7 +35,6 @@ INSTALLED_APPS = (
     'botbot.apps.plugins',
     'botbot.core',
 
-    'south',
     'launchpad',
     'social.apps.django_app.default',
     'django_assets',
@@ -137,13 +136,18 @@ TEMPLATE_CONTEXT_PROCESSORS += (
 MIDDLEWARE_CLASSES = (
     'django_statsd.middleware.GraphiteRequestTimingMiddleware',
     'django_statsd.middleware.GraphiteMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
 ) + MIDDLEWARE_CLASSES + (
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'botbot.core.middleware.TimezoneMiddleware',
 )
 
 #==============================================================================
 # Auth / security
-#==============================================================================
+#============================================================================
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 AUTHENTICATION_BACKENDS += (
@@ -265,7 +269,7 @@ SSE_ENDPOINT = SSE_ENDPOINT_URL + 'push/{token}'
 # Third party app settings
 # ==============================================================================
 
-SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
+# SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 
 SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
