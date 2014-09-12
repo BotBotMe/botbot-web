@@ -13,11 +13,6 @@ from botbot.apps.plugins.models import Plugin
 
 class PluginFormset(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
-        if not kwargs['instance'].pk:
-            defaults = Plugin.objects.filter(
-                slug__in=models.Channel.DEFAULT_PLUGINS)
-
-            kwargs['initial'] = [{"plugin": obj.pk} for obj in defaults]
         super(PluginFormset, self).__init__(*args, **kwargs)
 
 
@@ -26,8 +21,6 @@ class ActivePluginInline(admin.StackedInline):
     formset = PluginFormset
 
     def get_extra(self, request, obj=None, **kwargs):
-        if obj is None:
-            return len(models.Channel.DEFAULT_PLUGINS)
         return 0
 
 
