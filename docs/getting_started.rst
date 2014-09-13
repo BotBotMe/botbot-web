@@ -31,8 +31,8 @@ A bot acts as an IRC client. It connects to one or more IRC servers and joins on
         /msg NickServ info <desired_nick>
 
 6. **Real Name:** This should be a readable identifier related to your bot: a URL, project name, etc. The spec leaves a lot of room for interpretation about what this value should be. It could probably be any random value but other members of the Freenode community would likely appreciate if you use a sensible name. See **4.1.3 User message** in the `IRC protocol spec <http://www.ietf.org/rfc/rfc1459.txt>`_ for more info.
-
-7. **Save** the Bot. Check the output in the console you started ``honcho`` in. You should see a number of messages indicating the bot has connected to Freenode and identified itself.
+7. **Slug:** Enter a slug value for the Bot.
+8. **Save** the Bot.
 
 
 Add a Channel
