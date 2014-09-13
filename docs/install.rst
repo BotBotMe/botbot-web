@@ -57,10 +57,10 @@ Run in a terminal:
 
     createdb botbot
     echo "create extension hstore" | psql botbot
-    manage.py syncdb --migrate
+    honcho run manage.py syncdb --migrate
 
     # You'll need a staff account for creating a bot and registering channels
-    manage.py createsuperuser
+    honcho run manage.py createsuperuser
 
 Redis needs to be running prior to starting the BotBot services. For example:
 
@@ -76,7 +76,7 @@ Then, to run all the services defined in ``Procfile``:
 
 .. note:: `foreman <http://ddollar.github.com/foreman/>`_ will also work if you have the gem or Heroku toolbelt installed.
 
-You should now be able to access the site at ``http://localhost:8000``. Log in with the username you created.
+You should now be able to access the site at ``http://localhost:8000``.
 
 See :doc:`getting_started` for instructions on configuring a bot.
 
@@ -92,7 +92,7 @@ The tests can currently be run with the following command:
 
 .. code-block:: bash
 
-    manage.py test accounts bots logs plugins
+    honcho manage.py test
 
 
 Building Documentation
