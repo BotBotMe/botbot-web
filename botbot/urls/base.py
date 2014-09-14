@@ -11,7 +11,12 @@ channel_patterns = patterns('',
     url(r'', include('botbot.apps.bots.urls')),
 )
 
-urlpatterns = patterns('',
+urlpatterns = patterns('django.shortcuts',
+    url(r'^terms/$', 'render', {'template_name': 'terms.html'}),
+    url(r'^privacy/$', 'render', {'template_name': 'privacy.html'}),
+)
+
+urlpatterns += patterns('',
     (r'^$', LandingPage.as_view()),
     (r'', include('launchpad.urls')),
     url(r'^dashboard/$', Dashboard.as_view(), name='dashboard'),
@@ -28,10 +33,6 @@ urlpatterns = patterns('',
     url(r'^(?P<network_slug>[\-\w\.]+)/$', ChannelList.as_view())
 )
 
-urlpatterns += patterns('django.shortcuts',
-    url(r'^terms/$', 'render', {'template_name': 'terms.html'}),
-    url(r'^privacy/$', 'render', {'template_name': 'privacy.html'}),
-)
 
 if settings.INCLUDE_DJANGO_ADMIN:
     from .admin import urlpatterns as admin_urlpatterns
