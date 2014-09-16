@@ -8,8 +8,6 @@ import redis
 
 from . import models
 
-from botbot.apps.plugins.models import Plugin
-
 
 class PluginFormset(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
