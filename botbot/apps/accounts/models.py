@@ -17,6 +17,21 @@ class User(auth_models.AbstractUser):
     class Meta:
         db_table = 'auth_user'
 
+    def get_quantity_per_membership_kind(self):
+        """
+        Group the membership per kind and count them
+        The result is a list of dict:
+            [
+                {'kind': u'share', 'quantity': 1},
+                {'kind': u'personal', 'quantity': 2}
+            ]
+        """
+        return (
+            self.membership_set
+                .values("kind")
+                .annotate(quantity=models.Count("kind"))
+            )
+
 
 @receiver(user_logged_in)
 def set_user_timezone(sender, request, user, **kwargs):
