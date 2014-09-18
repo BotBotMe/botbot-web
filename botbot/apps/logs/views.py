@@ -241,7 +241,7 @@ class LogViewer(ChannelMixin, object):
 
 class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     show_first_header = False
-    allow_empty = False
+    allow_empty = True
 
     def dispatch(self, request, *args, **kwargs):
         try:
