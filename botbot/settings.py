@@ -37,9 +37,14 @@ INSTALLED_APPS = (
 
     'south',
     'launchpad',
-    'social.apps.django_app.default',
     'django_assets',
     'django_statsd',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.google',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,8 +132,8 @@ TEMPLATE_DIRS = (
 TEMPLATE_CONTEXT_PROCESSORS += (
     'django.core.context_processors.request',
     'django.core.context_processors.tz',
-    'social.apps.django_app.context_processors.backends',
-    'social.apps.django_app.context_processors.login_redirect',
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
 )
 
 #==============================================================================
@@ -147,11 +152,10 @@ MIDDLEWARE_CLASSES = (
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 AUTHENTICATION_BACKENDS += (
-    # WARNING! Users are automatically associated by email in the
-    # social pipeline. Before adding additional social auth backends
-    # Be sure you trust the provider to confirm the email address.
-    'social.backends.google.GoogleOpenId',
     'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 #==============================================================================
