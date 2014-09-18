@@ -19,10 +19,10 @@ honcho==0.5.0
 djorm-ext-pgfulltext==0.9.0
 djorm-ext-pgarray==0.9.0
 
-python-social-auth==0.1.20
-    # python-openid==2.2.5
-    # waiting for https://github.com/openid/python-openid/pull/39
-    https://github.com/lincolnloop/python-openid/tarball/master
+django-allauth==0.18.0
+    requests==2.2.1
+    oauthlib==0.6.1
+    requests-oauthlib==0.4.0
 
 # Needs pinning
 -e git+https://github.com/lincolnloop/django-jsonit.git#egg=jsonit
@@ -30,3 +30,4 @@ python-social-auth==0.1.20
 
 # For plugins
 -e git+https://github.com/BotBotMe/botbot-plugins.git#egg=botbot-plugins
+
