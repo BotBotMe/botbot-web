@@ -93,7 +93,7 @@ if not os.path.exists(VAR_ROOT):
 
 ROOT_URLCONF = 'botbot.urls'
 
-LOGIN_URL = '/dashboard/'
+LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/logout/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 INCLUDE_DJANGO_ADMIN = ast.literal_eval(os.environ.get(
