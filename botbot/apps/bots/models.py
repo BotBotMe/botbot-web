@@ -24,9 +24,10 @@ def pretty_slug(server):
 
 
 class ChatBotManager(models.Manager):
-
-    def get_slugs(self):
-        return [i[0] for i in self.get_queryset().distinct('slug').values_list('slug')]
+    def get_active_slugs(self):
+        return [i[0] for i in
+                self.get_queryset().filter(is_active=True).distinct(
+                    'slug').values_list('slug')]
 
 
 class NoAvailableChatBots(Exception):
