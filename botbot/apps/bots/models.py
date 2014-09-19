@@ -86,7 +86,7 @@ class ChatBot(models.Model):
 
     @classmethod
     def allocate_bot(cls, slug):
-        bots = cls.objects.filter(slug='freenode').annotate(
+        bots = cls.objects.filter(slug='freenode', is_active=True).annotate(
             Count('channel')).order_by('channel__count')
 
         for bot in bots:
