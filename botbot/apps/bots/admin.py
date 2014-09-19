@@ -29,13 +29,17 @@ class MembershipInline(admin.TabularInline):
 
 class ChatBotAdmin(admin.ModelAdmin):
     exclude = ('connection', 'server_identifier')
-    list_display = ('__unicode__', 'is_active')
+    list_display = ('__unicode__', 'is_active', 'usage')
     list_editable = ('is_active',)
     list_filter = ('is_active',)
     readonly_fields = ('server_identifier',)
 
     # Disable bulk delete, because it doesn't call delete, so skips REFRESH
     actions = None
+
+    def usage(self, obj):
+        return "%d%%" % (
+        (obj.channel_set.count() / float(obj.max_channels)) * 100)
 
 
 def botbot_refresh(modeladmin, request, queryset):
