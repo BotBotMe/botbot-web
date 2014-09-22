@@ -233,16 +233,7 @@ ADMINS = (
     ('LL', 'info@lincolnloop.com'),
 )
 EMAIL_SUBJECT_PREFIX = "[BBME] "
-
-if 'SMTP_URL' in os.environ:
-    url = urlparse.urlparse(os.environ['SMTP_URL'])
-    EMAIL_HOST = url.hostname
-    EMAIL_HOST_USER = url.username
-    EMAIL_HOST_PASSWORD = url.password
-    EMAIL_PORT = url.port or 25
-    EMAIL_USE_TLS = ast.literal_eval(os.environ.get('SMTP_TLS', 'False'))
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #==============================================================================
 # Miscellaneous project settings
