@@ -7,5 +7,11 @@ class MembershipAdmin(admin.ModelAdmin):
     list_display = ("user", "kind")
     list_filter = ("kind", "is_admin", "is_owner")
 
-admin.site.register(models.User, UserAdmin)
+
+class CustomUserAdmin(UserAdmin):
+    list_display = (
+    'username', 'email', 'first_name', 'last_name', 'is_staff', 'date_joined')
+
+
+admin.site.register(models.User, CustomUserAdmin)
 admin.site.register(models.Membership, MembershipAdmin)
