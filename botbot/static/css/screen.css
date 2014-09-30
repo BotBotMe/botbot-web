@@ -3834,6 +3834,10 @@ input[type=radio] {
 .page-header .nav {
   margin-bottom: 0;
 }
+.page-header h1 {
+  display: inline-block;
+  vertical-align: middle;
+}
 .page-header h1 ~ .nav {
   margin-left: 20px;
 }
@@ -4361,7 +4365,6 @@ body.log-view .misc-links {
 .misc-links {
   font-size: 13px;
   line-height: 21px;
-  margin-bottom: 10px;
   vertical-align: middle;
   display: inline-block;
 }

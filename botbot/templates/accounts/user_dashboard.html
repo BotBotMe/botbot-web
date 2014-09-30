@@ -14,7 +14,7 @@
             <li><a href="#Public-Logs">Public</a></li>
         </ul>
         {% endcomment %}
-        {% if request.user.is_staff or request.user.is_superuser %}<a href="{% url 'add_channel' %}" class="btn btn-primary pull-right"><i class="icon-plus-sign icon-white icon-large"> </i> Add Channel</a>{% endif %}
+        {% if request.user.is_staff or request.user.is_superuser %}<a href="{% url 'add_channel' %}" class="btn btn-primary pull-right"><i class="icon-plus-sign icon-white icon-large"> </i> Log Channel</a>{% endif %}
     </div>
 
     <h2>Private</h2>

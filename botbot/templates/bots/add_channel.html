@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% load verbatim %}
 
+{% block head_title %}Manage {{ chatbot.connection.rooms }}{{ block.super }}{% endblock %}
+
 {% block extra_head %}
 {% endblock %}
 
 {% block content %}
-    <div class="page-header">
-      <h1>Manage {{ chatbot.connection.rooms }}</h1>
-    </div>
 
+<header class="page-header">
+  <h1 class="headline">Manage {{ chatbot.connection.rooms }}</h1>
+</header>
 
     <form action="." method="post" id="chatbot">{% csrf_token %}
 
