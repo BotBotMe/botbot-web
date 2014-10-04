@@ -4374,6 +4374,17 @@ body.log-view .misc-links {
 .misc-links a:last-child {
   margin-right: 0;
 }
+/*********************
+ *  Membership Styles
+ *********************/
+body.dashboard #Content {
+  width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.memberships {
+  background: white;
+}
 /* 404 */
 .error-view header {
   position: relative;
