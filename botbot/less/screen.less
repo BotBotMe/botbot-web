@@ -1,4 +1,5 @@
 @import "bootstrap/bootstrap.less";
+@import "flexbox.less";
 @import "globals.less";
 
 // Twitter Bootstrap Overrides
@@ -518,14 +519,66 @@ body.log-view {
 
 body.dashboard {
   #Content {
-    width: 700px;
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .page-header {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  #Site-Footer {
+    max-width: 700px;
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  #Site-Footer .support {
+    float: none;
+    margin-right: 0;
+    text-align: center;
   }
 }
 
 .memberships {
+  border-top: 3px solid #f9f9f9;
+}
+
+.membership {
+  .flexbox;
+  padding: 14px 10px;
   background: white;
+  border-bottom: 1px solid #f9f9f9;
+}
+
+.membership-header {
+  width: 60%;
+}
+
+.membership-kind {
+  margin-bottom: 0;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+.membership .actions {
+  .flex(2013, auto);
+
+  .align-self(center);
+
+  text-align: right;
+
+  a {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 16px;
+  }
+
+  a:last-child {
+    margin-right: 0;
+  }
 }
 
 /* 404 */
@@ -534,7 +587,8 @@ body.dashboard {
     header {
         position: relative;
         padding-top: 118px;
-        float: left; margin-right: 40px;
+        float: left;
+        margin-right: 40px;
     }
 
     .brand {
@@ -583,7 +637,6 @@ body.dashboard {
         .support h5 { display: block; margin-bottom: 4px; }
     }
 }
-
 
 
 /*  ----------

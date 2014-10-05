@@ -1,0 +1,637 @@
+// display: inline-flex //
+// applies to flex container
+
+.inline-flexbox() {
+  // 2009 spec
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-box;
+  display: -o-box;
+  display: box;
+  // tweener -ms- spec
+  display: -ms-inline-flexbox;
+  // 2013 spec
+  display: -webkit-inline-flex;
+  display: -moz-inline-flex;
+  display: -ms-inline-flex;
+  display: -o-inline-flex;
+  display: inline-flex;
+}
+// display: flex //
+// applies to flex container
+
+.flexbox() {
+  // 2009 spec
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-box;
+  display: -o-box;
+  display: box;
+  // // tweener -ms- spec
+  // display: -webkit-flexbox;
+  // display: -moz-flexbox;
+  display: -ms-flexbox;
+  // display: -o-flexbox;
+  // display: flexbox;
+  // 2013 spec
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+}
+
+// flex //
+
+// applies to flex-items
+
+// specifying how items flex, in shorthand (like background property is shorthand)
+
+// 2009 spec is box-flex, and only accepts numbers with decimals
+// tweener -ms- spec and 2013 spec both use flex and contain 3 values instead of just one
+// tweener spec has different names for their values but the values do the same thing
+
+// 2009 spec only accepts a number (not just integer) as an input
+
+// tweener -ms- spec works as follows
+// -ms-flex: <positive-flex> <negative-flex> <preferred-size>
+// positive-flex is integer indicating whether item should grow
+// negative-flex is integer indicating whether item should shrink
+// preferred-size uses any valid value for width or height (i.e. px, em, rem, %)
+
+// 2013 spec works as follows
+// flex: <flex-grow> <flex-shrink> <flex-basis>
+// flex-grow is integer indicating whether item should grow
+// flex-shrink is integer indicating whether item should shrink
+// flex-basis  uses any valid value for width (i.e. px, em, rem, %)
+
+// handling when 2013 or tweener spec is 'none' instead of shorthand values
+.flex(@spec; @flex) when (@flex = none) and (@spec = 2013), (@spec = tweener) {
+// tweener -ms- spec is same as 2013
+// 2013 spec
+  -webkit-flex: 0 0 auto;
+  -moz-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  -o-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+
+
+// handling when 2013 or tweener spec is 'auto' instead of shorthand values
+.flex(@spec; @flex) when (@flex = auto) and (@spec = 2013), (@spec = tweener) {
+// tweener -ms- spec is same as 2013
+// 2013 spec
+  -webkit-flex: 1 1 auto;
+  -moz-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  -o-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+// handling when 2013 or tweener spec is 'initial' instead of shorthand values
+.flex(@spec; @flex) when (@flex = initial) and (@spec = 2013), (@spec = tweener) {
+// tweener -ms- spec is same as 2013
+// 2013 spec
+  -webkit-flex: 0 1 auto;
+  -moz-flex: 0 1 auto;
+  -ms-flex: 0 1 auto;
+  -o-flex: 0 1 auto;
+  flex: 0 1 auto;
+}
+
+// handling 2009 'none' value
+.flex(@spec; @grow) when (@grow = none) and (@spec = 2009) {
+// 2009 spec
+  -webkit-box-flex: 0.0;
+  -moz-box-flex: 0.0;
+  -ms-box-flex: 0.0;
+  -o-box-flex: 0.0;
+  box-flex: 0.0;
+}
+
+// handling remaining 2009 scenarios where it is not 'none'
+.flex(@spec; @grow) when (isnumber(@grow)) and (@spec = 2009) {
+  // 2009 spec (accepts only 1 integer value)
+    -webkit-box-flex: @grow;
+    -moz-box-flex: @grow;
+    -ms-box-flex: @grow;
+    -o-box-flex: @grow;
+    box-flex: @grow;
+}
+
+// this should cover all other scenarios that are not 2009 and/or not 'none'
+.flex(@spec; @grow; @shrink; @basis) when not (@spec = 2009) {
+  // tweener -ms- spec is same as 2013
+  // 2013 spec
+    -webkit-flex: @grow @shrink @basis;
+    -moz-flex: @grow @shrink @basis;
+    -ms-flex: @grow @shrink @basis;
+    -o-flex: @grow @shrink @basis;
+    flex: @grow @shrink @basis;
+}
+
+// flex-direction //
+
+// applies to flex container
+
+// 2009 spec
+.flex-direction(@direction) when (@direction = row) {
+  -webkit-box-orient: horizontal;
+  -moz-box-orient: horizontal;
+  -ms-box-orient: horizontal;
+  -o-box-orient: horizontal;
+  box-orient: horizontal;
+}
+// 2009 spec
+.flex-direction(@direction) when (@direction = row-reverse) {
+  -webkit-box-orient: horizontal;
+  -moz-box-orient: horizontal;
+  -ms-box-orient: horizontal;
+  -o-box-orient: horizontal;
+  box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -moz-box-direction: reverse;
+  -ms-box-direction: reverse;
+  -o-box-direction: reverse;
+  box-direction: reverse;
+}
+// 2009 spec
+.flex-direction(@direction) when (@direction = column) {
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -ms-box-orient: vertical;
+  -o-box-orient: vertical;
+  box-orient: vertical;
+}
+// 2009 spec
+.flex-direction(@direction) when (@direction = column-reverse) {
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -ms-box-orient: vertical;
+  -o-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-box-direction: reverse;
+  -moz-box-direction: reverse;
+  -ms-box-direction: reverse;
+  -o-box-direction: reverse;
+  box-direction: reverse;
+}
+// 2013 spec
+.flex-direction(@direction) {
+  -webkit-flex-direction: @direction;
+  -moz-flex-direction: @direction;
+  -ms-flex-direction: @direction;
+  -o-flex-direction: @direction;
+  flex-direction: @direction;
+}
+
+// order //
+
+// applies to flex-items
+
+// specifies the order of an individual flex item within a container; this is an override of natural DOM order
+
+// 2009 spec is box-ordinal-group and starts at 1
+// tweener -ms- spec is flex-order and starts at 0
+// 2013 spec is order and starts at 0
+
+.order(@order) {
+// 2009 spec
+  -webkit-box-ordinal-group: @order + 1;
+  -moz-box-ordinal-group: @order + 1;
+  -ms-box-ordinal-group: @order + 1;
+  -o-box-ordinal-group: @order + 1;
+  box-ordinal-group: @order + 1;
+// tweener -ms- spec
+    -ms-flex-order: @order;
+// 2013 spec
+  -webkit-order: @order;
+  -moz-order: @order;
+  -ms-order: @order;
+  -o-order: @order;
+  order: @order;
+}
+
+// flex-wrap //
+
+// applies to flex container
+
+// 2009 property is box-lines
+// single == nowrap
+// multiple == wrap
+// no equivalent to wrap-reverse
+// initial = single
+
+// 2009 spec
+.flex-wrap(@wrap-method) when (@wrap-method = wrap) {
+  -webkit-lines: multiple;
+  -webkit-box-lines: multiple;
+  -moz-box-lines: multiple;
+  -ms-box-lines: multiple;
+  -o-box-lines: multiple;
+  box-lines: multiple;
+}
+
+//box lines doesn't have wrap reverse, so use box-direction
+// 2009 spec
+.flex-wrap(@wrap-method) when (@wrap-method = wrap-reverse) {
+  -webkit-lines: multiple;
+  -webkit-box-lines: multiple;
+  -moz-box-lines: multiple;
+  -ms-box-lines: multiple;
+  -o-box-lines: multiple;
+  box-lines: multiple;
+  -webkit-box-direction: reverse;
+  -moz-box-direction: reverse;
+  -ms-box-direction: reverse;
+  -o-box-direction: reverse;
+  box-direction: reverse;
+}
+
+// 2009 spec
+.flex-wrap(@wrap-method) when (@wrap-method = nowrap) {
+  -webkit-lines: single;
+  -webkit-box-lines: single;
+  -moz-box-lines: single;
+  -ms-box-lines: single;
+  -o-box-lines: single;
+  box-lines: single;
+}
+
+// 2013 spec is flex-wrap instead of box-lines
+// nowrap = single line LTR
+// wrap = multiple lines LTR
+// wrap-reverse = multiple lines, reversed children LTR
+// initial = nowrap
+// not inherited by default; spec inherit to force it
+
+// 2013 spec
+.flex-wrap(@wrap-method) {
+  -webkit-flex-wrap: @wrap-method;
+  -moz-flex-wrap: @wrap-method;
+  -ms-flex-wrap: @wrap-method;
+  -o-flex-wrap: @wrap-method;
+  flex-wrap: @wrap-method;
+}
+
+// align-items //
+
+// applies to flex container
+
+// Specifies the alignment of flex items within a container on the cross axis
+
+// 2009 property is box-align
+// tweener -ms- spec is flex-align
+// start == flex-start
+// end == flex-end
+// center == center
+// baseline == baseline
+// stretch = stretch
+
+.align-items(@align-item-method) when (@align-item-method = start) {
+// 2009 spec
+  -webkit-box-align: start;
+  -moz-box-align: start;
+  -ms-box-align: start;
+  -o-box-align: start;
+  box-align: start;
+// tweener -ms- spec
+  -ms-flex-align: start;
+// 2013 spec
+  -webkit-align-items: flex-start;
+  -moz-align-items: flex-start;
+  -ms-align-items: flex-start;
+  -o-align-items: flex-start;
+  align-items: flex-start;
+}
+
+.align-items(@align-item-method) when (@align-item-method = end) {
+  // 2009 spec
+    -webkit-box-align: end;
+    -moz-box-align: end;
+    -ms-box-align: end;
+    -o-box-align: end;
+    box-align: end;
+  // tweener -ms- spec
+    -ms-flex-align: end;
+  // 2013 spec
+  -webkit-align-items: flex-end;
+  -moz-align-items: flex-end;
+  -ms-align-items: flex-end;
+  -o-align-items: flex-end;
+  align-items: flex-end;
+}
+
+// for center, baseline, and stretch, which are the same in all specs
+.align-items(@align-item-method) when
+                                  (@align-item-method = center),
+                                  (@align-item-method = baseline),
+                                  (@align-item-method = stretch) {
+// 2009 spec
+  -webkit-box-align: @align-item-method;
+  -moz-box-align: @align-item-method;
+  -ms-box-align: @align-item-method;
+  -o-box-align: @align-item-method;
+  box-align: @align-item-method;
+// tweener -ms- spec
+  -ms-flex-align: @align-item-method;
+// 2013 spec
+  -webkit-align-items: @align-item-method;
+  -moz-align-items: @align-item-method;
+  -ms-align-items: @align-item-method;
+  -o-align-items: @align-item-method;
+  align-items: @align-item-method;
+}
+
+// align-self //
+
+// applies to flex-items
+
+// specifying an override alignment of an individual flex-item
+// within a container on the cross axis
+
+// 2009 spec does not have an equivalent fallback
+// tweener -ms- spec is flex-item-align
+// auto == auto
+// start == flex-start
+// end == flex-end
+// center == center
+// baseline == baseline
+// stretch = stretch
+
+.align-self(@align-self-method) when (@align-self-method = start) {
+// tweener -ms- spec
+  -ms-flex-item-align: @align-self-method;
+  flex-item-align: @align-self-method;
+// 2013 spec
+  -webkit-align-self: flex-start;
+  -moz-align-self: flex-start;
+  -ms-align-self: flex-start;
+  -o-align-self: flex-start;
+  align-self: flex-start;
+}
+
+.align-self(@align-self-method) when (@align-self-method = end) {
+// tweener -ms- spec
+  -ms-flex-item-align: @align-self-method;
+  flex-item-align: @align-self-method;
+// 2013 spec
+  -webkit-align-self: flex-end;
+  -moz-align-self: flex-end;
+  -ms-align-self: flex-end;
+  -o-align-self: flex-end;
+  align-self: flex-end;
+}
+
+// for auto, center, baseline, and stretch, which are the same in both specs
+.align-self(@align-self-method) when
+                                (@align-self-method = auto),
+                                (@align-self-method = center),
+                                (@align-self-method = baseline),
+                                (@align-self-method = stretch) {
+// tweener -ms- spec
+  -ms-flex-item-align: @align-self-method;
+  flex-item-align: @align-self-method;
+// 2013 spec
+  -webkit-align-self: @align-self-method;
+  -moz-align-self: @align-self-method;
+  -ms-align-self: @align-self-method;
+  -o-align-self: @align-self-method;
+  align-self: @align-self-method;
+}
+
+// Align Content //
+
+// applies to flex container
+
+// Flex line alignment: specifying alignment of flex lines (not individual items) along the cross-axis
+// note: only applies when there is more than one line of content
+
+// 2009 spec does not have an equivalent fallback
+// microsoft property is flex-line-pack
+// flex-end == end
+// flex-start == start
+// space-between == justify
+// space-around == distribute
+// center == center
+// stretch == stretch
+
+.align-content(@align-content-method) when (@align-content-method = start) {
+// tweener -ms- spec
+  -ms-flex-line-pack: @align-content-method;
+// 2013 spec
+  -webkit-align-content: flex-start;
+  -moz-align-content: flex-start;
+  -o-align-content: flex-start;
+  align-content: flex-start;
+}
+
+.align-content(@align-content-method) when (@align-content-method = end) {
+// tweener -ms- spec
+  -ms-flex-line-pack: @align-content-method;
+// 2013 spec
+  -webkit-align-content: flex-end;
+  -moz-align-content: flex-end;
+  -o-align-content: flex-end;
+  align-content: flex-end;
+}
+
+.align-content(@align-content-method) when (@align-content-method = space-between) {
+// tweener -ms- spec
+  -ms-flex-line-pack: justify;
+// 2013 spec
+  -webkit-align-content: space-between;
+  -moz-align-content: space-between;
+  -o-align-content: space-between;
+  align-content: space-between;
+}
+
+.align-content(@align-content-method) when (@align-content-method = space-around) {
+// tweener -ms- spec
+  -ms-flex-line-pack: distribute;
+// 2013 spec
+  -webkit-align-content: space-around;
+  -moz-align-content: space-around;
+  -o-align-content: space-around;
+  align-content: space-around;
+}
+
+.align-content(@align-content-method) when
+                                  (@align-content-method = center),
+                                  (@align-content-method = stretch) {
+// tweener -ms- spec
+  -ms-flex-line-pack: @align-content-method;
+// 2013 spec
+  -webkit-align-content: @align-content-method;
+  -moz-align-content: @align-content-method;
+  -o-align-content: @align-content-method;
+  align-content: @align-content-method;
+}
+
+// Justify Content //
+
+// applies to flex container
+
+// Main Axis Alignment: specifying the alignment of flex items within a container on the primary axis
+
+// 2009 spec == box-pack
+// tweener MS spec == flex-pack
+// current spec == justify-content
+
+// flex-start == start
+// center == center
+// flex-end == end
+// space-between == justify
+// space-around == distribute
+// 2009 spec does not support 'distribute' or 'space-around' property
+
+.justify-content(@justify-method) when (@justify-method = start) {
+  //2009
+  -webkit-box-pack: @justify-method;
+  -moz-box-pack: @justify-method;
+  -ms-box-pack: @justify-method;
+  -o-box-pack: @justify-method;
+  box-pack: @justify-method;
+//tweener -ms-
+  -ms-flex-pack: @justify-method;
+// current spec
+  -webkit-justify-content: flex-start;
+  -moz-justify-content: flex-start;
+  -ms-justify-content: flex-start;
+  -o-justify-content: flex-start;
+  justify-content: flex-start;
+}
+
+.justify-content(@justify-method) when (@justify-method = end) {
+// 2009 spec
+  -webkit-box-pack: @justify-method;
+  -moz-box-pack: @justify-method;
+  -ms-box-pack: @justify-method;
+  -o-box-pack: @justify-method;
+  box-pack: @justify-method;
+// tweener -ms- spec
+  -ms-flex-pack: @justify-method;
+// 2013 spec
+  -webkit-justify-content: flex-end;
+  -moz-justify-content: flex-end;
+  -ms-justify-content: flex-end;
+  -o-justify-content: flex-end;
+  justify-content: flex-end;
+}
+
+.justify-content(@justify-method) when (@justify-method = center) {
+// 2009 spec
+  -webkit-box-pack: center;
+  -moz-box-pack: center;
+// tweener -ms- spec
+  -ms-flex-pack: center;
+// 2013 spec
+  -webkit-justify-content: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  -o-justify-content: center;
+  justify-content: center;
+}
+
+.justify-content(@justify-method) when (@justify-method = space-between) {
+// 2009 spec
+  -webkit-box-pack: justify;
+  -moz-box-pack: justify;
+// tweener -ms- spec
+  -ms-flex-pack: justify;
+// 2013 spec
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-justify-content: space-between;
+  -o-justify-content: space-between;
+  justify-content: space-between;
+}
+
+.justify-content(@justify-method) when (@justify-method = space-around) {
+// 2009 spec has no equivalent
+// tweener -ms- spec
+  -ms-flex-pack: distribute;
+// 2013 spec
+  -webkit-justify-content: space-around;
+  -moz-justify-content: space-around;
+  -ms-justify-content: space-around;
+  -o-justify-content: space-around;
+  justify-content: space-around;
+}
+
+// flex-grow //
+
+// applies to flex-items
+
+// controls how an individual flex item in a flex container will grow
+// flex grow factor is a multiplier that determines how much a flex item grows relative to the other
+// items in the container
+
+// flex-grow is the first of three shorthand values in the flex property
+
+// 2009 spec has box-flex which is an effectively equivalent concept to flex-grow, since it only
+// controls positive growth of flex items
+
+.flex-grow(@multiplier) {
+// 2009 spec
+  -webkit-box-flex: @multiplier;
+// 2013 spec and tweener -ms- spec
+  -webkit-flex-grow: @multiplier;
+  -moz-box-flex: @multiplier;
+  -ms-flex: @multiplier 1 auto;
+  flex-grow: @multiplier;
+}
+
+// flex-shrink //
+
+// applies to flex-items
+
+// controls how an individual flex item in a flex container will shrink
+// flex shrink factor is a multiplier that determines how much a flex item shrinks relative to the other
+// items in the container
+
+// flex-shrink is the second of three shorthand values in the flex property
+
+// 2009 spec does not have an equivalent to flex-shrink
+// controls positive growth of flex items
+
+.flex-shrink(@multiplier) {
+// 2009 spec does not have an equivalent to flex-shrink
+// 2013 spec and tweener -ms- spec
+  -webkit-flex-shrink: @multiplier;
+  -ms-flex: 0 @multiplier auto;
+  flex-shrink: @multiplier;
+}
+
+// flex-basis //
+
+// applies to flex-items
+
+// controls initial width of a flex item, as specified by a standard width value, or 'auto'
+
+// flex-basis is the third of three shorthand values in the flex property
+
+// 2009 spec does not have an equivalent to flex-basis
+
+.flex-basis(@width) {
+// 2009 spec does not have an equivalent to flex-basis
+// 2013 spec and tweener -ms- spec
+  -webkit-flex-basis: @width;
+  -ms-flex: 0 1 @width;
+  flex-basis: @width;
+}
+
+// flex-flow //
+
+// applies to flex container
+
+// flex-flow is actually a shorthand combination of flex-direction and flex-wrap
+
+// flex-direction accepts row | row-reverse | column | column-reverse
+// flex-wrap accepts nowrap | wrap | wrap-reverse
+
+.flex-flow (@direction; @rest...) {
+  -webkit-flex-flow: @direction @rest;
+  -ms-flex-flow: @direction @rest;
+  flex-flow: @direction @rest;
+}
