@@ -4087,6 +4087,13 @@ body.log-view #Site-Footer {
 body.log-view .misc-links {
   float: right;
 }
+/* iframed logs */
+body.framed #Site-Header,
+body.framed #Log-Header,
+body.framed #Log-Nav,
+body.framed #Site-Footer {
+  display: none;
+}
 #Log-Header {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

@@ -3,7 +3,7 @@
 
 
 {% block head_title %}Logs for {{ channel.name }} {{ block.super }}{% endblock %}
-{% block body_class %}log-view {% if big %}big{% endif %}{% endblock %}
+{% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}{% endblock %}
 
 {% block content_outer %}
     <header id="Log-Header">
