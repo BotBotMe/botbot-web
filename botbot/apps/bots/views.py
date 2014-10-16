@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.core.mail import mail_admins
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.generic import DeleteView, TemplateView, View, CreateView, FormView
@@ -263,7 +263,9 @@ class RequestChannel(FormView):
         channel.create_default_plugins()
         message = render_to_string('bots/emails/request.txt',
                                    {"data": form.cleaned_data})
-        mail_admins("Channel Request", message)
+        send_mail("Channel Request", message, 
+                  settings.DEFAULT_FROM_EMAIL, 
+                  [a[1] for a in settings.ADMINS], fail_silently= True,)
         return super(RequestChannel, self).form_valid(form)
 
 
