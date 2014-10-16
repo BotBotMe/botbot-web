@@ -14,7 +14,6 @@ from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.generic import DeleteView, TemplateView, View, CreateView, FormView
 from django import http
-from django.db.models import Q
 
 from botbot.apps.accounts import models as accounts_models
 from botbot.apps.plugins import forms as plugins_forms
