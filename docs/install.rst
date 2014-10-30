@@ -57,10 +57,10 @@ Run in a terminal:
 
     createdb botbot
     echo "create extension hstore" | psql botbot
-    manage.py syncdb --migrate
+    honcho run manage.py syncdb --migrate
 
     # You'll need a staff account for creating a bot and registering channels
-    manage.py createsuperuser
+    honcho run manage.py createsuperuser
 
 Redis needs to be running prior to starting the BotBot services. For example:
 
