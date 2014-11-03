@@ -70,9 +70,11 @@ PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 PYTHON_BIN = os.path.dirname(sys.executable)
 ve_path = os.path.dirname(os.path.dirname(os.path.dirname(PROJECT_DIR)))
+if "VAR_ROOT" in os.environ:
+     VAR_ROOT = os.environ.get("VAR_ROOT")
 # Assume that the presence of 'activate_this.py' in the python bin/
 # directory means that we're running in a virtual environment.
-if os.path.exists(os.path.join(PYTHON_BIN, 'activate_this.py')):
+elif os.path.exists(os.path.join(PYTHON_BIN, 'activate_this.py')):
     # We're running with a virtualenv python executable.
     VAR_ROOT = os.path.join(os.path.dirname(PYTHON_BIN), 'var')
 elif ve_path and os.path.exists(os.path.join(ve_path, 'bin',
