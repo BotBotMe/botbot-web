@@ -16,6 +16,7 @@ ADD . /srv/botbot-web
 WORKDIR /srv/botbot-web
 
 RUN pip install -r requirements.txt -e . \
+    --src /srv/python-src/\
     --index-url "http://172.17.42.1:3141/root/pypi/+simple"\
     --timeout=120
 
