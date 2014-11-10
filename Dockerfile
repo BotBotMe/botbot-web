@@ -17,7 +17,6 @@ WORKDIR /srv/botbot-web
 
 RUN pip install -r requirements.txt -e . \
     --src /srv/python-src/\
-    --index-url "http://172.17.42.1:3141/root/pypi/+simple"\
     --timeout=120
 
 CMD manage.py runserver 0.0.0.0:8080 --settings=botbot.settings
