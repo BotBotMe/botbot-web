@@ -138,7 +138,8 @@ class Channel(TimeStampedModel):
     class Meta:
         ordering = ('name',)
         unique_together = (
-            ('slug', 'chatbot')
+            ('slug', 'chatbot'),
+            ('name', 'chatbot')
         )
 
     @classmethod
