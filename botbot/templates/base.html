@@ -8,7 +8,7 @@
 
     <title>{% block head_title %} | BotBot.me [o__o]{% endblock %}</title>
 
-    
+
     {% assets filters="yui_css", output="gen/screen.css", "css/screen.css" %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
     {% endassets %}
@@ -67,7 +67,19 @@
 
 {% block content_outer %}
 <div id="Content" class="container-fluid">
-    {% block content %}{% endblock %}
+    <div class="row-fluid">
+        <div class="span3">
+          <ul class="nav nav-pills nav-stacked">
+            <li class="{% block dashboard_active %}{% endblock %}"><a href="{% url 'dashboard'%}"><i class="icon-home"></i> Dashboard</a></li>
+            <li class="{% block mychannels_active %}{% endblock %}"><a href="{% url 'dashboard'%}"><i class="icon-th"></i> My Channels</a></li>
+            <li class="{% block account_active %}{% endblock %}"><a href="{% url 'account_manage'%}"><i class="icon-user"></i> Account</a></li>
+            <li class="{% block billing_active %}{% endblock %}"><a href="{% url 'account_manage'%}"><i class="icon-inbox"></i> Billing</a></li>
+          </ul>
+        </div>
+        <div class="span9">
+        {% block content %}{% endblock %}
+        </div>
+    </div>
 </div>
 {% endblock %}
 

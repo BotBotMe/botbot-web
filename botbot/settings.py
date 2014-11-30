@@ -54,6 +54,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+
+    'bootstrap_toolkit',
 )
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"

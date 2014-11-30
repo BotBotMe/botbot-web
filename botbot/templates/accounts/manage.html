@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load bootstrap_toolkit %}
 
 {% block head_title %}Settings {{ block.super }}{% endblock %}
 
@@ -8,7 +9,8 @@
 	</div>
     <p>Give yourself a username so other users can find you. If it's available, use the same username you use in your chatroom.</p>
 
-    <form action="." method="post">{% csrf_token %}
+    <form class="manage form-horizontal" id="manage_form" method="post" action=".">
+        {% csrf_token %}
     	{% for field in form %}
         	{% include "includes/field.html" with field=field %}
         {% endfor %}
