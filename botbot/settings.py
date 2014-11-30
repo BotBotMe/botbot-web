@@ -284,6 +284,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.user_details'
 )
 
+# Allauth
+ACCOUNT_LOGOUT_ON_GET = (True)
 
 # Statsd
 STATSD_CLIENT = 'django_statsd.clients.normal'
