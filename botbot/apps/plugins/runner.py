@@ -56,7 +56,7 @@ class Line(object):
     def _channel(self):
         """Simple caching for Channel model"""
         if not hasattr(self, '_channel_cache'):
-            cache_key = 'channel:{0}'.format(self._channel_name)
+            cache_key = 'channel:{0}-{1}'.format(self._chatbot_id, self._channel_name)
             channel = cache.get(cache_key)
             if not channel and self._channel_name.startswith("#"):
                 channel = self._chatbot.channel_set.get(
