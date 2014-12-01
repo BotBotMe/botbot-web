@@ -12,6 +12,7 @@ from botbot.apps.logs import models as log_models
 from .management.commands import redact as redact_cmd
 from botbot.apps.bots.models import ChatBot, Channel
 from botbot.apps.bots.utils import reverse_channel
+from botbot.apps.kudos.models import Kudos, KudosTotal
 
 
 class BaseTestCase(TestCase):
@@ -255,3 +256,51 @@ class RedactTests(TestCase):
             nick='redact',
             timestamp=now())
         self.assertEqual(redacted.text, log_models.REDACTED_TEXT)
+
+
+class KudosViews(BaseTestCase):
+    def setUp(self):
+        super(KudosViews, self).setUp()
+        kudos = []
+        for i, letter in enumerate('abcdefghijklmnopqrstuvwxyz'):
+            kudos.append(Kudos(
+                nick=letter*3, count=1+i+(i % 5), channel=self.public_channel,
+                first=now()-datetime.timedelta(days=100), recent=now()))
+        Kudos.objects.bulk_create(kudos)
+        self.url = reverse_channel(self.public_channel, "kudos")
+
+    def test_basic(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'logs/kudos.html')
+
+    def test_randomized_order(self):
+        scoreboards = []
+        for i in range(10):
+            response = self.client.get(self.url)
+            scoreboards.append(response.context['random_scoreboard'])
+        same = True
+        for scoreboard in scoreboards[1:]:
+            if scoreboards[0] != scoreboard:
+                same = False
+                break
+        self.assertFalse(same, 'Scoreboards were not shuffled')
+
+    def test_no_kudos(self):
+        self.public_channel.kudos_set.all().delete()
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'logs/kudos.html')
+
+    def test_kudos_total(self):
+        KudosTotal.objects.create(
+            channel=self.public_channel, kudos_given=300,
+            message_count=900)
+        response = self.client.get(self.url)
+        self.assertContains(response, ' 33.33%')
+
+    def test_kudos_total_zero(self):
+        KudosTotal.objects.create(
+            channel=self.public_channel, kudos_given=0,
+            message_count=0)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'logs/kudos.html')
+        self.assertNotIn('channel_kudos_perc', response.context)
