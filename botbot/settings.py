@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     'botbot.apps.bots',
     'botbot.apps.logs',
     'botbot.apps.plugins',
+    'botbot.apps.kudos',
     'botbot.core',
 
     'south',

@@ -1,15 +1,18 @@
 import datetime
+import json
 import math
+import random
+import re
 
 from django.core.cache import cache
-import re
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.timezone import get_current_timezone_name, now
-from django.views.generic import ListView, TemplateView, RedirectView
+from django.views.generic import ListView, TemplateView, RedirectView, View
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.contrib.humanize.templatetags import humanize
 import pytz
 
 from botbot.apps.accounts import forms as accounts_forms
@@ -17,6 +20,7 @@ from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
 from . import forms
 from botbot.apps.logs.models import Log
+from botbot.apps.kudos.models import KudosTotal
 
 
 class Help(ChannelMixin, TemplateView):
@@ -480,3 +484,71 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         self.fetch_after = (last_exit.timestamp -
             datetime.timedelta(milliseconds=1))
         return queryset.filter(**date_filter)
+
+
+class Kudos(ChannelMixin, View):
+
+    def get(self, *args, **kwargs):
+
+        return HttpResponse(
+            json.dumps(
+                self.channel.kudos_set.ranks(debug=settings.DEBUG),
+                indent=2 if settings.DEBUG else None),
+            content_type='text/json')
+
+
+class ChannelKudos(ChannelMixin, TemplateView):
+    template_name = 'logs/kudos.html'
+
+    def rounded_percentage(self, score, total):
+        percentage = score / float(total) * 100
+        for i in (1, 10, 25, 50):
+            if i >= percentage:
+                return i
+
+    def get_context_data(self, **kwargs):
+        nick = self.request.GET.get('nick')
+
+        ranks = self.channel.kudos_set.ranks(debug=nick)
+        top_tier = ranks[:100]
+        if len(top_tier) > 20:
+            scoreboard = [r[0] for r in random.sample(top_tier, 20)]
+        elif len(top_tier) > 4:
+            scoreboard = random.shuffle([r[0] for r in ranks])
+        else:
+            scoreboard = None
+        kwargs.update({
+            'random_scoreboard': scoreboard,
+        })
+
+        try:
+            channel_kudos = self.channel.kudostotal
+        except KudosTotal.DoesNotExist:
+            channel_kudos = None
+        if channel_kudos and channel_kudos.message_count:
+            if channel_kudos.message_count > 1000000:
+                kwargs['channel_messages'] = humanize.intword(
+                    channel_kudos.message_count)
+            else:
+                kwargs['channel_messages'] = humanize.intcomma(
+                    channel_kudos.message_count)
+            kwargs['channel_kudos_perc'] = '{:.2%}'.format(
+                channel_kudos.appreciation)
+
+        if nick:
+            nick_lower = nick.lower()
+            details = None
+            for rank_nick, alltime, info in ranks:
+                if rank_nick == nick_lower:
+                    details = {
+                        'alltime': alltime,
+                        'alltime_perc': self.rounded_percentage(
+                            alltime, len(ranks)),
+                        'current': info['current_rank'],
+                        'current_perc': self.rounded_percentage(
+                            info['current_rank'], len(ranks)),
+                    }
+                    break
+            kwargs['search'] = {'nick': nick, 'details': details}
+
+        return super(ChannelKudos, self).get_context_data(**kwargs)
