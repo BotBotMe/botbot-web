@@ -1,6 +1,6 @@
 {% extends "account/base.html" %}
-{% load bootstrap_toolkit %}
 
+{% load bootstrap_toolkit %}
 {% load url from future %}
 {% load i18n %}
 
@@ -8,32 +8,26 @@
 
 {% block content %}
 
-  <div class="row show-grid">
-    <div class="span6 offset6">
-        <h1>{% trans "Sign Up" %}</h1>
+  <h1>{% trans "Sign Up" %}</h1>
 
 
-        <form class="signup form-horizontal" id="signup_form" method="post" action="{% url 'account_signup' %}">
-          {% csrf_token %}
-          {% bootstrap_form form layout="vertical" %}
-          {% if redirect_field_value %}
-          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-          {% endif %}
+  <form class="signup form-horizontal" id="signup_form" method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {% bootstrap_form form layout="vertical" %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
 
-          <div class="control-group">
-            <div class="controls">
-              <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">{% trans "Sign Up" %} &raquo;</button>
-          </div>
-        </form>
-
-      <!--Body content-->
+    <div class="control-group">
+      <div class="controls">
+        <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+      </div>
     </div>
-  </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">{% trans "Sign Up" %} &raquo;</button>
+    </div>
+  </form>
 
 {% endblock %}
 

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block content %}
+
 {% if "error" in request.GET %}
 <div class="alert alert-error">Sorry, but we couldn't log you in. This may mean that an account hasn't been created for you yet.</div>
 {% endif %}

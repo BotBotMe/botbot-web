@@ -99,7 +99,7 @@ ROOT_URLCONF = 'botbot.urls'
 
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/settings/dashboard/'
 INCLUDE_DJANGO_ADMIN = ast.literal_eval(os.environ.get(
                                         'INCLUDE_DJANGO_ADMIN', 'True'))
 

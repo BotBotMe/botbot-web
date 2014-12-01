@@ -41,7 +41,7 @@ input[type=checkbox], input[type=radio] { margin-right: 2px; }
 
 h1, h2, h3 { font-family: @baseFontFamily; }
 h1 { color: @highlight2; }
-
+li { list-style: none; }
 object[type='image/svg+xml'] { vertical-align: middle; }
 
 .logo-standalone {
@@ -599,6 +599,9 @@ body.framed {
 /* Include all of our CSS into one file */
 @import "animate-custom.less";
 @import "nick-colors.less";
+
+/* Include management.less */
+@import "management.less";
 
 /* Responsive stuff is always last */
 @import "responsive.less";

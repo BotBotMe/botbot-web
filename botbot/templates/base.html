@@ -31,7 +31,7 @@
 <header id="Site-Header" class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}/{% endif %}" class="brand-btn wiggler">
+            <a href="{% if user.is_authenticated %}{% url 'settings_dashboard' %}{% else %}/{% endif %}" class="brand-btn wiggler">
                 <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
             </a>
             <nav id="Primary-Nav">
@@ -40,6 +40,7 @@
                 {# <a href="/help/" class="btn btn-info pull-right">Help</a> #}
                 <ul class="nav pull-right">
                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'settings_dashboard' %}">Configure Account</a></li>
                         <li><a href="{% url 'account_logout' %}">Logout</a></li>
                     {% else %}
                         <li><a href="{% url 'account_login' %}">Login</a></li>
@@ -53,34 +54,37 @@
 
 {% include "includes/ie-no-support.html" %}
 
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
 {% block content_outer %}
-<div id="Content" class="container-fluid">
-  <div class="row-fluid">
-    <div class="span3">
-      {% if user.is_authenticated %}
-        <ul class="nav nav-pills nav-stacked">
-          <li class="{% block dashboard_active %}{% endblock %}"><a href="{% url 'dashboard'%}"><i class="icon-home"></i> Dashboard</a></li>
-          <li class="{% block mychannels_active %}{% endblock %}"><a href="{% url 'dashboard'%}"><i class="icon-th"></i> My Channels</a></li>
-          <li class="{% block account_active %}{% endblock %}"><a href="{% url 'account_manage'%}"><i class="icon-user"></i> Account</a></li>
-          <li class="{% block billing_active %}{% endblock %}"><a href="{% url 'account_manage'%}"><i class="icon-inbox"></i> Billing</a></li>
-        </ul>
-      {% else %}
+  <div id="Content" class="container-fluid">
+    <div class="row-fluid">
+      <div class="span12 messages-wrapper">
+        {% if messages %}
+          <ul class="messages">
+              {% for message in messages %}
+              <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+              {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span3">
+        {% if user.is_authenticated %}
+          <ul class="nav nav-pills nav-stacked">
+            <li class="{% block dashboard_active %}{% endblock %}"><a href="{% url 'settings_dashboard'%}"><i class="icon-home"></i> Dashboard</a></li>
+            <li class="{% block mychannels_active %}{% endblock %}"><a href="{% url 'settings_channels'%}"><i class="icon-th"></i> My Channels</a></li>
+            <li class="{% block account_active %}{% endblock %}"><a href="{% url 'settings_account'%}"><i class="icon-user"></i> Account</a></li>
+            <li class="{% block billing_active %}{% endblock %}"><a href="{% url 'payments_customer_detail'%}"><i class="icon-inbox"></i> Billing</a></li>
+          </ul>
+        {% else %}
 
-      {% endif %}
-    </div>
-        <div class="span9">
-        {% block content %}{% endblock %}
-        </div>
-    </div>
-</div>
+        {% endif %}
+      </div>
+          <div class="span9">
+          {% block content %}{% endblock %}
+          </div>
+      </div>
+  </div>
 {% endblock %}
 
 {% include "includes/footer.html" %}

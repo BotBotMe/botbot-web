@@ -4077,6 +4077,9 @@ h3 {
 h1 {
   color: #613016;
 }
+li {
+  list-style: none;
+}
 object[type='image/svg+xml'] {
   vertical-align: middle;
 }
@@ -5403,6 +5406,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 .nick-color31 {
   color: #458521;
+}
+/* Include management.less */
+.messages {
+  margin: 0;
 }
 /* Responsive stuff is always last */
 /* We really only have problems on small tables in portrait

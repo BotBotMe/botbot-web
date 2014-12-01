@@ -25,7 +25,7 @@ class ManageAccount(FormView):
         return super(ManageAccount, self).dispatch(*args, **kwargs)
 
     def get_success_url(self):
-        return reverse('account_manage')
+        return reverse('settings_account')
 
     def get_form_kwargs(self, *args, **kwargs):
         form_kwargs = super(ManageAccount, self).get_form_kwargs(*args,
@@ -41,9 +41,9 @@ class ManageAccount(FormView):
         return response
 
 
-class Dashboard(TemplateView):
+class Channels(TemplateView):
     """
-    The dashboard page, for both anonymous and authenticated users.
+    The channels page, for both anonymous and authenticated users.
     """
 
     def get_template_names(self):
@@ -51,14 +51,14 @@ class Dashboard(TemplateView):
         Use the user or anonymous dashboard template.
         """
         if self.request.user.is_authenticated():
-            return 'accounts/user_dashboard.html'
-        return 'accounts/anon_dashboard.html'
+            return 'accounts/user_channels.html'
+        return 'accounts/anon_channels.html'
 
     def get_context_data(self, **kwargs):
         """
         Add the channels to the context.
         """
-        data = super(Dashboard, self).get_context_data(**kwargs)
+        data = super(Channels, self).get_context_data(**kwargs)
         data['public_channels'] = bots_models.Channel.objects \
             .filter(is_public=True)
         if self.request.user.is_authenticated():
@@ -70,6 +70,20 @@ class Dashboard(TemplateView):
         elif 'login' in self.request.GET:
             data['login_form'] = AuthenticationForm()
         return data
+
+
+class Dashboard(TemplateView):
+    """
+    The channels page, for both anonymous and authenticated users.
+    """
+
+    def get_template_names(self):
+        """
+        Use the user or anonymous dashboard template.
+        """
+        if self.request.user.is_authenticated():
+            return 'accounts/user_dashboard.html'
+        return 'accounts/anon_dashboard.html'
 
 
 class SetTimezone(View):

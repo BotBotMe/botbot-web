@@ -1,13 +1,19 @@
 {% extends "base.html" %}
 {% load channel_url %}
 
-{% block head_title %}Dashboard {{ block.super }}{% endblock %}
-{% block dashboard_active %}active{% endblock %}
+{% block head_title %}Channels {{ block.super }}{% endblock %}
 
 {% block content %}
     <div class="page-header clearfix">
-        <h1>Dashboard</h1>
-        <h3>Welcome {{request.user}}</h3>
+        <h1 class="pull-left">Channels</h1>
+
+        {% comment %}
+        <ul class="nav nav-pills pull-left">
+            <li class="active"><a href="#">All</a></li>
+            <li><a href="#Private-Logs">Private</a></li>
+            <li><a href="#Public-Logs">Public</a></li>
+        </ul>
+        {% endcomment %}
         {% if request.user.is_staff or request.user.is_superuser %}<a href="{% url 'add_channel' %}" class="btn btn-primary pull-right"><i class="icon-plus-sign icon-white icon-large"> </i> Add Channel</a>{% endif %}
     </div>
 
