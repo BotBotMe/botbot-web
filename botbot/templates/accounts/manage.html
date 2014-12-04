@@ -5,10 +5,13 @@
 {% block account_active %}active{% endblock %}
 
 {% block content %}
-	<div class="page-header">
+	<div class="settings-header">
 		<h1>Settings</h1>
 	</div>
-    <p>Give yourself a username so other users can find you. If it's available, use the same username you use in your chatroom.</p>
+
+    <div class="settings-intro">
+        <p>Give yourself a username so other users can find you. If it's available, use the same username you use in your chatroom.</p>
+    </div>
 
     <form class="manage form-horizontal" id="manage_form" method="post" action=".">
         {% csrf_token %}

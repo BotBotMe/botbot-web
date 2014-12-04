@@ -1,4 +1,4 @@
-    {% extends "base.html" %}
+{% extends "base.html" %}
 {% load channel_url %}
 {% load i18n %}
 
@@ -6,11 +6,14 @@
 {% block dashboard_active %}active{% endblock %}
 
 {% block content %}
-    <div class="page-header">
+    <div class="settings-header">
         <h1>Dashboard</h1>
-        <h3>Welcome {{request.user}}</h3>
-    </div>
 
+    </div>
+    <div class="settings-intro">
+        <h3>Hello {{request.user}}!</h3>
+        <p>All the channels your are monitoring ...</p>
+    </div>
     <h2>Private</h2>
     {% if private_channels %}
         <ul class="channels">
