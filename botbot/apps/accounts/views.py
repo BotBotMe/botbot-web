@@ -85,6 +85,22 @@ class Dashboard(TemplateView):
             return 'accounts/user_dashboard.html'
         return 'accounts/anon_dashboard.html'
 
+    def get_context_data(self, **kwargs):
+        """
+        Add the channels to the context.
+        """
+        data = super(Dashboard, self).get_context_data(**kwargs)
+        data['public_channels'] = bots_models.Channel.objects \
+            .filter(is_public=True)
+        if self.request.user.is_authenticated():
+            data['admin_channels'] = bots_models.Channel.objects \
+                .filter(membership__user=self.request.user,
+                        membership__is_admin=True)
+            data['private_channels'] = bots_models.Channel.objects \
+                .filter(is_public=False, membership__user=self.request.user)
+        elif 'login' in self.request.GET:
+            data['login_form'] = AuthenticationForm()
+        return data
 
 class SetTimezone(View):
     """

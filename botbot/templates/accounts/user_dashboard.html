@@ -1,14 +1,14 @@
-{% extends "base.html" %}
+    {% extends "base.html" %}
 {% load channel_url %}
+{% load i18n %}
 
 {% block head_title %}Dashboard {{ block.super }}{% endblock %}
 {% block dashboard_active %}active{% endblock %}
 
 {% block content %}
-    <div class="page-header clearfix">
+    <div class="page-header">
         <h1>Dashboard</h1>
         <h3>Welcome {{request.user}}</h3>
-        {% if request.user.is_staff or request.user.is_superuser %}<a href="{% url 'add_channel' %}" class="btn btn-primary pull-right"><i class="icon-plus-sign icon-white icon-large"> </i> Add Channel</a>{% endif %}
     </div>
 
     <h2>Private</h2>
@@ -25,12 +25,16 @@
         <p>You have no private channels.</p>
     {% endif %}
 
+
+    <div class="form-actions">
+      <a href="{% url 'add_channel' %}"  class="btn btn-primary"><i class="icon-plus-sign icon-white icon-large"> </i>{% trans "Add Channel" %}</a>
+    </div>
     <h2>Public</h2>
     {% if public_channels %}
-        <ul class="channels">
+        <ul class="public-channels">
         {% for channel in public_channels %}
             <li>
-                <a href="{{ channel.get_absolute_url }}">{{ channel }}</a>  (<a href="{% channel_url channel 'help_bot' %}">Channel Docs</a>)
+                <a href="{{ channel.get_absolute_url }}">{{ channel }}</a>
                 {% if channel in admin_channels %}/ <a href="{% channel_url channel 'manage_channel' %}">manage</a>{% endif %}
             </li>
         {% endfor %}
@@ -38,4 +42,5 @@
     {% else %}
         <p>You have no public channels.</p>
     {% endif %}
+
 {% endblock content %}

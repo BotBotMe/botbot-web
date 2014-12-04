@@ -15,8 +15,8 @@
     	{% for field in form %}
         	{% include "includes/field.html" with field=field %}
         {% endfor %}
-        <p class="actions">
-        	<button type="submit" class="btn">Update</button>
-        </p>
+        <div class="form-actions">
+        	<button type="submit" class="btn btn-primary">Update</button>
+        </div>
     </form>
 {% endblock content %}
