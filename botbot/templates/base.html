@@ -55,38 +55,29 @@
 {% include "includes/ie-no-support.html" %}
 
 {% block content_outer %}
-  <div id="Content" class="container-fluid">
-    <div class="row-fluid">
-      <div class="span12 messages-wrapper">
-        {% if messages %}
-          <ul class="messages">
-              {% for message in messages %}
-              <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
-              {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span3">
-        {% if user.is_authenticated %}
-          <ul class="nav nav-pills nav-stacked">
-            <li class="{% block dashboard_active %}{% endblock %}"><a href="{% url 'settings_dashboard'%}"><i class="icon-home"></i> Dashboard</a></li>
-            <li class="{% block mychannels_active %}{% endblock %}"><a href="{% url 'settings_channels'%}"><i class="icon-th"></i> My Channels</a></li>
-            <li class="{% block account_active %}{% endblock %}"><a href="{% url 'settings_account'%}"><i class="icon-user"></i> Account</a></li>
-            <li class="{% block billing_active %}{% endblock %}"><a href="{% url 'payments_customer_detail'%}"><i class="icon-inbox"></i> Billing</a></li>
-          </ul>
-        {% else %}
-
-        {% endif %}
-      </div>
-          <div class="span9">
-            <div class="settings-content">
-              {% block content %}{% endblock %}
+    <div id="Content" class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12 messages-wrapper">
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li{% if message.tags %}
+                                class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
-          </div>
-      </div>
-  </div>
+        </div>
+        <div class="row-fluid">
+            {% include "includes/right_nav.html" %}
+            <div class="span9">
+                <div class="settings-content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% include "includes/footer.html" %}

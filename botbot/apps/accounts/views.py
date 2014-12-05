@@ -24,6 +24,12 @@ class ManageAccount(FormView):
         """
         return super(ManageAccount, self).dispatch(*args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super(ManageAccount, self).get_context_data(**kwargs)
+        context['breadcrumb'] = 'account'
+        return context
+
+
     def get_success_url(self):
         return reverse('settings_account')
 
@@ -98,8 +104,6 @@ class Dashboard(TemplateView):
                         membership__is_admin=True)
             data['private_channels'] = bots_models.Channel.objects \
                 .filter(is_public=False, membership__user=self.request.user)
-        elif 'login' in self.request.GET:
-            data['login_form'] = AuthenticationForm()
         return data
 
 class SetTimezone(View):
