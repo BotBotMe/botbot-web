@@ -129,6 +129,7 @@ class Channel(TimeStampedModel):
                                    through='accounts.Membership')
     is_featured = models.BooleanField(default=False)
     fingerprint = models.CharField(max_length=36, blank=True, null=True)
+    public_kudos = models.BooleanField(default=True)
 
     objects = ChannelManager()
 
