@@ -1,5 +1,11 @@
-/* We really only have problems on small tables in portrait
+/* We really only have problems on small devices in portrait
    mode, so tackle anything smaller than that */
+@media (max-width: 860px) {
+	.channel-nav .wicon span {
+		display: none;
+	}
+}
+
 @media only screen
 and (max-width: 768px) {
 	.context-help,
@@ -140,8 +146,6 @@ and (max-width: 480px) {
 		li .info { margin-left: 0; border-left: none; }
 		li + .same { margin-top: -15px; border-top: none; }
 	}
-
-	.channel-nav { display: none; }
 
 	#Log-Container article { border: none; }
 	.error-view #Site-Footer { margin-left: 0; }
