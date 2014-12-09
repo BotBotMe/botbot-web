@@ -31,7 +31,7 @@
 <header id="Site-Header" class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a href="{% if user.is_authenticated %}{% url 'settings_dashboard' %}{% else %}/{% endif %}" class="brand-btn wiggler">
+            <a href="/" class="brand-btn wiggler">
                 <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
             </a>
             <nav id="Primary-Nav">

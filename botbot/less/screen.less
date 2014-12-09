@@ -341,7 +341,7 @@ body.framed {
     .timeline-navigation {
         width: 180px;
         position: fixed;
-        right: 0;
+        right: 0px;
         top: 140px;
     }
 
@@ -350,6 +350,21 @@ body.framed {
     article {
         border: 1px solid #eee;
         margin-right: 160px;
+    }
+}
+
+.display_bbsponsor #Log-Container {
+
+    .timeline-navigation {
+        width: 180px;
+        position: fixed;
+        right: 160px;
+        top: 140px;
+    }
+
+    article {
+        border: 1px solid #eee;
+        margin-right: 320px;
     }
 }
 
@@ -489,7 +504,7 @@ body.framed {
     .clearfix;
 
     padding: 0 20px 4px;
-    margin-right: 160px;
+    margin-right: 340px;
     margin-top: 40px;
 
     .support {
@@ -603,5 +618,7 @@ body.framed {
 /* Include management.less */
 @import "management.less";
 
+/* Include management.less */
+@import "banners.less";
 /* Responsive stuff is always last */
 @import "responsive.less";
