@@ -210,7 +210,6 @@ class Channel(TimeStampedModel):
             cache.set(cache_key, cached_config)
         return cached_config
 
-
     def user_can_access(self, user, only_owners=False):
         if only_owners:
             if not user.is_authenticated():
@@ -222,6 +221,14 @@ class Channel(TimeStampedModel):
         if self.users.filter(pk=user.id).exists():
             return True
         return False
+
+    def user_can_access_kudos(self, user):
+        if self.public_kudos:
+            return True
+        return (
+            user.is_authenticated()
+            and self.membership_set.filter(user=user, is_admin=True).exists()
+        )
 
     @property
     def visible_commands_filter(self):
