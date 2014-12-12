@@ -6,9 +6,14 @@
 {% block head_title %}{% trans "Sign Up Closed" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Sign Up Closed" %}</h1>
+{% block span_class_left %}span1{% endblock %}
+{% block span_class_right %}span8{% endblock %}
+{% block content %}
+  <div class="settings-header clearfix">
+    <h1>{% trans "Sign Up Closed" %}</h1>
 
-<p>{% trans "We are sorry, but the sign up is currently closed." %}</p>
+    <p>{% trans "We are sorry, but the sign up is currently closed." %}</p>
+  </div>
 {% endblock %}
 
 

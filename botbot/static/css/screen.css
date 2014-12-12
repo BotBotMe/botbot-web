@@ -4490,7 +4490,7 @@ body.framed #Log-Container article {
 #Log-Container .timeline-navigation {
   width: 180px;
   position: fixed;
-  right: 0;
+  right: 0px;
   top: 140px;
 }
 #Log-Container .timeline-navigation > ul {
@@ -4499,6 +4499,16 @@ body.framed #Log-Container article {
 #Log-Container article {
   border: 1px solid #eee;
   margin-right: 160px;
+}
+.display_bbsponsor #Log-Container .timeline-navigation {
+  width: 180px;
+  position: fixed;
+  right: 160px;
+  top: 140px;
+}
+.display_bbsponsor #Log-Container article {
+  border: 1px solid #eee;
+  margin-right: 320px;
 }
 #Log-Prep-Prev,
 #Log-Prep-Next {
@@ -4631,7 +4641,7 @@ body.framed #Log-Container article {
 #Site-Footer {
   *zoom: 1;
   padding: 0 20px 4px;
-  margin-right: 160px;
+  margin-right: 340px;
   margin-top: 40px;
 }
 #Site-Footer:before,
@@ -5499,11 +5509,56 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .label-active {
   background: #7fc07b;
 }
+.label-active {
+  background: #a9c0a7;
+}
 .messages {
   margin: 0;
 }
 .public-channels li {
   display: inline;
+}
+.predefined-channels {
+  display: block;
+  margin: 30px 0 11px 0px;
+}
+.predefined-channels li {
+  float: left;
+  width: 25%;
+  line-height: 25px;
+}
+.predefined-channels li .channel-item {
+  border-color: #49afcd;
+  border: 1px solid;
+  background-color: #49afcd;
+  cursor: pointer;
+  padding: 5px 10px;
+  margin: 0 3px 3px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.predefined-channels li .channel-item:hover {
+  opacity: 0.5;
+}
+.predefined-channels li .channel-item a {
+  color: #fff;
+}
+.predefined-channels li .channel-item.added {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+}
+.predefined-channels li .channel-item.added a {
+  display: none;
+}
+.predefined-channels li .channel-item span,
+.predefined-channels li .channel-item a {
+  font-size: 12px;
 }
 .btn {
   background-color: #49afcd;
@@ -5540,6 +5595,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 .nav-pills > .active > a,
 .nav-pills > .active > a:hover {
   background: #ee632a;
+}
+/* Include management.less */
+.bbsponsor-area {
+  position: fixed;
+  right: 0px;
+  top: 110px;
+  width: 160px;
+  height: 100%;
+  background: #fff;
+}
+.bbsponsor-area .bbsponsor {
+  overflow: hidden;
+}
+.bbsponsor-area .bbsponsor.vertical {
+  width: 160px;
+  height: 100%;
 }
 /* Responsive stuff is always last */
 /* We really only have problems on small devices in portrait
@@ -5698,6 +5769,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   }
   #Log-Container .timeline-navigation .active a span {
     background: none;
+  }
+  #Log-Container .bbsponsor-area {
+    display: none;
   }
   #Log-Container article {
     margin-right: 0;
