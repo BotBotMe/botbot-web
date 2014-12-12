@@ -5581,7 +5581,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #ccc;
 }
 .predefined-channels li .channel-item .icon-bbchannel::before {
-  content: "\f067";
+  content: "\f096";
 }
 .predefined-channels li .channel-item.remove-channel {
   color: #fff;
@@ -5589,7 +5589,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   border-color: #2e6da4;
 }
 .predefined-channels li .channel-item.remove-channel .icon-bbchannel::before {
-  content: "\f068";
+  content: "\f046";
 }
 .predefined-channels li .channel-item.remove-channel .icon-bbchannel {
   color: #fff;
