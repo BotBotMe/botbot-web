@@ -6,10 +6,13 @@
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
 
+{% block span_class_left %}span1{% endblock %}
+{% block span_class_right %}span8{% endblock %}
+
 {% block content %}
-
-  <h1>{% trans "Sign Up" %}</h1>
-
+  <div class="settings-header clearfix">
+    <h1>{% trans "Sign Up" %}</h1>
+  </div>
 
   <form class="signup form-horizontal" id="signup_form" method="post" action="{% url 'account_signup' %}">
     {% csrf_token %}

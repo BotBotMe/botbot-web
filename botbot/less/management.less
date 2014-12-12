@@ -35,6 +35,53 @@
     li { display: inline;}
 }
 
+.predefined-channels {
+  display: block;
+  margin: 30px 0 11px 0px;
+
+  li {
+    float: left;
+    width: 25%;
+    line-height: 25px;
+
+    .channel-item {
+
+      border-color: #49afcd;
+      border: 1px solid;
+      background-color: #49afcd;
+      cursor: pointer;
+      padding: 5px 10px;
+      margin: 0 3px 3px 0;
+      font-size: 12px;
+      line-height: 1.5;
+      border-radius: 3px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:hover {
+        opacity: 0.5;
+      }
+      a {
+        color: #fff;
+      }
+      &.added {
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+        a {
+          display: none;
+        }
+      }
+      span, a {
+        font-size: 12px;
+      }
+    }
+  }
+
+}
+
 .btn {
   .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight);
   background-image: none;
