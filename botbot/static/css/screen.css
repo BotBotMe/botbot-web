@@ -5542,8 +5542,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   background: #ee632a;
 }
 /* Responsive stuff is always last */
-/* We really only have problems on small tables in portrait
+/* We really only have problems on small devices in portrait
    mode, so tackle anything smaller than that */
+@media (max-width: 860px) {
+  .channel-nav .wicon span {
+    display: none;
+  }
+}
 @media only screen and (max-width: 768px) {
   .context-help,
   .timeline-navigation,
@@ -5751,9 +5756,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   .log li + .same {
     margin-top: -15px;
     border-top: none;
-  }
-  .channel-nav {
-    display: none;
   }
   #Log-Container article {
     border: none;

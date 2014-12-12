@@ -4,3 +4,6 @@ botbot.egg-info
 docs/_build
 *.pyc
 settings_debug.py
+
+.DS_Store
+node_modules/
