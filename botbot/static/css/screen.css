@@ -4247,8 +4247,6 @@ object[type='image/svg+xml'] {
   display: none;
 }
 .brand-btn {
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
   border-radius: 12px;
   background: #3a3e3f url(../img/logo.svg) no-repeat center center;
   text-indent: -999em;
@@ -5487,23 +5485,53 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   color: #458521;
 }
 /* Include management.less */
+.socialaccount_providers {
+  margin-left: 0;
+  padding: 1rem 0;
+}
+.socialaccount_providers li,
+.socialaccount_provider {
+  display: inline-block;
+}
+.socialaccount_provider {
+  padding: 4px 10px 4px;
+  margin-bottom: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: #333;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: 1px solid #cccccc;
+  border-bottom-color: #b3b3b3;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.socialaccount_provider:hover {
+  text-decoration: none;
+  background: #b3b3b3;
+  color: #111;
+}
+.form-actions .btn {
+  margin-right: 1rem;
+}
+.form-actions *:last-child {
+  margin-right: 0;
+}
 .settings-content {
   background: #fff;
-  padding: 50px;
-  -webkit-border-radius: 0 0 .25rem .25rem;
-  -moz-border-radius: 0 0 .25rem .25rem;
+  margin: 0 auto;
+  padding: 50px 50px 0;
+  max-width: 700px;
   border-radius: 0 0 .25rem .25rem;
-  -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
 }
 .settings-content .form-actions {
-  padding: 21px 50px 22px;
-  margin-top: 22px;
-  margin-left: -50px;
-  margin-right: -50px;
-  margin-bottom: 22px;
+  padding: 22px 50px 22px;
+  margin: 22px -50px;
   background-color: #f5f5f5;
   border-top: 1px solid #e5e5e5;
 }
@@ -5640,8 +5668,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 }
 #pricing .plan:hover {
   top: -10px;
-  -webkit-box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2);
   box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2);
 }
 #pricing .plan ul {

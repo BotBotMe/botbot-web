@@ -6,38 +6,41 @@
 {% load url from future %}
 
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
-{% block span_class_left %}span1{% endblock %}
-{% block span_class_right %}span8{% endblock %}
-{% block content %}
-  <div class="settings-header clearfix">
 
-    <h1>{% trans "Sign In" %}</h1>
+{% block content %}
+  <header class="settings-header">
+    <div class="page-header">
+      <h1>{% trans "Sign In" %}</h1>
+    </div>
 
     {% if socialaccount.providers  %}
-      <p>{% blocktrans with site.name as site_name %}Please sign in with one
-      of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-      for a {{site_name}} account and sign in below:{% endblocktrans %}</p>
+      <p>
+        {% blocktrans %}
+          Please sign in with one of your existing third party accounts.
+        {% endblocktrans %}
+      </p>
 
       <div class="socialaccount_ballot">
-
         <ul class="socialaccount_providers">
           {% include "socialaccount/snippets/provider_list.html" with process="login" %}
         </ul>
-
-        <div class="login-or">{% trans 'or' %}</div>
-
       </div>
 
-    {% include "socialaccount/snippets/login_extra.html" %}
+      <p>
+        {% blocktrans with site.name as site_name %}
+        Or, <strong><a href="{{ signup_url }}">sign up</a></strong> for a {{site_name}} account and sign in below:
+        {% endblocktrans %}
+      </p>
+
+      {% include "socialaccount/snippets/login_extra.html" %}
 
     {% else %}
       <p>{% blocktrans %}If you have not created an account yet, then please
       <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
     {% endif %}
+  </header>
 
-</div>
-
-<form class="login form-horizontal" method="post" action="{% url 'account_login' %}">
+<form class="login" method="post" action="{% url 'account_login' %}">
   {% csrf_token %}
   {% bootstrap_form form layout="vertical" %}
   {% if redirect_field_value %}
@@ -45,7 +48,7 @@
   {% endif %}
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary">{% trans "Sign Up" %} &raquo;</button>
+    <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
     <a class="button" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
   </div>
 </form>

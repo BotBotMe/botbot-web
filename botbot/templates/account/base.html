@@ -1,3 +1,27 @@
 {% extends "base.html" %}
 
+{% block content_outer %}
+<div id="Content" class="container-fluid">
+  {% if messages %}
+  <div class="messages-wrapper">
+    <ul class="messages">
+      {% for message in messages %}
+      <li{% if message.tags %}
+      class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 
+  <main class="content-main">
+    <div class="{% block span_class_left %}{% endblock %}">
+      {% include "includes/right_nav.html" %}
+    </div>
+
+    <div class="settings-content">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+{% endblock %}
