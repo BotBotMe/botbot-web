@@ -5,9 +5,7 @@
 {% load i18n %}
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
-
-{% block span_class_left %}span1{% endblock %}
-{% block span_class_right %}span8{% endblock %}
+{% block dashboard_active %}{% endblock %}
 
 {% block content %}
   <div class="settings-header clearfix">
@@ -28,7 +26,7 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">{% trans "Sign Up" %} &raquo;</button>
+      <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
     </div>
   </form>
 

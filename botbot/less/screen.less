@@ -9,13 +9,16 @@
     ------
 */
 
-html, body { height: 100%; }
-
+html,
 body {
-    background: @backgroundColor url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQImWP48uXLfwYkAOfDGOgKcAtgaEVWAAAd8yK0HBWm1wAAAABJRU5ErkJggg==);
+  height: 100%;
 }
 
-.hidden { display: none   }
+body {
+  background: @backgroundColor;
+}
+
+.hidden { display: none }
 
 fieldset { margin-bottom: 30px; }
 legend { border-bottom: none; margin-bottom: 10px; } // Default line-height here gives us plenty of padding

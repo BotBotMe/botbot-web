@@ -52,7 +52,11 @@
 </header>
 {% endblock %}
 
-{% block content_outer %}{% endblock %}
+{% block content_outer %}
+  <div id="Content" class="container-fluid">
+    {% block content %}{% endblock %}
+  </div>
+{% endblock %}
 
 {% include "includes/footer.html" %}
 

@@ -8,44 +8,47 @@
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 
 {% block content %}
-  <header class="settings-header">
-    <div class="page-header">
-      <h1>{% trans "Sign In" %}</h1>
+<header class="page-header account-header">
+  <h1 class="page-title">{% trans "Sign In" %}</h1>
+</header>
+
+<div class="account-body">
+  {% if socialaccount.providers  %}
+    <p>
+      {% blocktrans %}
+        Please sign in with one of your existing third party accounts.
+      {% endblocktrans %}
+    </p>
+
+    <div class="socialaccount_ballot">
+      <ul class="socialaccount_providers">
+        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+      </ul>
     </div>
 
-    {% if socialaccount.providers  %}
-      <p>
-        {% blocktrans %}
-          Please sign in with one of your existing third party accounts.
-        {% endblocktrans %}
-      </p>
+    <p>
+      {% blocktrans with site.name as site_name %}
+      Or, <strong><a href="{{ signup_url }}">sign up</a></strong> for a {{site_name}} account and sign in below:
+      {% endblocktrans %}
+    </p>
 
-      <div class="socialaccount_ballot">
-        <ul class="socialaccount_providers">
-          {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-        </ul>
-      </div>
+    {% include "socialaccount/snippets/login_extra.html" %}
 
-      <p>
-        {% blocktrans with site.name as site_name %}
-        Or, <strong><a href="{{ signup_url }}">sign up</a></strong> for a {{site_name}} account and sign in below:
-        {% endblocktrans %}
-      </p>
-
-      {% include "socialaccount/snippets/login_extra.html" %}
-
-    {% else %}
-      <p>{% blocktrans %}If you have not created an account yet, then please
-      <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
-    {% endif %}
-  </header>
-
-<form class="login" method="post" action="{% url 'account_login' %}">
-  {% csrf_token %}
-  {% bootstrap_form form layout="vertical" %}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% else %}
+    <p>{% blocktrans %}If you have not created an account yet, then please
+    <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
   {% endif %}
+</div>
+
+<form class="login account-form" method="post" action="{% url 'account_login' %}">
+  {% csrf_token %}
+
+  <div class="account-content-wrap">
+    {% bootstrap_form form layout="vertical" %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+  </div>
 
   <div class="form-actions">
     <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
