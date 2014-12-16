@@ -22,12 +22,16 @@ class User(auth_models.AbstractUser):
         Group the membership per kind and count them
         The result is a list of dict:
             [
-                {'kind': u'share', 'quantity': 1},
+                {'kind': u'public', 'quantity': 1},
                 {'kind': u'personal', 'quantity': 2}
             ]
         """
         return (
             self.membership_set
+                .filter(channel__is_active=True)
+                .filter(
+                    models.Q(kind=Membership.KIND_PERSONAL, channel__is_public=False) | 
+                    models.Q(kind=Membership.KIND_PUBLIC))
                 .values("kind")
                 .annotate(quantity=models.Count("kind"))
             )
