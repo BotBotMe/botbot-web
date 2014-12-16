@@ -47,11 +47,9 @@ def set_user_timezone(sender, request, user, **kwargs):
 class Membership(models.Model):
     KIND_PERSONAL = "personal"
     KIND_PUBLIC = "public"
-    KIND_SPONSOR = "sponsor"
     KIND_CHOICES = (
         (KIND_PERSONAL, KIND_PERSONAL.title()),
         (KIND_PUBLIC, KIND_PUBLIC.title()),
-        (KIND_SPONSOR, KIND_SPONSOR.title()),
     )
 
     user = models.ForeignKey(User)
