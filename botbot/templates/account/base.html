@@ -15,7 +15,41 @@
 {% endif %}
 
 <main class="page-main">
-  {% include "includes/account_nav.html" %}
+  {% if user.is_authenticated %}
+  <nav class="account-nav {% block account_nav %}{% endblock %}">
+    <a
+      href="{% url 'settings_dashboard' %}"
+      class="nav-item nav-dashboard {% if breadcrumb == 'dashboard' %}is-active{% endif %}">
+      <span class="nav-item-label">
+        <i class="icon-home"></i>Dashboard
+      </span>
+    </a>
+
+    <a
+      href="{% url 'settings_channels' %}"
+      class="nav-item nav-channels {% if breadcrumb == 'my_channels' %}is-active{% endif %}">
+      <span class="nav-item-label">
+        <i class="icon-th"></i>My Channels
+      </span>
+    </a>
+
+    <a
+      href="{% url 'settings_account' %}"
+      class="nav-item nav-account {% if breadcrumb == 'account' %}is-active{% endif %}">
+      <span class="nav-item-label">
+        <i class="icon-user"></i> Account
+      </span>
+      </a>
+
+    <a
+      href="{% url 'payments_customer_detail' %}"
+      class="nav-item nav-billing {% if breadcrumb == 'billing' %}is-active{% endif %}">
+      <span class="nav-item-label">
+        <i class="icon-inbox"></i> Billing
+      </span>
+    </a>
+  </nav>
+  {% endif %}
 
   <div class="account-content">
     {% block content %}{% endblock %}
