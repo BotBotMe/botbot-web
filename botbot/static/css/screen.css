@@ -5533,8 +5533,6 @@ body.account-view #Site-Footer,
 .account-nav {
   display: -webkit-flex;
   display: flex;
-  -webkit-flex-direction: row;
-  flex-direction: row;
   -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -5613,12 +5611,40 @@ body.account-view #Site-Footer,
   margin-right: 0;
 }
 /* CHANNEL LISTING */
+.account-channel-list-lead {
+  display: -webkit-flex;
+  display: flex;
+  margin-bottom: 3rem;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.account-channel-list-lead .headline {
+  margin-bottom: 0;
+  font-size: 18px;
+  font-weight: normal;
+  vertical-align: middle;
+}
 .add-channel-block {
-  margin-bottom: 2rem;
+  text-align: right;
 }
 .account-channel-item .channel-name {
   margin-bottom: .5em;
   font-size: 24px;
+}
+.account-channel-list {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.account-channel-list .account-channel-item {
+  margin-right: 3rem;
+  margin-bottom: 2rem;
 }
 .label-active {
   background: #7fc07b;
