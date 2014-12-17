@@ -3,9 +3,11 @@ from django.contrib.auth.admin import UserAdmin
 
 from . import models
 
+
 class MembershipAdmin(admin.ModelAdmin):
     list_display = ("user", "kind")
     list_filter = ("kind", "is_admin", "is_owner")
+    raw_id_fields = ("user",)
 
 
 class CustomUserAdmin(UserAdmin):
