@@ -40,6 +40,11 @@ body.account-view #Site-Footer,
   padding: 0 2rem 2rem;
 }
 
+.account-header *,
+.account-body * {
+  line-height: 1.5; // TODO: This should be everywhere
+}
+
 // Account Headers
 .account-header {
   margin-top: 0; // BOOTFIX: Overrides .page-header
@@ -181,8 +186,8 @@ body.account-view #Site-Footer,
   justify-content: space-between;
 }
 
-.account-channel-list-lead .headline {
-  margin-bottom: 0;
+.channel-list-count {
+  margin-bottom: 1rem;
   font-size: 18px;
   font-weight: normal;
   vertical-align: middle;
