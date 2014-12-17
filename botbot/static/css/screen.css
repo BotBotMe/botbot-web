@@ -5653,7 +5653,7 @@ body.account-view #Site-Footer,
 .account-channel-list .account-channel-item {
   margin-right: 3rem;
   margin-bottom: 2rem;
-  flex: 1 1 33%;
+  flex: 1 1 30%;
 }
 /* WELCOME SCREEN */
 body.welcome-page .account-header {
