@@ -15,6 +15,7 @@
 {% endif %}
 
 <main class="page-main">
+  {% block outer_account_nav %}
   {% if user.is_authenticated %}
   <nav class="account-nav {% block account_nav %}{% endblock %}">
     <a
@@ -50,6 +51,7 @@
     </a>
   </nav>
   {% endif %}
+  {% endblock %}
 
   <div class="account-content">
     {% block content %}{% endblock %}
