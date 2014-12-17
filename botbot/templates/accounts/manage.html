@@ -1,25 +1,27 @@
-{% extends "base.html" %}
-{% load bootstrap_toolkit %}
+{% extends "account/base.html" %}
 
 {% block head_title %}Settings {{ block.super }}{% endblock %}
 {% block account_active %}active{% endblock %}
 
 {% block content %}
-	<div class="settings-header">
-		<h1>Settings</h1>
-	</div>
+	<header class="page-header account-header">
+		<h1 class="page-title">Account</h1>
 
-    <div class="settings-intro">
-        <p>Give yourself a username so other users can find you. If it's available, use the same username you use in your chatroom.</p>
+		{#<p class="account-header-intro">Give yourself a username so other users can find you. If it's available, use the same username you use in your channel.</p>#}
+	</header>
+
+
+  <form class="manage" id="manage_form" method="post" action=".">
+    {% csrf_token %}
+
+		<div class="account-body">
+  	{% for field in form %}
+      	{% include "includes/field.html" with field=field %}
+      {% endfor %}
+		</div>
+
+    <div class="form-actions">
+    	<button type="submit" class="btn btn-primary">Update</button>
     </div>
-
-    <form class="manage form-horizontal" id="manage_form" method="post" action=".">
-        {% csrf_token %}
-    	{% for field in form %}
-        	{% include "includes/field.html" with field=field %}
-        {% endfor %}
-        <div class="form-actions">
-        	<button type="submit" class="btn btn-primary">Update</button>
-        </div>
-    </form>
+  </form>
 {% endblock content %}
