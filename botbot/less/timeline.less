@@ -1,0 +1,87 @@
+.timeline-navigation {
+  overflow: hidden;
+
+  ul { margin: 0; padding: 0; }
+
+
+  li:before {
+    content: "";
+    position: absolute;
+
+    height: 100%;
+
+    width: 2px;
+    top: 0;
+    left: 7px;
+
+    background: @partialLight;
+
+    display: block;
+    z-index: -1;
+  }
+
+  li {
+    list-style: none;
+    position: relative;
+    z-index: 10;
+  }
+
+  // The very first element should adjust its line.
+  .older:before,
+  .older + .year:before {
+    height: 100%;
+    top: 1em;
+  }
+
+  & > ul > li:last-of-type:before {
+    height: 50%;
+    bottom: 50%;
+  }
+
+  a {
+    background: url(../img/timeline-circle-large.svg) no-repeat left center;
+    background-size: 16px 16px;
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 15px;
+    line-height: 2;
+    padding: 2px 6px 2px 22px;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  .active {
+    a {
+      background-image: url(../img/timeline-circle-selected-large.svg);
+      font-weight: 600;
+
+      &:hover { text-decoration: none; }
+    }
+
+    span {
+      .border-radius(4px);
+
+      background: @currentColor;
+      color: #fff;
+      padding: 2px 6px;
+      text-shadow: none;
+    }
+  }
+
+  .older a {
+    background-image: url(../img/timeline-more.svg);
+  }
+
+  .year ul { display: none; }
+
+  .month a { font-size: 13px; line-height: 24px; }
+
+  .month a {
+    background-image: url(../img/timeline-circle-small.svg);
+    background-position: 2px center;
+    background-size: 12px 12px;
+  }
+
+  .month.active a {
+    background-image: url(../img/timeline-circle-selected-small.svg);
+  }
+}
