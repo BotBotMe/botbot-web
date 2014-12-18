@@ -5,7 +5,9 @@ from . import models
 
 
 class MembershipAdmin(admin.ModelAdmin):
-    list_display = ("user", "kind")
+    search_fields = (
+        "user__username", "user__email", "channel__name", "channel__slug")
+    list_display = ("user", "channel", "kind")
     list_filter = ("kind", "is_admin", "is_owner")
     raw_id_fields = ("user",)
 
