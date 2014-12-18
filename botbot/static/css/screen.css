@@ -5514,6 +5514,10 @@ body.account-view #Site-Footer,
 .account-body {
   padding: 0 2rem 2rem;
 }
+.account-header *,
+.account-body * {
+  line-height: 1.5;
+}
 .account-header {
   margin-top: 0;
   padding: 3rem 2rem 2rem;
@@ -5624,8 +5628,8 @@ body.account-view #Site-Footer,
   align-items: baseline;
   justify-content: space-between;
 }
-.account-channel-list-lead .headline {
-  margin-bottom: 0;
+.channel-list-count {
+  margin-bottom: 1rem;
   font-size: 18px;
   font-weight: normal;
   vertical-align: middle;
@@ -5635,7 +5639,7 @@ body.account-view #Site-Footer,
 }
 .account-channel-item .channel-name {
   margin-bottom: .5em;
-  font-size: 24px;
+  font-size: 22px;
 }
 .account-channel-list {
   display: -webkit-flex;
@@ -5649,6 +5653,7 @@ body.account-view #Site-Footer,
 .account-channel-list .account-channel-item {
   margin-right: 3rem;
   margin-bottom: 2rem;
+  flex: 1 1 30%;
 }
 /* WELCOME SCREEN */
 body.welcome-page .account-header {
