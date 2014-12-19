@@ -164,6 +164,7 @@ class PluginRunner(object):
     def listen(self):
         """Listens for incoming messages on the Redis queue"""
         while 1:
+            val = None
             try:
                 val = self.bot_bus.blpop('q', 1)
 
@@ -183,7 +184,9 @@ class PluginRunner(object):
 
                     self.dispatch(line)
             except Exception:
-                LOG.error("Line Dispatch Failed", exc_info=True)
+                LOG.error("Line Dispatch Failed", exc_info=True, extra={
+                    "line": val
+                })
 
     def dispatch(self, line):
         """Given a line, dispatch it to the right plugins & functions."""
