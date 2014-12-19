@@ -77,12 +77,18 @@ class ChannelAdmin(admin.ModelAdmin):
 
 
 class PublicChannelApproval(ChannelAdmin):
+    def has_add_permission(self, request):
+        return False
+
     def get_queryset(self, request):
         qs = super(PublicChannelApproval, self).get_queryset(request)
         return qs.filter(is_pending=True, is_public=True)
 
 
 class PersonalChannelApproval(ChannelAdmin):
+    def has_add_permission(self, request):
+        return False
+    
     def get_queryset(self, request):
         qs = super(PersonalChannelApproval, self).get_queryset(request)
         return qs.filter(is_pending=True, is_public=False)
