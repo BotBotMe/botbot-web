@@ -1,15 +1,20 @@
 import datetime
+import json
 import math
-
-from django.core.cache import cache
+import random
 import re
-from django.db.models import Q
-from django.http import Http404
-from django.shortcuts import redirect, get_object_or_404
-from django.utils.timezone import get_current_timezone_name, now
-from django.views.generic import ListView, TemplateView, RedirectView
-from django.utils.translation import ugettext as _
+
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.humanize.templatetags import humanize
+from django.core.cache import cache
+from django.db.models import Q
+from django.http import Http404, HttpResponse
+from django.shortcuts import redirect, get_object_or_404
+from django.utils.decorators import method_decorator
+from django.utils.timezone import get_current_timezone_name, now
+from django.utils.translation import ugettext as _
+from django.views.generic import ListView, TemplateView, View
 import pytz
 
 from botbot.apps.accounts import forms as accounts_forms
@@ -17,6 +22,7 @@ from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
 from . import forms
 from botbot.apps.logs.models import Log
+from botbot.apps.kudos.models import KudosTotal
 
 
 class Help(ChannelMixin, TemplateView):
@@ -124,7 +130,6 @@ class LogViewer(ChannelMixin, object):
         self.prev_page = ""
         self.current_page = ""
 
-
     def dispatch(self, request, *args, **kwargs):
         self.form = forms.SearchForm(request.GET)
         self.timezone = get_current_timezone_name()
@@ -169,6 +174,8 @@ class LogViewer(ChannelMixin, object):
                 'tz_form': accounts_forms.TimezoneForm(self.request),
                 'show_first_header': self.show_first_header,
                 'newest_first': self.newest_first,
+                'show_kudos': self.channel.user_can_access_kudos(
+                    self.request.user),
             })
         context.update({
             'prev_page': self.prev_page,
@@ -480,3 +487,102 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         self.fetch_after = (last_exit.timestamp -
             datetime.timedelta(milliseconds=1))
         return queryset.filter(**date_filter)
+
+
+class KudosMixin(object):
+    """
+    View mixin to check that kudos access is allowed.
+
+    If the channel's ``public_kudos`` is False then only accessible to channel
+    admins.
+
+    Must go after ChannelMixin.
+    """
+
+    def dispatch(self, *args, **kwargs):
+        """
+        Check kudos authorization.
+        """
+        if not self.channel.user_can_access_kudos(self.request.user):
+            raise Http404("Only accessible to channel admins")
+        return super(KudosMixin, self).dispatch(*args, **kwargs)
+
+
+class Kudos(ChannelMixin, KudosMixin, View):
+    """
+    View that returns a ranked JSON list of users with the most kudos.
+
+    Not accessible to anonymous users.
+    """
+
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_authenticated():
+            raise Http404('Only accessible to authenticated users')
+        return super(Kudos, self).dispatch(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        return HttpResponse(
+            json.dumps(
+                self.channel.kudos_set.ranks(debug=settings.DEBUG),
+                indent=2 if settings.DEBUG else None),
+            content_type='text/json')
+
+
+class ChannelKudos(ChannelMixin, KudosMixin, TemplateView):
+    """
+    Display a shuffled subset of the people with the most kudos.
+    """
+    template_name = 'logs/kudos.html'
+
+    def rounded_percentage(self, score, total):
+        percentage = score / float(total) * 100
+        for i in (1, 10, 25, 50):
+            if i >= percentage:
+                return i
+
+    def get_context_data(self, **kwargs):
+        nick = self.request.GET.get('nick')
+
+        ranks = self.channel.kudos_set.ranks(debug=nick)
+        top_tier = ranks[:100]
+        if len(top_tier) > 20:
+            scoreboard = [r[0] for r in random.sample(top_tier, 20)]
+        elif len(top_tier) > 4:
+            scoreboard = random.shuffle([r[0] for r in ranks])
+        else:
+            scoreboard = None
+        kwargs.update({
+            'random_scoreboard': scoreboard,
+        })
+
+        try:
+            channel_kudos = self.channel.kudostotal
+        except KudosTotal.DoesNotExist:
+            channel_kudos = None
+        if channel_kudos and channel_kudos.message_count:
+            if channel_kudos.message_count > 1000000:
+                kwargs['channel_messages'] = humanize.intword(
+                    channel_kudos.message_count)
+            else:
+                kwargs['channel_messages'] = humanize.intcomma(
+                    channel_kudos.message_count)
+            kwargs['channel_kudos_perc'] = '{:.2%}'.format(
+                channel_kudos.appreciation)
+
+        if nick:
+            nick_lower = nick.lower()
+            details = None
+            for rank_nick, alltime, info in ranks:
+                if rank_nick == nick_lower:
+                    details = {
+                        'alltime': alltime,
+                        'alltime_perc': self.rounded_percentage(
+                            alltime, len(ranks)),
+                        'current': info['current_rank'],
+                        'current_perc': self.rounded_percentage(
+                            info['current_rank'], len(ranks)),
+                    }
+                    break
+            kwargs['search'] = {'nick': nick, 'details': details}
+
+        return super(ChannelKudos, self).get_context_data(**kwargs)

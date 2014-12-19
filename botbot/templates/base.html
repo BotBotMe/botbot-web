@@ -8,7 +8,7 @@
 
     <title>{% block head_title %} | BotBot.me [o__o]{% endblock %}</title>
 
-    
+
     {% assets filters="yui_css", output="gen/screen.css", "css/screen.css" %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
     {% endassets %}
@@ -31,22 +31,19 @@
 <header id="Site-Header" class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}/{% endif %}" class="brand-btn wiggler">
+            <a href="/" class="brand-btn wiggler">
                 <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
             </a>
-            <nav id="Primary-Nav"
-                <ul class="nav">
-                    <li><a href="{% url 'dashboard' %}">All Channels</a></li>
-                </ul>
+            <nav id="Primary-Nav">
             </nav>
             <nav id="User-Nav">
                 {# <a href="/help/" class="btn btn-info pull-right">Help</a> #}
                 <ul class="nav pull-right">
                    {% if user.is_authenticated %}
-                        <li><a href="{% url 'account_manage' %}">Settings</a></li>
-                        <li><a href="{% url 'account_logout' %}">Logout</a></li>
+                        <li><a href="{% url 'settings_dashboard' %}">Configure Account</a></li>
+                        <li><a href="{% url 'account_logout' %}">Log Out</a></li>
                     {% else %}
-                        <li><a href="{% url 'account_login' %}">Login</a></li>
+                        <li><a href="{% url 'account_login' %}">Sign In</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -55,20 +52,10 @@
 </header>
 {% endblock %}
 
-{% include "includes/ie-no-support.html" %}
-
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
 {% block content_outer %}
-<div id="Content" class="container-fluid">
+  <div id="Content" class="container-fluid">
     {% block content %}{% endblock %}
-</div>
+  </div>
 {% endblock %}
 
 {% include "includes/footer.html" %}

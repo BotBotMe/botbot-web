@@ -22,12 +22,16 @@ class User(auth_models.AbstractUser):
         Group the membership per kind and count them
         The result is a list of dict:
             [
-                {'kind': u'share', 'quantity': 1},
+                {'kind': u'public', 'quantity': 1},
                 {'kind': u'personal', 'quantity': 2}
             ]
         """
         return (
             self.membership_set
+                .filter(channel__is_active=True)
+                .filter(
+                    models.Q(kind=Membership.KIND_PERSONAL, channel__is_public=False) | 
+                    models.Q(kind=Membership.KIND_PUBLIC))
                 .values("kind")
                 .annotate(quantity=models.Count("kind"))
             )
@@ -43,11 +47,9 @@ def set_user_timezone(sender, request, user, **kwargs):
 class Membership(models.Model):
     KIND_PERSONAL = "personal"
     KIND_PUBLIC = "public"
-    KIND_SPONSOR = "sponsor"
     KIND_CHOICES = (
         (KIND_PERSONAL, KIND_PERSONAL.title()),
         (KIND_PUBLIC, KIND_PUBLIC.title()),
-        (KIND_SPONSOR, KIND_SPONSOR.title()),
     )
 
     user = models.ForeignKey(User)

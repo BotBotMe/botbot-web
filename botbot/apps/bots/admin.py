@@ -24,6 +24,7 @@ class ActivePluginInline(admin.StackedInline):
 
 class MembershipInline(admin.TabularInline):
     model = models.Channel.users.through
+    raw_id_fields = ("user",)
     extra = 0
 
 
@@ -39,7 +40,7 @@ class ChatBotAdmin(admin.ModelAdmin):
 
     def usage(self, obj):
         return "%d%%" % (
-        (obj.channel_set.count() / float(obj.max_channels)) * 100)
+            (obj.channel_set.count() / float(obj.max_channels)) * 100)
 
 
 def botbot_refresh(modeladmin, request, queryset):
@@ -57,6 +58,7 @@ class ChannelForm(forms.ModelForm):
 
     def clean_private_slug(self):
         return self.cleaned_data['private_slug'] or None
+
 
 class ChannelAdmin(admin.ModelAdmin):
     form = ChannelForm

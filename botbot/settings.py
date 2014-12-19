@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     'botbot.apps.bots',
     'botbot.apps.logs',
     'botbot.apps.plugins',
+    'botbot.apps.kudos',
     'botbot.core',
 
     'south',
@@ -54,6 +55,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+
+    'bootstrap_toolkit',
 )
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
@@ -95,9 +98,9 @@ if not os.path.exists(VAR_ROOT):
 
 ROOT_URLCONF = 'botbot.urls'
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/settings/login/'
 LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/settings/'
 INCLUDE_DJANGO_ADMIN = ast.literal_eval(os.environ.get(
                                         'INCLUDE_DJANGO_ADMIN', 'True'))
 
@@ -282,6 +285,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.user_details'
 )
 
+# Allauth
+ACCOUNT_LOGOUT_ON_GET = (True)
 
 # Statsd
 STATSD_CLIENT = 'django_statsd.clients.normal'

@@ -23,6 +23,7 @@ django-allauth==0.18.0
     requests==2.2.1
     oauthlib==0.6.1
     requests-oauthlib==0.4.0
+django-bootstrap-toolkit==2.15.0
 
 # Needs pinning
 -e git+https://github.com/lincolnloop/django-jsonit.git#egg=jsonit

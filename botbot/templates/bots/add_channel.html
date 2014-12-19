@@ -1,30 +1,33 @@
-{% extends "base.html" %}
+{% extends "account/base.html" %}
 {% load verbatim %}
+{% load bootstrap_toolkit %}
+{% load i18n %}
 
-{% block extra_head %}
-{% endblock %}
+{% block extra_head %}{% endblock %}
 
 {% block content %}
-    <div class="page-header">
-      <h1>Manage {{ chatbot.connection.rooms }}</h1>
-    </div>
 
+<header class="page-header account-header">
+  {# <h1 class="page-title">Manage {{ chatbot.connection.rooms }}</h1> #}
+  <h1 class="page-title">Log a Channel</h1>
+</header>
 
-    <form action="." method="post" id="chatbot">{% csrf_token %}
+<form class="account-body signup" id="chatbot" method="post" action=".">
+  {% csrf_token %}
+  
+  <div class="account-body">
+    {% for field in form %}
+      {% if field.name == "is_public" or field.name == "is_active" or field.name == "identifiable_url" %}
+        {% include "includes/checkbox.html" %}
+      {% else %}
+        {% include "includes/field.html" %}
+      {% endif %}
+    {% endfor %}
+  </div>
 
-    <fieldset>
-      <legend>Connection Information</legend>
-      {% for field in form %}
-        {% if field.name == "is_public" or field.name == "is_active" or field.name == "identifiable_url" %}
-          {% include "includes/checkbox.html" %}
-        {% else %}
-          {% include "includes/field.html" %}
-        {% endif %}
-      {% endfor %}
-    </fieldset>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+  </div>
+</form>
 
-    <p class="actions">
-      <button type="submit" class="btn btn-primary">Save</button>
-    </p>
-  </form>
 {% endblock content %}

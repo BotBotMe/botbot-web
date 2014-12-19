@@ -7,11 +7,13 @@ from django.core.urlresolvers import reverse
 from django.utils.timezone import now
 import pytz
 
+from botbot.apps.accounts import models as account_models
 from botbot.apps.bots import models as bot_models
 from botbot.apps.logs import models as log_models
 from .management.commands import redact as redact_cmd
 from botbot.apps.bots.models import ChatBot, Channel
 from botbot.apps.bots.utils import reverse_channel
+from botbot.apps.kudos.models import Kudos, KudosTotal
 
 
 class BaseTestCase(TestCase):
@@ -76,7 +78,7 @@ class SearchTestCase(TestCase):
             is_public=True)
 
     def _add_log_line(self, text, nick="Nick"):
-        obj =  log_models.Log.objects.create(
+        obj = log_models.Log.objects.create(
             bot=self.chatbot, channel=self.public_channel, timestamp=now(),
             nick=nick, text=text, command='PRIVMSG')
         obj.update_search_field()
@@ -87,12 +89,12 @@ class SearchTestCase(TestCase):
         b = self._add_log_line("Hello Europe")
 
         # Just search for "World"
-        results =  log_models.Log.objects.search("World")
+        results = log_models.Log.objects.search("World")
         self.assertTrue(a in results)
         self.assertFalse(b in results)
 
         # Search for Hello which returns both results
-        results =  log_models.Log.objects.search("Hello")
+        results = log_models.Log.objects.search("Hello")
         self.assertTrue(a in results)
         self.assertTrue(b in results)
 
@@ -125,7 +127,6 @@ class SearchTestCase(TestCase):
         self.assertEqual(len(context), 1)
         self.assertTrue(a in context)
         self.assertFalse(b in context)
-
 
     def test_nick_search_both(self):
         a = self._add_log_line("Hello World", nick="Foo")
@@ -255,3 +256,133 @@ class RedactTests(TestCase):
             nick='redact',
             timestamp=now())
         self.assertEqual(redacted.text, log_models.REDACTED_TEXT)
+
+
+class KudosTests(BaseTestCase):
+
+    def setUp(self):
+        super(KudosTests, self).setUp()
+        kudos = []
+        for i, letter in enumerate('abcdefghijklmnopqrstuvwxyz'):
+            kudos.append(Kudos(
+                nick=letter*3, count=1+i+(i % 5), channel=self.public_channel,
+                first=now()-datetime.timedelta(days=100), recent=now()))
+        Kudos.objects.bulk_create(kudos)
+        self.url = reverse_channel(self.public_channel, "kudos")
+
+    def test_basic(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'logs/kudos.html')
+
+    def test_randomized_order(self):
+        scoreboards = []
+        for i in range(10):
+            response = self.client.get(self.url)
+            scoreboards.append(response.context['random_scoreboard'])
+        same = True
+        for scoreboard in scoreboards[1:]:
+            if scoreboards[0] != scoreboard:
+                same = False
+                break
+        self.assertFalse(same, 'Scoreboards were not shuffled')
+
+    def test_no_kudos(self):
+        self.public_channel.kudos_set.all().delete()
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'logs/kudos.html')
+
+    def test_kudos_total(self):
+        KudosTotal.objects.create(
+            channel=self.public_channel, kudos_given=300,
+            message_count=900)
+        response = self.client.get(self.url)
+        self.assertContains(response, ' 33.33%')
+
+    def test_kudos_total_zero(self):
+        KudosTotal.objects.create(
+            channel=self.public_channel, kudos_given=0,
+            message_count=0)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'logs/kudos.html')
+        self.assertNotIn('channel_kudos_perc', response.context)
+
+    def test_not_public_kudos(self):
+        self.public_channel.public_kudos = False
+        self.public_channel.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_not_public_kudos_member(self):
+        self.public_channel.public_kudos = False
+        self.public_channel.save()
+        member = account_models.User.objects.create_user(
+            username="member",
+            password="password",
+            email="member@botbot.local")
+        self.public_channel.membership_set.create(user=member)
+
+        self.assertTrue(self.client.login(
+            username='member', password='password'))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_not_public_kudos_admin(self):
+        self.public_channel.public_kudos = False
+        self.public_channel.save()
+        admin = account_models.User.objects.create_user(
+            username="admin",
+            password="password",
+            email="admin@botbot.local")
+        self.public_channel.membership_set.create(user=admin, is_admin=True)
+
+        self.assertTrue(self.client.login(
+            username='admin', password='password'))
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'logs/kudos.html')
+
+
+class KudosJSONTest(BaseTestCase):
+
+    def setUp(self):
+        super(KudosJSONTest, self).setUp()
+        member = account_models.User.objects.create_user(
+            username="member",
+            password="password",
+            email="member@botbot.local")
+        admin = account_models.User.objects.create_user(
+            username="admin",
+            password="password",
+            email="admin@botbot.local")
+        self.public_channel.membership_set.create(user=member)
+        self.public_channel.membership_set.create(user=admin, is_admin=True)
+
+        self.url = reverse_channel(self.public_channel, "kudos_json")
+
+    def test_anonymous(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_basic(self):
+        self.client.login(username='member', password='password')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/json')
+
+    def test_not_public_kudos_member(self):
+        self.public_channel.public_kudos = False
+        self.public_channel.save()
+
+        self.assertTrue(self.client.login(
+            username='member', password='password'))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_not_public_kudos_admin(self):
+        self.public_channel.public_kudos = False
+        self.public_channel.save()
+
+        self.assertTrue(self.client.login(
+            username='admin', password='password'))
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/json')
