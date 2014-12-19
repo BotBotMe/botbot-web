@@ -259,7 +259,7 @@ class RequestChannel(FormView):
         slug = slugify(form.cleaned_data['channel_name'])
         channel = models.Channel.objects.create(
             name=form.cleaned_data['channel_name'], chatbot=bot, slug=slug,
-            is_active=False, is_pending=True)
+            is_active=False, is_pending=True, is_public=True)
         channel.create_default_plugins()
         message = render_to_string('bots/emails/request.txt',
                                    {"data": form.cleaned_data})

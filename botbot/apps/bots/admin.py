@@ -62,7 +62,7 @@ class ChannelForm(forms.ModelForm):
 
 class ChannelAdmin(admin.ModelAdmin):
     form = ChannelForm
-    list_display = ('__unicode__', 'name', 'chatbot', 'is_active',
+    list_display = ('name', 'chatbot', 'is_active',
                     'is_public', 'is_featured', 'is_pending', 'updated')
     list_filter = ('chatbot', 'is_active', 'is_public',
                    'is_featured', 'is_pending')
@@ -74,6 +74,32 @@ class ChannelAdmin(admin.ModelAdmin):
     search_fields = ('name', 'chatbot__server')
     inlines = [ActivePluginInline, MembershipInline]
     actions = [botbot_refresh]
+
+
+class PublicChannelApproval(ChannelAdmin):
+    def get_queryset(self, request):
+        qs = super(PublicChannelApproval, self).get_queryset(request)
+        return qs.filter(is_pending=True, is_public=True)
+
+
+class PersonalChannelApproval(ChannelAdmin):
+    def get_queryset(self, request):
+        qs = super(PersonalChannelApproval, self).get_queryset(request)
+        return qs.filter(is_pending=True, is_public=False)
+
+class PublicChannels(models.Channel):
+    class Meta:
+        proxy = True
+        verbose_name = "Pending Public Channel"
+
+class PersonalChannels(models.Channel):
+    class Meta:
+        proxy = True
+        verbose_name = "Pending Personal Channel"
+
+
+admin.site.register(PublicChannels, PublicChannelApproval)
+admin.site.register(PersonalChannels, PersonalChannelApproval)
 
 admin.site.register(models.ChatBot, ChatBotAdmin)
 admin.site.register(models.Channel, ChannelAdmin)
