@@ -5746,13 +5746,6 @@ body.welcome-page .account-header {
   color: #fff;
   text-decoration: none;
 }
-.btn {
-  background-color: #337ab7;
-  border-color: #2e6da4;
-  background-image: none;
-  border: none;
-  box-shadow: none;
-}
 #pricing {
   text-align: center;
 }
@@ -6024,6 +6017,9 @@ body.welcome-page .account-header {
     margin-right: 0;
     position: relative;
     z-index: 0;
+  }
+  .display_bbsponsor #Log-Container article {
+    margin-right: 0;
   }
   #Log-Nav:target {
     display: block;
