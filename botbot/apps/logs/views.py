@@ -13,6 +13,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.utils.timezone import get_current_timezone_name, now
 from django.utils.translation import ugettext as _
 from django.views.generic import ListView, TemplateView, View
+from django.views.decorators.cache import patch_cache_control
 import pytz
 
 from botbot.apps.accounts import forms as accounts_forms
@@ -21,6 +22,7 @@ from botbot.apps.bots.views import ChannelMixin
 from . import forms
 from botbot.apps.logs.models import Log
 from botbot.apps.kudos.models import KudosTotal
+
 
 
 class Help(ChannelMixin, TemplateView):
@@ -221,13 +223,15 @@ class LogViewer(ChannelMixin, object):
         return result
 
     def render_to_response(self, context, **response_kwargs):
-        response = super(LogViewer, self).render_to_response(context,
-                                                             **response_kwargs)
+        response = super(LogViewer, self).render_to_response(
+            context, **response_kwargs)
 
+        has_next_page = False
         if self.request.is_ajax():
             # easily parsed with Javascript
             if self.next_page:
                 response['X-NextPage'] = self.next_page
+                has_next_page = True
 
             if self.prev_page:
                 response['X-PrevPage'] = self.prev_page
@@ -236,11 +240,16 @@ class LogViewer(ChannelMixin, object):
             links = []
             if self.next_page:
                 links.append('{0}; rel="next"'.format(self.next_page))
+                has_next_page = True
 
             if self.prev_page:
                 links.append('{0}; rel="prev"'.format(self.prev_page))
             response['Link'] = ','.join(links)
         response['X-Timezone'] = self.timezone
+        if has_next_page:
+            patch_cache_control(response, public=True)
+        else:
+            patch_cache_control(response, private=True)
         return response
 
     def _pages_for_queryset(self, queryset):
