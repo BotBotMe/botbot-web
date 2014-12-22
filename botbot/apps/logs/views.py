@@ -5,13 +5,11 @@ import random
 import re
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.humanize.templatetags import humanize
 from django.core.cache import cache
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.utils.decorators import method_decorator
 from django.utils.timezone import get_current_timezone_name, now
 from django.utils.translation import ugettext as _
 from django.views.generic import ListView, TemplateView, View
@@ -37,7 +35,8 @@ class PaginatorPageLinksMixin(object):
 
     def paginate_queryset(self, queryset, page_size):
         paginator, page, object_list, has_other_pages = super(
-            PaginatorPageLinksMixin, self).paginate_queryset(queryset, page_size)
+            PaginatorPageLinksMixin, self).paginate_queryset(
+                queryset, page_size)
 
         self.next_page = self.get_next_page_link(page)
         self.prev_page = self.get_previous_page_link(page)
@@ -67,12 +66,12 @@ class PaginatorPageLinksMixin(object):
 
         return '{0}?{1}'.format(url, params.urlencode())
 
-
     def get_current_page_link(self, page):
         url = self.request.path
         params = self.request.GET.copy()
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
+
 
 class LogDateMixin(object):
 
@@ -88,7 +87,7 @@ class LogDateMixin(object):
     def _kwargs_with_date(self, date):
         kwargs = {
             'year': date.year,
-            'month': "%02d" % date.month ,
+            'month': "%02d" % date.month,
             'day': "%02d" % date.day
         }
         return kwargs
@@ -105,8 +104,10 @@ class LogDateMixin(object):
         """
         Find the previous day, that has content.
         """
-        qs = self._get_base_queryset().filter(
-            timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
+        qs = (
+            self._get_base_queryset()
+            .filter(timestamp__gte=datetime.timedelta(days=1) + self.date)
+            .order_by('timestamp'))
         if qs.exists():
             return qs[0].timestamp.date()
 
@@ -259,10 +260,12 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         try:
             # Handle the case we we are trying to find a single message.
             if 'msg_pk' in self.kwargs:
-                self.highlight_line = get_object_or_404(Log.objects, pk=self.kwargs['msg_pk'])
-                date = datetime.datetime(year=self.highlight_line.timestamp.year,
-                                month=self.highlight_line.timestamp.month,
-                                day=self.highlight_line.timestamp.day)
+                self.highlight_line = get_object_or_404(
+                    Log.objects, pk=self.kwargs['msg_pk'])
+                date = datetime.datetime(
+                    year=self.highlight_line.timestamp.year,
+                    month=self.highlight_line.timestamp.month,
+                    day=self.highlight_line.timestamp.day)
                 self.date = self.tz.localize(date)
             else:
                 self.set_view_date()
@@ -278,17 +281,20 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         if getattr(self, 'highlight_line', None):
             # Maybe one day we can push this to varnish
             url, params = cache.get(
-                self._messaage_redirect_cache_key(self.highlight_line), [None, None])
+                self._message_redirect_cache_key(self.highlight_line),
+                [None, None])
             if not url:
-                paginator = self.get_paginator(self.object_list, self.get_paginate_by(self.object_list))
+                paginator = self.get_paginator(
+                    self.object_list, self.get_paginate_by(self.object_list))
                 for n in paginator.page_range:
                     page = paginator.page(n)
                     if self.highlight_line in page.object_list:
                         params = {"msg": self.highlight_line.pk, "page": n}
                         url = self.channel_date_url()
-                        cache.set(self._messaage_redirect_cache_key(self.highlight_line),
-                                  [url, {"msg": self.highlight_line.pk, "page": n}], None)
-                        break # Found the page.
+                        cache.set(
+                            self._message_redirect_cache_key(self.highlight_line),
+                            [url, {"msg": self.highlight_line.pk, "page": n}], None)
+                        break  # Found the page.
 
             oparams = self.request.GET.copy()
             oparams.update(params)
@@ -395,7 +401,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
 
-    def _messaage_redirect_cache_key(self, line):
+    def _message_redirect_cache_key(self, line):
         return "line:{0}:permalink".format(line.pk)
 
     def set_view_date(self):
@@ -409,7 +415,10 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         else:
             current = now()
             self.date = self.tz.localize(
-                datetime.datetime(year=current.year, month=current.month, day=current.day))
+                datetime.datetime(
+                    year=current.year,
+                    month=current.month,
+                    day=current.day))
 
             # Use the last page.
             self.kwargs['page'] = 'last'
@@ -466,11 +475,13 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         nick = self.kwargs['nick']
         try:
             # cover nicks in the form: nick OR nick_ OR nick|<something>
-            last_exit = queryset.filter(
-                Q(nick__iexact=nick) |
-                Q(nick__istartswith="{0}|".format(nick)) |
-                Q(nick__iexact="{0}_".format(nick)),
-                Q(command='QUIT') | Q(command='PART')).order_by('-timestamp')[0]
+            last_exit = (queryset
+                .filter(
+                    Q(nick__iexact=nick) |
+                    Q(nick__istartswith="{0}|".format(nick)) |
+                    Q(nick__iexact="{0}_".format(nick)),
+                    Q(command='QUIT') | Q(command='PART'))
+                .order_by('-timestamp')[0])
         except IndexError:
             raise Http404("User hasn't left room")
         try:
@@ -484,8 +495,8 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         except IndexError:
             date_filter = {'timestamp__gte': last_exit.timestamp}
         # Only fetch results from when the user logged out.
-        self.fetch_after = (last_exit.timestamp -
-            datetime.timedelta(milliseconds=1))
+        self.fetch_after = (
+            last_exit.timestamp - datetime.timedelta(milliseconds=1))
         return queryset.filter(**date_filter)
 
 
