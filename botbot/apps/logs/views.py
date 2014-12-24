@@ -14,7 +14,6 @@ from django.utils.timezone import get_current_timezone_name, now
 from django.utils.translation import ugettext as _
 from django.views.generic import ListView, TemplateView, View
 from django.views.decorators.cache import patch_cache_control
-from django.views.decorators.vary import vary_on_cookie
 import pytz
 
 from botbot.apps.accounts import forms as accounts_forms
@@ -248,7 +247,9 @@ class LogViewer(ChannelMixin, object):
             response['Link'] = ','.join(links)
         response['X-Timezone'] = self.timezone
         if has_next_page and self.request.user.is_anonymous():
-            patch_cache_control(response, public=True)
+            patch_cache_control(
+                response, public=True,
+                max_age=settings.CACHE_MIDDLEWARE_SECONDS)
         else:
             patch_cache_control(response, private=True)
         return response
