@@ -6021,6 +6021,12 @@ body.welcome-page .account-header {
   .display_bbsponsor #Log-Container article {
     margin-right: 0;
   }
+  .display_bbsponsor #Log-Container .timeline-navigation {
+    width: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+  }
   #Log-Nav:target {
     display: block;
   }
