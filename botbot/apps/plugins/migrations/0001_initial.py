@@ -8,7 +8,7 @@ import botbot.core.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bots', '0001_initial'),
+        ('bots', '__first__'),
     ]
 
     operations = [
