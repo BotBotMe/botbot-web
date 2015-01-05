@@ -33,12 +33,18 @@ INSTALLED_APPS = (
     'botbot.apps.bots',
     'botbot.apps.logs',
     'botbot.apps.plugins',
+    'botbot.apps.kudos',
     'botbot.core',
 
     'launchpad',
-    'social.apps.django_app.default',
     'django_assets',
     'django_statsd',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.google',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +54,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+
+    'bootstrap_toolkit',
 )
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
@@ -64,9 +72,11 @@ PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 PYTHON_BIN = os.path.dirname(sys.executable)
 ve_path = os.path.dirname(os.path.dirname(os.path.dirname(PROJECT_DIR)))
+if "VAR_ROOT" in os.environ:
+     VAR_ROOT = os.environ.get("VAR_ROOT")
 # Assume that the presence of 'activate_this.py' in the python bin/
 # directory means that we're running in a virtual environment.
-if os.path.exists(os.path.join(PYTHON_BIN, 'activate_this.py')):
+elif os.path.exists(os.path.join(PYTHON_BIN, 'activate_this.py')):
     # We're running with a virtualenv python executable.
     VAR_ROOT = os.path.join(os.path.dirname(PYTHON_BIN), 'var')
 elif ve_path and os.path.exists(os.path.join(ve_path, 'bin',
@@ -87,9 +97,9 @@ if not os.path.exists(VAR_ROOT):
 
 ROOT_URLCONF = 'botbot.urls'
 
-LOGIN_URL = '/dashboard/'
+LOGIN_URL = '/settings/login/'
 LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/settings/'
 INCLUDE_DJANGO_ADMIN = ast.literal_eval(os.environ.get(
                                         'INCLUDE_DJANGO_ADMIN', 'True'))
 
@@ -126,8 +136,8 @@ TEMPLATE_DIRS = (
 TEMPLATE_CONTEXT_PROCESSORS += (
     'django.core.context_processors.request',
     'django.core.context_processors.tz',
-    'social.apps.django_app.context_processors.backends',
-    'social.apps.django_app.context_processors.login_redirect',
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
 )
 
 #==============================================================================
@@ -151,11 +161,10 @@ MIDDLEWARE_CLASSES = (
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 AUTHENTICATION_BACKENDS += (
-    # WARNING! Users are automatically associated by email in the
-    # social pipeline. Before adding additional social auth backends
-    # Be sure you trust the provider to confirm the email address.
-    'social.backends.google.GoogleOpenId',
     'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 #==============================================================================
@@ -233,16 +242,7 @@ ADMINS = (
     ('LL', 'info@lincolnloop.com'),
 )
 EMAIL_SUBJECT_PREFIX = "[BBME] "
-
-if 'SMTP_URL' in os.environ:
-    url = urlparse.urlparse(os.environ['SMTP_URL'])
-    EMAIL_HOST = url.hostname
-    EMAIL_HOST_USER = url.username
-    EMAIL_HOST_PASSWORD = url.password
-    EMAIL_PORT = url.port or 25
-    EMAIL_USE_TLS = ast.literal_eval(os.environ.get('SMTP_TLS', 'False'))
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #==============================================================================
 # Miscellaneous project settings
@@ -289,6 +289,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.user.user_details'
 )
 
+# Allauth
+ACCOUNT_LOGOUT_ON_GET = (True)
 
 # Statsd
 STATSD_CLIENT = 'django_statsd.clients.normal'
@@ -301,3 +303,5 @@ STATSD_PATCHES = [
 STATSD_PREFIX = os.environ.get('STATSD_PREFIX', 'bbme')
 
 DJANGO_HSTORE_ADAPTER_REGISTRATION = 'connection'
+
+SOUTH_TESTS_MIGRATE = False

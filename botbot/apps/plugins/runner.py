@@ -56,7 +56,7 @@ class Line(object):
     def _channel(self):
         """Simple caching for Channel model"""
         if not hasattr(self, '_channel_cache'):
-            cache_key = 'channel:{0}'.format(self._channel_name)
+            cache_key = 'channel:{0}-{1}'.format(self._chatbot_id, self._channel_name)
             channel = cache.get(cache_key)
             if not channel and self._channel_name.startswith("#"):
                 channel = self._chatbot.channel_set.get(
@@ -164,6 +164,7 @@ class PluginRunner(object):
     def listen(self):
         """Listens for incoming messages on the Redis queue"""
         while 1:
+            val = None
             try:
                 val = self.bot_bus.blpop('q', 1)
 
@@ -183,7 +184,9 @@ class PluginRunner(object):
 
                     self.dispatch(line)
             except Exception:
-                LOG.error("Line Dispatch Failed", exc_info=True)
+                LOG.error("Line Dispatch Failed", exc_info=True, extra={
+                    "line": val
+                })
 
     def dispatch(self, line):
         """Given a line, dispatch it to the right plugins & functions."""

@@ -62,12 +62,13 @@ class ChannelRequestForm(forms.Form):
 
     def clean_channel_name(self):
         channel_name = self.cleaned_data['channel_name']
+        if not channel_name.startswith("#"):
+            channel_name = "#" + channel_name
+
         if models.Channel.objects.filter(name=channel_name).exists():
             raise forms.ValidationError(
                 "Sorry, this channel is already being monitored.")
 
-        if not channel_name.startswith("#"):
-            channel_name = "#" + channel_name
 
         return channel_name
 

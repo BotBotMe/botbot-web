@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db import models
 from django.db.models import Max, Min
+from django.db.models.aggregates import Count
 from django.utils.text import slugify
 from django.utils.datastructures import SortedDict
 from djorm_pgarray.fields import ArrayField
@@ -20,6 +21,19 @@ def pretty_slug(server):
     if len(parts) == 3:
         return parts[1]
     return server
+
+
+class ChatBotManager(models.Manager):
+    def get_active_slugs(self):
+        return [i[0] for i in
+                self.get_queryset().filter(is_active=True).distinct(
+                    'slug').values_list('slug')]
+
+
+class NoAvailableChatBots(Exception):
+    """
+    Raised we we don't have any chat bots aviable that can be used on the network.
+    """
 
 class ChatBot(models.Model):
     is_active = models.BooleanField(default=False)
@@ -44,6 +58,9 @@ class ChatBot(models.Model):
             help_text="Usually a URL with information about this bot.")
 
     slug = models.CharField(max_length=50, db_index=True)
+    max_channels = models.IntegerField(default=200)
+
+    objects = ChatBotManager()
 
     @property
     def legacy_slug(self):
@@ -67,6 +84,25 @@ class ChatBot(models.Model):
             self.slug = pretty_slug(server)
 
         return super(ChatBot, self).save(*args, **kwargs)
+
+    @classmethod
+    def allocate_bot(cls, slug):
+        bots = cls.objects.filter(slug='freenode', is_active=True).annotate(
+            Count('channel')).order_by('channel__count')
+
+        for bot in bots:
+            if bot.max_channels > bot.channel__count:
+                return bot
+            else:
+                continue
+
+        raise NoAvailableChatBots(slug)
+
+
+class ChannelManager(models.Manager):
+
+    def public(self):
+        return self.get_queryset().filter(is_public=True)
 
 
 class Channel(TimeStampedModel):
@@ -93,6 +129,9 @@ class Channel(TimeStampedModel):
                                    through='accounts.Membership')
     is_featured = models.BooleanField(default=False)
     fingerprint = models.CharField(max_length=36, blank=True, null=True)
+    public_kudos = models.BooleanField(default=True)
+
+    objects = ChannelManager()
 
     def __unicode__(self):
         return self.name
@@ -100,7 +139,8 @@ class Channel(TimeStampedModel):
     class Meta:
         ordering = ('name',)
         unique_together = (
-            ('slug', 'chatbot')
+            ('slug', 'chatbot'),
+            ('name', 'chatbot')
         )
 
     @classmethod
@@ -170,7 +210,6 @@ class Channel(TimeStampedModel):
             cache.set(cache_key, cached_config)
         return cached_config
 
-
     def user_can_access(self, user, only_owners=False):
         if only_owners:
             if not user.is_authenticated():
@@ -182,6 +221,14 @@ class Channel(TimeStampedModel):
         if self.users.filter(pk=user.id).exists():
             return True
         return False
+
+    def user_can_access_kudos(self, user):
+        if self.public_kudos:
+            return True
+        return (
+            user.is_authenticated()
+            and self.membership_set.filter(user=user, is_admin=True).exists()
+        )
 
     @property
     def visible_commands_filter(self):

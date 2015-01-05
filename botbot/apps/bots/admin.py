@@ -8,16 +8,9 @@ import redis
 
 from . import models
 
-from botbot.apps.plugins.models import Plugin
-
 
 class PluginFormset(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
-        if not kwargs['instance'].pk:
-            defaults = Plugin.objects.filter(
-                slug__in=models.Channel.DEFAULT_PLUGINS)
-
-            kwargs['initial'] = [{"plugin": obj.pk} for obj in defaults]
         super(PluginFormset, self).__init__(*args, **kwargs)
 
 
@@ -26,24 +19,28 @@ class ActivePluginInline(admin.StackedInline):
     formset = PluginFormset
 
     def get_extra(self, request, obj=None, **kwargs):
-        if obj is None:
-            return len(models.Channel.DEFAULT_PLUGINS)
         return 0
 
 
 class MembershipInline(admin.TabularInline):
     model = models.Channel.users.through
+    raw_id_fields = ("user",)
     extra = 0
 
 
 class ChatBotAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'is_active')
+    exclude = ('connection', 'server_identifier')
+    list_display = ('__unicode__', 'is_active', 'usage')
     list_editable = ('is_active',)
     list_filter = ('is_active',)
     readonly_fields = ('server_identifier',)
 
     # Disable bulk delete, because it doesn't call delete, so skips REFRESH
     actions = None
+
+    def usage(self, obj):
+        return "%d%%" % (
+            (obj.channel_set.count() / float(obj.max_channels)) * 100)
 
 
 def botbot_refresh(modeladmin, request, queryset):
@@ -62,9 +59,10 @@ class ChannelForm(forms.ModelForm):
     def clean_private_slug(self):
         return self.cleaned_data['private_slug'] or None
 
+
 class ChannelAdmin(admin.ModelAdmin):
     form = ChannelForm
-    list_display = ('__unicode__', 'name', 'chatbot', 'is_active',
+    list_display = ('name', 'chatbot', 'is_active',
                     'is_public', 'is_featured', 'is_pending', 'updated')
     list_filter = ('chatbot', 'is_active', 'is_public',
                    'is_featured', 'is_pending')
@@ -76,6 +74,38 @@ class ChannelAdmin(admin.ModelAdmin):
     search_fields = ('name', 'chatbot__server')
     inlines = [ActivePluginInline, MembershipInline]
     actions = [botbot_refresh]
+
+
+class PublicChannelApproval(ChannelAdmin):
+    def has_add_permission(self, request):
+        return False
+
+    def get_queryset(self, request):
+        qs = super(PublicChannelApproval, self).get_queryset(request)
+        return qs.filter(is_pending=True, is_public=True)
+
+
+class PersonalChannelApproval(ChannelAdmin):
+    def has_add_permission(self, request):
+        return False
+    
+    def get_queryset(self, request):
+        qs = super(PersonalChannelApproval, self).get_queryset(request)
+        return qs.filter(is_pending=True, is_public=False)
+
+class PublicChannels(models.Channel):
+    class Meta:
+        proxy = True
+        verbose_name = "Pending Public Channel"
+
+class PersonalChannels(models.Channel):
+    class Meta:
+        proxy = True
+        verbose_name = "Pending Personal Channel"
+
+
+admin.site.register(PublicChannels, PublicChannelApproval)
+admin.site.register(PersonalChannels, PersonalChannelApproval)
 
 admin.site.register(models.ChatBot, ChatBotAdmin)
 admin.site.register(models.Channel, ChannelAdmin)

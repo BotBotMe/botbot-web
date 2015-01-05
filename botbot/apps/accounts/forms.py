@@ -9,7 +9,7 @@ class AccountForm(forms.ModelForm):
         model = models.User
         exclude = ('first_name', 'last_name', 'password', 'is_staff',
                    'is_active', 'is_superuser', 'last_login', 'date_joined',
-                   'groups', 'user_permissions')
+                   'groups', 'user_permissions', 'email')
 
 class TimezoneForm(forms.Form):
     CHOICES = [('', '')]

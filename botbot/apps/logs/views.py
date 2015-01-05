@@ -1,15 +1,18 @@
 import datetime
+import json
 import math
-
-from django.core.cache import cache
+import random
 import re
+
+from django.conf import settings
+from django.contrib.humanize.templatetags import humanize
+from django.core.cache import cache
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.timezone import get_current_timezone_name, now
-from django.views.generic import ListView, TemplateView, RedirectView
 from django.utils.translation import ugettext as _
-from django.conf import settings
+from django.views.generic import ListView, TemplateView, View
 import pytz
 
 from botbot.apps.accounts import forms as accounts_forms
@@ -17,6 +20,7 @@ from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
 from . import forms
 from botbot.apps.logs.models import Log
+from botbot.apps.kudos.models import KudosTotal
 
 
 class Help(ChannelMixin, TemplateView):
@@ -31,7 +35,8 @@ class PaginatorPageLinksMixin(object):
 
     def paginate_queryset(self, queryset, page_size):
         paginator, page, object_list, has_other_pages = super(
-            PaginatorPageLinksMixin, self).paginate_queryset(queryset, page_size)
+            PaginatorPageLinksMixin, self).paginate_queryset(
+                queryset, page_size)
 
         self.next_page = self.get_next_page_link(page)
         self.prev_page = self.get_previous_page_link(page)
@@ -61,12 +66,12 @@ class PaginatorPageLinksMixin(object):
 
         return '{0}?{1}'.format(url, params.urlencode())
 
-
     def get_current_page_link(self, page):
         url = self.request.path
         params = self.request.GET.copy()
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
+
 
 class LogDateMixin(object):
 
@@ -82,7 +87,7 @@ class LogDateMixin(object):
     def _kwargs_with_date(self, date):
         kwargs = {
             'year': date.year,
-            'month': "%02d" % date.month ,
+            'month': "%02d" % date.month,
             'day': "%02d" % date.day
         }
         return kwargs
@@ -99,8 +104,10 @@ class LogDateMixin(object):
         """
         Find the previous day, that has content.
         """
-        qs = self._get_base_queryset().filter(
-            timestamp__gte=datetime.timedelta(days=1) + self.date).order_by('timestamp')
+        qs = (
+            self._get_base_queryset()
+            .filter(timestamp__gte=datetime.timedelta(days=1) + self.date)
+            .order_by('timestamp'))
         if qs.exists():
             return qs[0].timestamp.date()
 
@@ -123,7 +130,6 @@ class LogViewer(ChannelMixin, object):
         self.next_page = ""
         self.prev_page = ""
         self.current_page = ""
-
 
     def dispatch(self, request, *args, **kwargs):
         self.form = forms.SearchForm(request.GET)
@@ -169,6 +175,8 @@ class LogViewer(ChannelMixin, object):
                 'tz_form': accounts_forms.TimezoneForm(self.request),
                 'show_first_header': self.show_first_header,
                 'newest_first': self.newest_first,
+                'show_kudos': self.channel.user_can_access_kudos(
+                    self.request.user),
             })
         context.update({
             'prev_page': self.prev_page,
@@ -241,7 +249,7 @@ class LogViewer(ChannelMixin, object):
 
 class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     show_first_header = False
-    allow_empty = False
+    allow_empty = True
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -252,10 +260,12 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         try:
             # Handle the case we we are trying to find a single message.
             if 'msg_pk' in self.kwargs:
-                self.highlight_line = get_object_or_404(Log.objects, pk=self.kwargs['msg_pk'])
-                date = datetime.datetime(year=self.highlight_line.timestamp.year,
-                                month=self.highlight_line.timestamp.month,
-                                day=self.highlight_line.timestamp.day)
+                self.highlight_line = get_object_or_404(
+                    Log.objects, pk=self.kwargs['msg_pk'])
+                date = datetime.datetime(
+                    year=self.highlight_line.timestamp.year,
+                    month=self.highlight_line.timestamp.month,
+                    day=self.highlight_line.timestamp.day)
                 self.date = self.tz.localize(date)
             else:
                 self.set_view_date()
@@ -271,17 +281,20 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         if getattr(self, 'highlight_line', None):
             # Maybe one day we can push this to varnish
             url, params = cache.get(
-                self._messaage_redirect_cache_key(self.highlight_line), [None, None])
+                self._message_redirect_cache_key(self.highlight_line),
+                [None, None])
             if not url:
-                paginator = self.get_paginator(self.object_list, self.get_paginate_by(self.object_list))
+                paginator = self.get_paginator(
+                    self.object_list, self.get_paginate_by(self.object_list))
                 for n in paginator.page_range:
                     page = paginator.page(n)
                     if self.highlight_line in page.object_list:
                         params = {"msg": self.highlight_line.pk, "page": n}
                         url = self.channel_date_url()
-                        cache.set(self._messaage_redirect_cache_key(self.highlight_line),
-                                  [url, {"msg": self.highlight_line.pk, "page": n}], None)
-                        break # Found the page.
+                        cache.set(
+                            self._message_redirect_cache_key(self.highlight_line),
+                            [url, {"msg": self.highlight_line.pk, "page": n}], None)
+                        break  # Found the page.
 
             oparams = self.request.GET.copy()
             oparams.update(params)
@@ -388,7 +401,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
 
-    def _messaage_redirect_cache_key(self, line):
+    def _message_redirect_cache_key(self, line):
         return "line:{0}:permalink".format(line.pk)
 
     def set_view_date(self):
@@ -402,7 +415,10 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         else:
             current = now()
             self.date = self.tz.localize(
-                datetime.datetime(year=current.year, month=current.month, day=current.day))
+                datetime.datetime(
+                    year=current.year,
+                    month=current.month,
+                    day=current.day))
 
             # Use the last page.
             self.kwargs['page'] = 'last'
@@ -459,11 +475,13 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         nick = self.kwargs['nick']
         try:
             # cover nicks in the form: nick OR nick_ OR nick|<something>
-            last_exit = queryset.filter(
-                Q(nick__iexact=nick) |
-                Q(nick__istartswith="{0}|".format(nick)) |
-                Q(nick__iexact="{0}_".format(nick)),
-                Q(command='QUIT') | Q(command='PART')).order_by('-timestamp')[0]
+            last_exit = (queryset
+                .filter(
+                    Q(nick__iexact=nick) |
+                    Q(nick__istartswith="{0}|".format(nick)) |
+                    Q(nick__iexact="{0}_".format(nick)),
+                    Q(command='QUIT') | Q(command='PART'))
+                .order_by('-timestamp')[0])
         except IndexError:
             raise Http404("User hasn't left room")
         try:
@@ -477,6 +495,105 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
         except IndexError:
             date_filter = {'timestamp__gte': last_exit.timestamp}
         # Only fetch results from when the user logged out.
-        self.fetch_after = (last_exit.timestamp -
-            datetime.timedelta(milliseconds=1))
+        self.fetch_after = (
+            last_exit.timestamp - datetime.timedelta(milliseconds=1))
         return queryset.filter(**date_filter)
+
+
+class KudosMixin(object):
+    """
+    View mixin to check that kudos access is allowed.
+
+    If the channel's ``public_kudos`` is False then only accessible to channel
+    admins.
+
+    Must go after ChannelMixin.
+    """
+
+    def dispatch(self, *args, **kwargs):
+        """
+        Check kudos authorization.
+        """
+        if not self.channel.user_can_access_kudos(self.request.user):
+            raise Http404("Only accessible to channel admins")
+        return super(KudosMixin, self).dispatch(*args, **kwargs)
+
+
+class Kudos(ChannelMixin, KudosMixin, View):
+    """
+    View that returns a ranked JSON list of users with the most kudos.
+
+    Not accessible to anonymous users.
+    """
+
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_authenticated():
+            raise Http404('Only accessible to authenticated users')
+        return super(Kudos, self).dispatch(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        return HttpResponse(
+            json.dumps(
+                self.channel.kudos_set.ranks(debug=settings.DEBUG),
+                indent=2 if settings.DEBUG else None),
+            content_type='text/json')
+
+
+class ChannelKudos(ChannelMixin, KudosMixin, TemplateView):
+    """
+    Display a shuffled subset of the people with the most kudos.
+    """
+    template_name = 'logs/kudos.html'
+
+    def rounded_percentage(self, score, total):
+        percentage = score / float(total) * 100
+        for i in (1, 10, 25, 50):
+            if i >= percentage:
+                return i
+
+    def get_context_data(self, **kwargs):
+        nick = self.request.GET.get('nick')
+
+        ranks = self.channel.kudos_set.ranks(debug=nick)
+        top_tier = ranks[:100]
+        if len(top_tier) > 20:
+            scoreboard = [r[0] for r in random.sample(top_tier, 20)]
+        elif len(top_tier) > 4:
+            scoreboard = random.shuffle([r[0] for r in ranks])
+        else:
+            scoreboard = None
+        kwargs.update({
+            'random_scoreboard': scoreboard,
+        })
+
+        try:
+            channel_kudos = self.channel.kudostotal
+        except KudosTotal.DoesNotExist:
+            channel_kudos = None
+        if channel_kudos and channel_kudos.message_count:
+            if channel_kudos.message_count > 1000000:
+                kwargs['channel_messages'] = humanize.intword(
+                    channel_kudos.message_count)
+            else:
+                kwargs['channel_messages'] = humanize.intcomma(
+                    channel_kudos.message_count)
+            kwargs['channel_kudos_perc'] = '{:.2%}'.format(
+                channel_kudos.appreciation)
+
+        if nick:
+            nick_lower = nick.lower()
+            details = None
+            for rank_nick, alltime, info in ranks:
+                if rank_nick == nick_lower:
+                    details = {
+                        'alltime': alltime,
+                        'alltime_perc': self.rounded_percentage(
+                            alltime, len(ranks)),
+                        'current': info['current_rank'],
+                        'current_perc': self.rounded_percentage(
+                            info['current_rank'], len(ranks)),
+                    }
+                    break
+            kwargs['search'] = {'nick': nick, 'details': details}
+
+        return super(ChannelKudos, self).get_context_data(**kwargs)

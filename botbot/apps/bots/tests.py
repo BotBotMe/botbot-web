@@ -57,6 +57,15 @@ class ModelTests(BaseTestCase):
         self.assertFalse(self.private_channel.user_can_access(self.outsider))
         self.assertFalse(self.private_channel.user_can_access(AnonymousUser))
 
+    def test_member_get_quantity_per_membership_kind(self):
+        self.assertEqual(
+            len(self.member.get_quantity_per_membership_kind()),
+            1)
+        for k, v in {'kind': u'personal', 'quantity': 1}.items():
+            self.assertEqual(
+                self.member.get_quantity_per_membership_kind()[0][k], v)
+
+
 
 class UrlTests(BaseTestCase):
 

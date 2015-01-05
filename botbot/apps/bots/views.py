@@ -9,12 +9,12 @@ from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.core.mail import mail_admins
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
-from django.views.generic import DeleteView, TemplateView, View, CreateView, FormView
+from django.views.generic import (DeleteView, TemplateView, View,
+                                  CreateView, FormView)
 from django import http
-from django.db.models import Q
 
 from botbot.apps.accounts import models as accounts_models
 from botbot.apps.plugins import forms as plugins_forms
@@ -110,7 +110,6 @@ class ChannelMixin(object):
                     kwargs=kwargs
                 ))
 
-
         raise http.Http404("No such channel / network combination")
 
 
@@ -133,8 +132,8 @@ class AddChannel(CreateView):
         channel.
         """
         response = super(AddChannel, self).form_valid(*args, **kwargs)
-        self.object.membership_set.create(user=self.request.user,
-            is_admin=True, is_owner=True)
+        self.object.membership_set.create(
+            user=self.request.user, is_admin=True, is_owner=True)
         self.object.create_default_plugins()
         return response
 
@@ -187,12 +186,12 @@ class ManageChannel(ChannelMixin, TemplateView):
         else:
             data = None
         self._forms = {
-            'form': forms.ChannelForm(data=data, instance=self.channel,
-                prefix='cb'),
-            'plugin_form': plugins_forms.PluginsForm(self.channel, data=data,
-                prefix='plgn'),
-            'users_form': forms.UsersForm(self.channel, data=data,
-                prefix='usrs'),
+            'form': forms.ChannelForm(
+                data=data, instance=self.channel, prefix='cb'),
+            'plugin_form': plugins_forms.PluginsForm(
+                self.channel, data=data, prefix='plgn'),
+            'users_form': forms.UsersForm(
+                self.channel, data=data, prefix='usrs'),
         }
         return self._forms
 
@@ -242,8 +241,8 @@ class SuggestUsers(View):
             results = [{'label': u['email'], 'value': u['pk']} for u in users]
         else:
             results = []
-        return http.HttpResponse(json.dumps(results),
-            content_type='application/json')
+        return http.HttpResponse(
+            json.dumps(results), content_type='application/json')
 
 
 class RequestChannel(FormView):
@@ -255,16 +254,18 @@ class RequestChannel(FormView):
         bot = form.cleaned_data['server']
         connection = form.cleaned_data['connection']
         if bot is None:
-            bot, _ = models.ChatBot.objects.get_or_create(server=connection,
-                                              defaults={"is_active" : False})
+            bot, _ = models.ChatBot.objects.get_or_create(
+                server=connection, defaults={"is_active": False})
         slug = slugify(form.cleaned_data['channel_name'])
-        channel = models.Channel.objects.create(name=form.cleaned_data['channel_name'],
-                                      chatbot=bot, slug=slug,
-                                      is_active=False, is_pending=True)
+        channel = models.Channel.objects.create(
+            name=form.cleaned_data['channel_name'], chatbot=bot, slug=slug,
+            is_active=False, is_pending=True, is_public=True)
         channel.create_default_plugins()
         message = render_to_string('bots/emails/request.txt',
                                    {"data": form.cleaned_data})
-        mail_admins("Channel Request", message)
+        send_mail("Channel Request", message,
+                  settings.DEFAULT_FROM_EMAIL,
+                  [a[1] for a in settings.ADMINS], fail_silently=True)
         return super(RequestChannel, self).form_valid(form)
 
 
@@ -274,8 +275,9 @@ class ChannelList(ListView):
 
     def get_queryset(self, *args, **kwargs):
         qs = super(ChannelList, self).get_queryset(*args, **kwargs)
-        return qs.filter(chatbot__slug=self.kwargs['network_slug'], is_public=True,
-                  is_active=True)
+        return qs.filter(
+            chatbot__slug=self.kwargs['network_slug'],
+            is_public=True, is_active=True)
 
     def get_context_data(self, **kwargs):
         data = super(ChannelList, self).get_context_data(**kwargs)

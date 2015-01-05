@@ -1,0 +1,436 @@
+/*
+  LAYOUT AND FRAMING
+*/
+
+body.account-view {
+  #Site-Footer { // TODO: ids are horrible
+    text-align: center;
+  }
+
+  #Site-Footer .support {
+    float: none;
+  }
+}
+
+// Helpers, if we get stuck
+.account-content-wrap {
+  padding: 0 2rem 1rem;
+}
+
+.page-main {
+  margin-top: 80px; // TODO: Refactor
+  margin-bottom: 3rem;
+}
+
+body.account-view #Site-Footer,
+.account-content,
+.account-nav {
+  // Setup our base layout, no more than 840px
+  margin: 0 auto;
+  max-width: 840px;
+}
+
+.account-content {
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.account-body {
+  // We always assume we have a page header
+  padding: 0 2rem 2rem;
+}
+
+.account-header *,
+.account-body * {
+  line-height: 1.5; // TODO: This should be everywhere
+}
+
+// Account Headers
+.account-header {
+  margin-top: 0; // BOOTFIX: Overrides .page-header
+  padding: 3rem 2rem 2rem;
+}
+
+.account-header .page-title {
+  margin-bottom: 1rem;
+}
+
+.account-header-intro {
+  font-size: 17px;
+}
+
+// Just in case we have a paragraph or something
+.account-header > *:last-child {
+  margin-bottom: 0;
+}
+
+/*
+  ACCOUNT NAVIGATION
+*/
+.account-nav {
+  display: -webkit-flex;
+  display: flex;
+
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+
+  align-items: flex-end;
+}
+
+.nav-item {
+  position: relative;
+  display: inline-block;
+
+  -webkit-flex: 1 1 8em;
+  flex: 1 1 8em;
+
+  height: 1.75em;
+  padding: .5em 1em;
+
+  border-top: 1px solid #ddd;
+  background-color: #e9e9e9;
+}
+
+.nav-item-label {
+  position: absolute;
+  left: 1em;
+  bottom: .5em;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.nav-item:hover {
+  text-decoration: none;
+}
+
+.nav-item [class^="icon-"] {
+  display: inline-block;
+  margin-top: -4px; // Massaging the placement
+  margin-right: .35em;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+.account-nav.nav-dashboard .nav-dashboard,
+.account-nav.nav-billing .nav-billing,
+.account-nav.nav-account .nav-account,
+.account-nav.nav-channels .nav-channels,
+.nav-item.is-active {
+  height: 2.25em;
+  background: #fff;
+  border-top: 3px solid @highlight1;
+}
+
+// Third-party buttons for authentication
+.socialaccount_providers {
+  margin-left: 0;
+  padding: 1rem 0;
+}
+
+.socialaccount_providers li,
+.socialaccount_provider {
+  display: inline-block;
+}
+
+.socialaccount_provider {
+  // TODO: These *should* be buttons
+  padding: 4px 10px 4px;
+  margin-bottom: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: #333;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: 1px solid #cccccc;
+  border-bottom-color: #b3b3b3;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+}
+
+.socialaccount_provider:hover {
+  text-decoration: none;
+  background: #b3b3b3;
+  color: #111;
+}
+
+// Form Styles
+.form-actions {
+  margin-top: 0;
+  padding: 1rem 2rem;
+  background: #e9e9e9;
+  border-top: 1px solid #e5e5e5;
+}
+
+.form-actions .btn {
+  margin-right: 1em;
+}
+
+.form-actions > *:last-child {
+  margin-right: 0;
+}
+
+/* CHANNEL LISTING */
+.account-channel-list-lead {
+  display: -webkit-flex;
+  display: flex;
+
+  margin-bottom: 3rem;
+
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.channel-list-count {
+  margin-bottom: 1rem;
+  font-size: 18px;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+.add-channel-block {
+  text-align: right;
+}
+
+.account-channel-item .channel-name {
+  margin-bottom: .5em;
+  font-size: 22px;
+}
+
+.account-channel-list {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+
+  justify-content: flex-start;
+}
+
+.account-channel-list .account-channel-item {
+  margin-right: 3rem;
+  margin-bottom: 2rem;
+  flex: 1 1 30%;
+}
+
+/* WELCOME SCREEN */
+body.welcome-page {
+  .account-header {
+    text-align: center;
+  }
+}
+
+.accounts-benefits-list li {
+  margin-bottom: .5rem;
+  list-style: disc;
+}
+
+
+//------- OLD STUFF ----------//
+
+.label-active {
+    background: #7fc07b;
+}
+.label-active {
+    background: #a9c0a7
+}
+
+.messages {
+    margin: 0;
+}
+
+.public-channels {
+    li { display: inline;}
+}
+
+.predefined-channels {
+  display: block;
+  margin: 30px 0 11px 0px;
+
+  li {
+    float: left;
+    width: 25%;
+    line-height: 25px;
+
+    .channel-item {
+      box-sizing: border-box;
+      border: 1px solid  #ccc;
+      background-color: #fff;
+      cursor: pointer;
+      padding: 5px 10px;
+      margin: 0 5px 5px 0;
+      font-size: 12px;
+      line-height: 1.5;
+      border-radius: 3px;
+      color: #848484;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      -moz-transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      -o-transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      -ms-transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+
+      a {
+        color: #848484;
+        text-decoration: none;
+
+        .channel-name {
+          width: 95%;
+          display: inline-block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        -webkit-backface-visibility: hidden;
+
+      }
+      &:hover {
+        color:#fff;
+        background-color: #337ab7;
+        border-color: #2e6da4;
+        opacity: 0.8;
+        a {
+          color: #fff;
+        }
+      }
+      .icon-bbchannel {
+        color: #ccc;
+      }
+      .icon-bbchannel::before {
+        content: "\f096";
+      }
+      &.remove-channel {
+        color: #fff;
+        background-color: #337ab7;
+        border-color: #2e6da4;
+        .icon-bbchannel::before {
+          content: "\f046";
+        }
+        .icon-bbchannel {
+          color: #fff;
+        }
+        a {
+          color: #fff;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+}
+
+#pricing {
+  text-align: center;
+
+  .pricing-plans {
+    margin-top: 50px;
+  }
+
+  .plan {
+    box-sizing: border-box;
+    width: 25%;
+    display: block;
+    float: left;
+    margin-top: 0px;
+    // @include gutters(12 inside);
+    position: relative;
+
+    background-color: #f7f7f7;
+    color: #454545;
+    padding: 14px;
+    border-right: 1px solid #e1e1e1;
+    border-bottom: 1px solid #e1e1e1;
+    border-top: 5px solid #333;
+
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    -ms-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    .btn {
+      color: #fff;
+      text-shadow: none;
+    }
+    &:hover {
+      top: -10px;
+      box-shadow: 0px 0px 12px rgba(0,0,0,0.2);
+    }
+
+    ul {
+      margin: 0;
+    }
+
+    &.best-value {
+      position: relative;
+      top: -10px;
+      background-color: #fff;
+      border-top: 5px solid #333;
+
+      &:hover {
+        top: -20px;
+      }
+
+      .btn {
+        color: #fff;
+        background: #333;
+      }
+    }
+
+
+
+    .price {
+      font-weight: bold;
+      font-size: 23px;
+      float: left;
+      width: 100%;
+      margin-bottom: 35px;
+      margin-top: 35px;
+
+      .dollar, .amount, .slash, .month {
+        display: inline-block;
+        position: relative;
+      }
+
+      .dollar {
+        top:-28px;
+        letter-spacing: -1px;
+        left: 3px;
+      }
+
+      .amount {
+        font-size:70px;
+      }
+
+      .slash {
+        left: -6px;
+      }
+
+      .month {
+        left: -12px;
+      }
+    }
+
+    .best-plan, .best-plan-sign {
+      display: inline-block;
+      position: relative;
+    }
+
+    .best-plan {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .best-plan-sign {
+      right:  6px;
+    }
+  }
+}

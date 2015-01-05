@@ -18,6 +18,6 @@ before_script:
   - "psql -c 'create database botbot;' -U postgres"
   - "psql -c 'create extension hstore;' -U postgres botbot"
   - "psql -c 'create extension hstore;' -U postgres template1"
-  - "echo 'DATABASE_URL=postgres://postgres@localhost:5432/botbot' >> .env"
+  - "echo 'STORAGE_URL=postgres://postgres@localhost:5432/botbot' >> .env"
   - "manage.py collectstatic --noinput"
 script: "manage.py test"

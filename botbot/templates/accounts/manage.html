@@ -1,19 +1,27 @@
-{% extends "base.html" %}
+{% extends "account/base.html" %}
 
 {% block head_title %}Settings {{ block.super }}{% endblock %}
+{% block account_active %}active{% endblock %}
 
 {% block content %}
-	<div class="page-header">
-		<h1>Settings</h1>
-	</div>
-    <p>Give yourself a username so other users can find you. If it's available, use the same username you use in your chatroom.</p>
+	<header class="page-header account-header">
+		<h1 class="page-title">Account</h1>
 
-    <form action="." method="post">{% csrf_token %}
-    	{% for field in form %}
-        	{% include "includes/field.html" with field=field %}
-        {% endfor %}
-        <p class="actions">
-        	<button type="submit" class="btn">Update</button>
-        </p>
-    </form>
+		{#<p class="account-header-intro">Give yourself a username so other users can find you. If it's available, use the same username you use in your channel.</p>#}
+	</header>
+
+
+  <form class="manage" id="manage_form" method="post" action=".">
+    {% csrf_token %}
+
+		<div class="account-body">
+  	{% for field in form %}
+      	{% include "includes/field.html" with field=field %}
+      {% endfor %}
+		</div>
+
+    <div class="form-actions">
+    	<button type="submit" class="btn btn-primary">Update</button>
+    </div>
+  </form>
 {% endblock content %}
