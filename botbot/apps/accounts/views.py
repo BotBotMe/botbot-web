@@ -106,6 +106,7 @@ class Dashboard(TemplateView):
                 .filter(is_public=False, membership__user=self.request.user)
         return data
 
+
 class SetTimezone(View):
     """
     Set the current timezone.
