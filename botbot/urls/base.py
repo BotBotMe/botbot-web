@@ -13,6 +13,8 @@ channel_patterns = patterns('',
 urlpatterns = patterns('django.shortcuts',
     url(r'^terms/$', 'render', {'template_name': 'terms.html'}),
     url(r'^privacy/$', 'render', {'template_name': 'privacy.html'}),
+    url(r'^how-to-setup-irc-channel/$', 'render', {
+        'template_name': 'howto.html'}),
 )
 
 if settings.INCLUDE_DJANGO_ADMIN:
@@ -21,13 +23,6 @@ if settings.INCLUDE_DJANGO_ADMIN:
     urlpatterns = admin_urlpatterns + urlpatterns
 
 if settings.DEBUG:
-    import os
-    urlpatterns = patterns('django.views.static',
-        url(r'^how-to-setup-irc-channel/$', 'serve', {
-            'document_root': os.path.join(settings.PROJECT_DIR, 'static'),
-            'path': 'howto.html'
-        }),
-    ) + urlpatterns
     urlpatterns += patterns('django.shortcuts',
         url(r'^404/$', 'render', {'template_name': '404.html'}),
         url(r'^500/$', 'render', {'template_name': '500.html'}),
