@@ -27,7 +27,7 @@
     </a>
 
     <a
-      href="{% url 'settings_channels' %}"
+      href="{% url 'account_channels' %}"
       class="nav-item nav-channels {% if breadcrumb == 'my_channels' %}is-active{% endif %}">
       <span class="nav-item-label">
         <i class="icon-th"></i>My Channels
@@ -42,12 +42,7 @@
       </span>
       </a>
 
-    <a
-      href="{% url 'payments_customer_detail' %}"
-      class="nav-item nav-billing {% if breadcrumb == 'billing' %}is-active{% endif %}">
-      <span class="nav-item-label">
-        <i class="icon-inbox"></i> Billing
-      </span>
+      {% block extra_outer_account_nav %}{% endblock %}
     </a>
   </nav>
   {% endif %}
