@@ -58,7 +58,7 @@ class DashboardTests(AccountMixin, TestCase):
     """
     url = reverse_lazy('settings_dashboard')
 
-    def test_anon_template(self):
+    def test_template_used(self):
         """
         Ensure anonymous users are served the correct template
         """
@@ -67,6 +67,47 @@ class DashboardTests(AccountMixin, TestCase):
 
         for var in ('admin_channels', 'private_channels'):
             self.assertTrue(var not in response.context.keys())
+
+        self.assertTemplateUsed(response, 'accounts/anon_dashboard.html')
+
+        self.client.login(username="dupont éîïè", password='secret')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+        for var in ('admin_channels', 'private_channels'):
+            self.assertIn(var, response.context.keys())
+
+        self.assertTemplateUsed(response, 'accounts/user_dashboard.html')
+
+
+class ChannelsTests(AccountMixin, TestCase):
+    """
+    Test the dashboard for anon & authenticated users.
+    """
+    url = reverse_lazy('account_channels')
+
+    def test_template_used(self):
+        """
+        Ensure anonymous users are served the correct template
+        """
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        for var in ('admin_channels', 'private_channels'):
+            self.assertTrue(var not in response.context.flatten().keys())
+
+        self.assertTrue('login_form' in response.context.flatten().keys())
+        self.assertTemplateUsed(response, 'accounts/anon_channels.html')
+
+        self.client.login(username="dupont éîïè", password='secret')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+        for var in ('admin_channels', 'private_channels'):
+            self.assertIn(var, response.context.keys())
+
+        self.assertTemplateUsed(response, 'accounts/user_channels.html')
 
 
 class SetTimezoneTests(AccountMixin, TestCase):

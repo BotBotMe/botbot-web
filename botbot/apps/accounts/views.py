@@ -66,13 +66,16 @@ class Channels(TemplateView):
         """
         data = super(Channels, self).get_context_data(**kwargs)
         data['public_channels'] = bots_models.Channel.objects \
-            .filter(is_public=True)
+            .filter(is_public=True) \
+            .select_related('chatbot')
         if self.request.user.is_authenticated():
             data['admin_channels'] = bots_models.Channel.objects \
                 .filter(membership__user=self.request.user,
-                        membership__is_admin=True)
+                        membership__is_admin=True) \
+                .select_related('chatbot')
             data['private_channels'] = bots_models.Channel.objects \
-                .filter(is_public=False, membership__user=self.request.user)
+                .filter(is_public=False, membership__user=self.request.user) \
+                .select_related('chatbot')
         elif 'login' in self.request.GET:
             data['login_form'] = AuthenticationForm()
         return data
