@@ -108,6 +108,44 @@ class ChannelsTests(AccountMixin, TestCase):
         self.assertContains(response, 'Private')
 
 
+class ManageAccountTests(AccountMixin, TestCase):
+    """
+    Test the manage account view.
+    """
+    url = reverse_lazy('settings_account')
+
+    def test_logged_out(self):
+        """
+        A logged out user should be redirected.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_update_account(self):
+        """
+        Ensure an account is updated.
+        """
+        self.client.login(username='Marie Thérèse', password='secret')
+
+        response = self.client.get(self.url)
+        instance = response.context['form'].instance
+
+        self.assertEqual(self.outsider, instance)
+
+        data = {
+            'username': 'marie',
+            'nick': 'marie',
+            'timezone': self.outsider.timezone
+        }
+
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        user = account_models.User.objects.get(pk=self.outsider.pk)
+        self.assertEqual(user.username, 'marie')
+        self.assertEqual(user.nick, 'marie')
+
+
 class SetTimezoneTests(AccountMixin, TestCase):
     """
     Test Setting timezone
