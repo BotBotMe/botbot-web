@@ -87,17 +87,15 @@ class ChannelsTests(AccountMixin, TestCase):
     """
     url = reverse_lazy('account_channels')
 
-    def test_template_used(self):
+    def test_template_context_variables(self):
         """
-        Ensure anonymous users are served the correct template
+        Ensure anonymous users are served the correct context vars.
         """
         response = self.client.get(self.url)
         self.assertEquals(response.status_code, 200)
         for var in ('admin_channels', 'private_channels'):
-            self.assertTrue(var not in response.context.flatten().keys())
-
-        self.assertTrue('login_form' in response.context.flatten().keys())
-        self.assertTemplateUsed(response, 'accounts/anon_channels.html')
+            self.assertTrue(var not in response.context.keys())
+        self.assertNotContains(response, 'Private')
 
         self.client.login(username="dupont éîïè", password='secret')
 
@@ -107,7 +105,7 @@ class ChannelsTests(AccountMixin, TestCase):
         for var in ('admin_channels', 'private_channels'):
             self.assertIn(var, response.context.keys())
 
-        self.assertTemplateUsed(response, 'accounts/user_channels.html')
+        self.assertContains(response, 'Private')
 
 
 class SetTimezoneTests(AccountMixin, TestCase):

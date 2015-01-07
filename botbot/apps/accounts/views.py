@@ -51,14 +51,7 @@ class Channels(TemplateView):
     """
     The channels page, for both anonymous and authenticated users.
     """
-
-    def get_template_names(self):
-        """
-        Use the user or anonymous dashboard template.
-        """
-        if self.request.user.is_authenticated():
-            return 'accounts/user_channels.html'
-        return 'accounts/anon_channels.html'
+    template_name = 'accounts/user_channels.html'
 
     def get_context_data(self, **kwargs):
         """
@@ -76,8 +69,6 @@ class Channels(TemplateView):
             data['private_channels'] = bots_models.Channel.objects \
                 .filter(is_public=False, membership__user=self.request.user) \
                 .select_related('chatbot')
-        elif 'login' in self.request.GET:
-            data['login_form'] = AuthenticationForm()
         return data
 
 
