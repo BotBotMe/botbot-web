@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('bots', '0001_initial'),
-        ('accounts', '0001_initial'),
+        ('accounts', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('plugins', '0001_initial'),
     ]
@@ -29,6 +29,26 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='channel',
-            unique_together=set([('slug', 'chatbot')]),
+            unique_together=set([('slug', 'chatbot'), ('name', 'chatbot')]),
+        ),
+        migrations.CreateModel(
+            name='PersonalChannels',
+            fields=[
+            ],
+            options={
+                'verbose_name': 'Pending Personal Channel',
+                'proxy': True,
+            },
+            bases=('bots.channel',),
+        ),
+        migrations.CreateModel(
+            name='PublicChannels',
+            fields=[
+            ],
+            options={
+                'verbose_name': 'Pending Public Channel',
+                'proxy': True,
+            },
+            bases=('bots.channel',),
         ),
     ]
