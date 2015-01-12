@@ -31,6 +31,7 @@
     <object data="{{ STATIC_URL }}img/evil-logo-large.svg" type="image/svg+xml" class="logo-standalone wiggler"></object>
 
     <article>
+        {% include "includes/navigation.html" %}
         {% include "includes/header.html" %}
         {% block content %}{% endblock content %}
         {% include "includes/footer.html" %}
