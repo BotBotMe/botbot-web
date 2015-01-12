@@ -39,7 +39,7 @@ class ManageAccount(FormView):
             if not self.password_form.is_valid():
                 form = self.get_form(self.get_form_class())
                 return self.form_invalid(form)
-            return super(ManageAccount, self).post(request, *args, **kwargs)
+        return super(ManageAccount, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ManageAccount, self).get_context_data(**kwargs)
