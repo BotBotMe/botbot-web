@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -24,11 +24,28 @@ class ManageAccount(FormView):
         """
         return super(ManageAccount, self).dispatch(*args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        self.password_form = self.get_password_form()
+        return super(ManageAccount, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('change_password_toggle'):
+            """
+            Since we're dealing with multiple forms in the template,
+            check the password form here, and if it is invalid,
+            return to the template
+            """
+            self.password_form = self.get_password_form()
+            if not self.password_form.is_valid():
+                form = self.get_form(self.get_form_class())
+                return self.form_invalid(form)
+            return super(ManageAccount, self).post(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(ManageAccount, self).get_context_data(**kwargs)
         context['breadcrumb'] = 'account'
+        context['password_form'] = self.password_form
         return context
-
 
     def get_success_url(self):
         return reverse('settings_account')
@@ -39,9 +56,18 @@ class ManageAccount(FormView):
         form_kwargs['instance'] = self.request.user
         return form_kwargs
 
+    def get_password_form(self):
+        return SetPasswordForm(user=self.request.user,
+            data=self.request.POST or None, prefix='password-form')
+
     def form_valid(self, form, *args, **kwargs):
         response = super(ManageAccount, self).form_valid(form, *args, **kwargs)
         form.save()
+
+        if self.request.POST.get('change_password_toggle'):
+            # the password form is already instantiated in ``post``
+            self.password_form.save()
+
         self.request.session['django_timezone'] = form.instance.timezone
         messages.success(self.request, 'Account details updated.')
         return response
