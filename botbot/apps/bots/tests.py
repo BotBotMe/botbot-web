@@ -145,13 +145,13 @@ class UrlTests(BaseTestCase):
                 self.assertNotIn(name, channel_url)
 
     def test_dashboard_annonymous_get(self):
-        url = reverse("dashboard")
+        url = reverse("settings_dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_dashboard_authenticated_get(self):
         self.client.login(username=self.member.username, password="secret")
-        url = reverse("dashboard")
+        url = reverse("settings_dashboard")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -174,7 +174,7 @@ class UrlTests(BaseTestCase):
         url = utils.reverse_channel(self.private_channel, "delete_channel")
         response = self.client.post(url, {})
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("dashboard"))
+        self.assertRedirects(response, reverse("settings_dashboard"))
         self.assertEqual(models.Channel.objects.count(), channel_count - 1)
         with self.assertRaises(models.Channel.DoesNotExist):
             models.Channel.objects.get(id=self.private_channel.id)

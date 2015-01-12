@@ -1,16 +1,12 @@
 {% extends "base.html" %}
 {% load channel_url assets logs_tags%}
-{% load ad_tags %}
-
 
 {% block head_title %}IRC Logs for {{ channel.name }} {{ block.super }}{% endblock %}
-{% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}{% get_ads_by_kind channel=channel as channel_ads %}
-{% if channel_ads %} display_bbsponsor{% endif %}{% endblock %}
+{% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}{% endblock %}
 
 {% block content_outer %}
 
     <header id="Log-Header">
-      {{channel_ads}}
         <a href="/dashboard/" class="brand-btn">
             <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
         </a>
@@ -105,21 +101,6 @@
           </ul>
         </nav>
         {% endif %}
-
-        {% get_ads_by_kind channel=channel as channel_ads %}
-
-        {% if channel_ads %}
-              {% for ad in channel_ads.Right %}
-              <a href="{{ad.url}}">
-                <div class="bbsponsor-area" style="background: {{ ad.bg_color }} ">
-                  <div class="bbsponsor vertical">
-                    <img src="{{ ad.image.url }}" alt="bbsponsor-image">
-                  </div>
-                </div>
-              </a>
-              {% endfor %}
-        {% endif %}
-
       </div>
       {% endblock content %}
     </div>
