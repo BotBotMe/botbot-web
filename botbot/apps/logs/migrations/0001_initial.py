@@ -8,7 +8,7 @@ import djorm_pgfulltext.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bots', '__first__'),
+        ('bots', '0001_initial'),
     ]
 
     operations = [
