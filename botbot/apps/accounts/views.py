@@ -51,14 +51,7 @@ class Channels(TemplateView):
     """
     The channels page, for both anonymous and authenticated users.
     """
-
-    def get_template_names(self):
-        """
-        Use the user or anonymous dashboard template.
-        """
-        if self.request.user.is_authenticated():
-            return 'accounts/user_channels.html'
-        return 'accounts/anon_channels.html'
+    template_name = 'accounts/user_channels.html'
 
     def get_context_data(self, **kwargs):
         """
@@ -66,15 +59,16 @@ class Channels(TemplateView):
         """
         data = super(Channels, self).get_context_data(**kwargs)
         data['public_channels'] = bots_models.Channel.objects \
-            .filter(is_public=True)
+            .filter(is_public=True) \
+            .select_related('chatbot')
         if self.request.user.is_authenticated():
             data['admin_channels'] = bots_models.Channel.objects \
                 .filter(membership__user=self.request.user,
-                        membership__is_admin=True)
+                        membership__is_admin=True) \
+                .select_related('chatbot')
             data['private_channels'] = bots_models.Channel.objects \
-                .filter(is_public=False, membership__user=self.request.user)
-        elif 'login' in self.request.GET:
-            data['login_form'] = AuthenticationForm()
+                .filter(is_public=False, membership__user=self.request.user) \
+                .select_related('chatbot')
         return data
 
 
@@ -97,13 +91,16 @@ class Dashboard(TemplateView):
         """
         data = super(Dashboard, self).get_context_data(**kwargs)
         data['public_channels'] = bots_models.Channel.objects \
-            .filter(is_public=True)
+            .filter(is_public=True)\
+            .select_related('chatbot')
         if self.request.user.is_authenticated():
             data['admin_channels'] = bots_models.Channel.objects \
                 .filter(membership__user=self.request.user,
-                        membership__is_admin=True)
+                        membership__is_admin=True)\
+                .select_related('chatbot')
             data['private_channels'] = bots_models.Channel.objects \
-                .filter(is_public=False, membership__user=self.request.user)
+                .filter(is_public=False, membership__user=self.request.user)\
+                .select_related('chatbot')
         return data
 
 

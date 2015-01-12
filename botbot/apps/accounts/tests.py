@@ -58,7 +58,7 @@ class DashboardTests(AccountMixin, TestCase):
     """
     url = reverse_lazy('settings_dashboard')
 
-    def test_anon_template(self):
+    def test_template_used(self):
         """
         Ensure anonymous users are served the correct template
         """
@@ -67,6 +67,83 @@ class DashboardTests(AccountMixin, TestCase):
 
         for var in ('admin_channels', 'private_channels'):
             self.assertTrue(var not in response.context.keys())
+
+        self.assertTemplateUsed(response, 'accounts/anon_dashboard.html')
+
+        self.client.login(username="dupont éîïè", password='secret')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+        for var in ('admin_channels', 'private_channels'):
+            self.assertIn(var, response.context.keys())
+
+        self.assertTemplateUsed(response, 'accounts/user_dashboard.html')
+
+
+class ChannelsTests(AccountMixin, TestCase):
+    """
+    Test the dashboard for anon & authenticated users.
+    """
+    url = reverse_lazy('account_channels')
+
+    def test_template_context_variables(self):
+        """
+        Ensure anonymous users are served the correct context vars.
+        """
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+        for var in ('admin_channels', 'private_channels'):
+            self.assertTrue(var not in response.context.keys())
+        self.assertNotContains(response, 'Private')
+
+        self.client.login(username="dupont éîïè", password='secret')
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+        for var in ('admin_channels', 'private_channels'):
+            self.assertIn(var, response.context.keys())
+
+        self.assertContains(response, 'Private')
+
+
+class ManageAccountTests(AccountMixin, TestCase):
+    """
+    Test the manage account view.
+    """
+    url = reverse_lazy('settings_account')
+
+    def test_logged_out(self):
+        """
+        A logged out user should be redirected.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_update_account(self):
+        """
+        Ensure an account is updated.
+        """
+        self.client.login(username='Marie Thérèse', password='secret')
+
+        response = self.client.get(self.url)
+        instance = response.context['form'].instance
+
+        self.assertEqual(self.outsider, instance)
+
+        data = {
+            'username': 'marie',
+            'nick': 'marie',
+            'timezone': self.outsider.timezone
+        }
+
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        user = account_models.User.objects.get(pk=self.outsider.pk)
+        self.assertEqual(user.username, 'marie')
+        self.assertEqual(user.nick, 'marie')
 
 
 class SetTimezoneTests(AccountMixin, TestCase):
