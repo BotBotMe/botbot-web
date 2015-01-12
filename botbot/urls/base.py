@@ -11,10 +11,13 @@ channel_patterns = patterns('',
 )
 
 urlpatterns = patterns('django.shortcuts',
-    url(r'^terms/$', 'render', {'template_name': 'terms.html'}),
-    url(r'^privacy/$', 'render', {'template_name': 'privacy.html'}),
+    url(r'^terms/$', 'render', {'template_name': 'terms.html'},
+        name='terms'),
+    url(r'^privacy/$', 'render', {'template_name': 'privacy.html'},
+        name='privacy'),
     url(r'^how-to-setup-irc-channel/$', 'render', {
-        'template_name': 'howto.html'}),
+        'template_name': 'howto.html'},
+        name='how-to'),
 )
 
 if settings.INCLUDE_DJANGO_ADMIN:
@@ -31,6 +34,7 @@ if settings.DEBUG:
 urlpatterns += patterns('',
     (r'^$', LandingPage.as_view()),
     (r'', include('launchpad.urls')),
+    url(r'^sitemap\.xml$', include('botbot.apps.sitemap.urls')),
     url(r'^add/$', AddChannel.as_view(), name="add_channel"),
     url(r'^request/$', RequestChannel.as_view(), name='request_channel'),
     url(r'^request/success/$', 'django.shortcuts.render',
