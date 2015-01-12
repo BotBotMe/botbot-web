@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
                 ('is_pending', models.BooleanField(default=False)),
                 ('is_featured', models.BooleanField(default=False)),
                 ('fingerprint', models.CharField(max_length=36, null=True, blank=True)),
+                ('public_kudos', models.BooleanField(default=True)),
             ],
             options={
                 'ordering': ('name',),
@@ -44,6 +45,7 @@ class Migration(migrations.Migration):
                 ('password', models.CharField(help_text=b'Password to identify with NickServ. Optional.', max_length=100, null=True, blank=True)),
                 ('real_name', models.CharField(help_text=b'Usually a URL with information about this bot.', max_length=250)),
                 ('slug', models.CharField(max_length=50, db_index=True)),
+                ('max_channels', models.IntegerField(default=200)),
             ],
             options={
             },
