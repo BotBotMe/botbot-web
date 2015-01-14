@@ -58,10 +58,22 @@ class Line(object):
         if not hasattr(self, '_channel_cache'):
             cache_key = 'channel:{0}-{1}'.format(self._chatbot_id, self._channel_name)
             channel = cache.get(cache_key)
+
             if not channel and self._channel_name.startswith("#"):
                 channel = self._chatbot.channel_set.get(
                     name=self._channel_name)
                 cache.set(cache_key, channel, CACHE_TIMEOUT_2H)
+
+                """
+                The following logging is to help out in sentry. For some
+                channels, we are getting occasional issues with the
+                ``channel_set.get()`` lookup above
+                """
+                LOG.debug(channel)
+                LOG.debug(self._channel_name)
+                LOG.debug(cache_key)
+                LOG.debug(", ".join([i.name for i in self._chatbot.channel_set.all()]))
+
             self._channel_cache = channel
         return self._channel_cache
 
