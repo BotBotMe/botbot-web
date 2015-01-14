@@ -72,7 +72,7 @@ class Line(object):
                 LOG.debug(channel)
                 LOG.debug(self._channel_name)
                 LOG.debug(cache_key)
-                LOG.debug("%s", ", ".join(self._chatbot.channel_set.values_list('name', flat=True))
+                LOG.debug("%s", ", ".join(self._chatbot.channel_set.values_list('name', flat=True)))
 
             self._channel_cache = channel
         return self._channel_cache
