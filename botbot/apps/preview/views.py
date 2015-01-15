@@ -8,8 +8,10 @@ class LandingPage(Signup):
     def get_context_data(self, **kwargs):
         kwargs.update({
             'featured_channels': bots_models.Channel.objects\
-                .filter(is_public=True, is_featured=True),
+                .filter(is_public=True, is_featured=True)\
+                .select_related('chatbot'),
             'public_not_featured_channels': bots_models.Channel.objects\
-                .filter(is_public=True, is_featured=False)
+                .filter(is_public=True, is_featured=False)\
+                .select_related('chatbot')
         })
         return kwargs
