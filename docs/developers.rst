@@ -56,7 +56,7 @@ If you would prefer not to use Honcho, you'll need to manage the environment var
 Then you could invoke commands and individual services like::
 
     source set_env.sh && manage.py runserver
-    source set_env.sh && botbot-bot
+    source set_env.sh && botbot-bot -v=2 -logtostderr=true
     source set_env.sh && botbot-eventsource
     source set_env.sh && manage.py run_plugins
 
@@ -145,5 +145,3 @@ You can optionally run the plugins under gevent (``pip install gevent``) which w
 .. code-block:: bash
 
     manage.py run_plugins --with-gevent
-
-

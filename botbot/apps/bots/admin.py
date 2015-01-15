@@ -63,7 +63,7 @@ class ChannelForm(forms.ModelForm):
 class ChannelAdmin(admin.ModelAdmin):
     form = ChannelForm
     list_display = ('name', 'chatbot', 'is_active',
-                    'is_public', 'is_featured', 'is_pending', 'updated')
+                    'is_public', 'is_featured', 'is_pending', 'created', 'updated')
     list_filter = ('chatbot', 'is_active', 'is_public',
                    'is_featured', 'is_pending')
     prepopulated_fields = {
@@ -88,7 +88,7 @@ class PublicChannelApproval(ChannelAdmin):
 class PersonalChannelApproval(ChannelAdmin):
     def has_add_permission(self, request):
         return False
-    
+
     def get_queryset(self, request):
         qs = super(PersonalChannelApproval, self).get_queryset(request)
         return qs.filter(is_pending=True, is_public=False)
