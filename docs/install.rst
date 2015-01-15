@@ -20,7 +20,7 @@ Postgresql with hStore extension
   * Homebrew: installed by default
   * Postgres.app: installed by default
 
-* **Ubuntu**: ``apt-get install postgresql-contrib-9.1``
+* **Ubuntu**: ``apt-get install postgresql-contrib-9.1 postgresql-server-dev-9.1 python-dev``
 
 Go
 ~~
@@ -54,6 +54,9 @@ Run in a terminal:
     # If your Postgres server requires a password, you'll need to override STORAGE_URL
     # The default database name is 'botbot'
     $EDITOR .env
+    
+    # Make the variables available to subprocesses 
+    export $(cat .env | grep -v ^# | xargs)
 
     createdb botbot
     echo "create extension hstore" | psql botbot

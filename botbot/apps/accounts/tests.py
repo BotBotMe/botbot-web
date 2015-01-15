@@ -145,6 +145,42 @@ class ManageAccountTests(AccountMixin, TestCase):
         self.assertEqual(user.username, 'marie')
         self.assertEqual(user.nick, 'marie')
 
+    def test_change_password(self):
+        """
+        Ensure the users password can be changed.
+        """
+        original_password = self.outsider.password
+        self.client.login(username='Marie Thérèse', password='secret')
+
+        response = self.client.get(self.url)
+        # password form should be in template context
+        self.assertIn('password_form', response.context)
+
+        data = {
+            'username': 'marie',
+            'nick': 'marie',
+            'timezone': self.outsider.timezone,
+            'change_password_toggle': 'yes',
+            'password-form-new_password1': 'abc',
+            'password-form-new_password2': '123'
+        }
+        response = self.client.post(self.url, data=data)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(
+            response.context['password_form'].errors,
+            {'new_password2': [u"The two password fields didn't match."]})
+
+        data.update({
+            'password-form-new_password1': 'abc123',
+            'password-form-new_password2': 'abc123',
+        })
+
+        response = self.client.post(self.url, data=data)
+        self.assertEquals(response.status_code, 302)
+        user = account_models.User.objects.get(pk=self.outsider.pk)
+
+        self.assertNotEqual(user.password, original_password)
+
 
 class SetTimezoneTests(AccountMixin, TestCase):
     """

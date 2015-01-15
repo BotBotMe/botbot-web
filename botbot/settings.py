@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.sitemaps',
 
     'bootstrap_toolkit',
 )
@@ -233,6 +234,8 @@ else:
 CACHES = {
     'default': DEFAULT_CACHE
 }
+
+CACHE_MIDDLEWARE_SECONDS = 600  # Unit is second
 
 #=============================================================================
 # Email
