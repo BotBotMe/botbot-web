@@ -131,6 +131,8 @@ class Channel(TimeStampedModel):
     fingerprint = models.CharField(max_length=36, blank=True, null=True)
     public_kudos = models.BooleanField(default=True)
 
+    notes = models.TextField(blank=True)
+
     objects = ChannelManager()
 
     def __unicode__(self):
