@@ -20,6 +20,7 @@ class Plugin(BasePlugin):
                 nick=line.user,
                 text=line.full_text,
                 room=line._channel,
+                host=line._host,
                 command=line._command,
                 raw=line._raw)
 

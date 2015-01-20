@@ -1,3 +1,5 @@
+import socket
+
 from djorm_pgfulltext.models import SearchManager
 from djorm_pgfulltext.fields import VectorField
 from django.db import models
@@ -30,6 +32,7 @@ class Log(models.Model):
     action = models.BooleanField(default=False)
 
     command = models.CharField(max_length=50, null=True, blank=True)
+    host = models.TextField(null=True, blank=True)
     raw = models.TextField(null=True, blank=True)
 
     # freenode chan name length limit is 50 chars, Campfire room ids are ints,
@@ -62,11 +65,22 @@ class Log(models.Model):
                                 {
                                     'message_list': [self],
                                 })
+    def get_ip(self):
+        if self.host:
+            if '@' in self.host:
+                h = self.host.split('@')[1]
+            else:
+                h = self.host
+        try:
+            return socket.gethostbyname(h)
+        except:
+            return ""
+
 
     def notify(self):
         """Send update to Redis queue to be picked up by SSE"""
         utils.send_event_with_id("log", self.as_html(),
-            self.timestamp.isoformat(),
+            self.timestamp.isoformat(), self.get_ip(),
             channel="channel_update:{0}".format(self.channel_id))
 
     def get_nick_color(self):

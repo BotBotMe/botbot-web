@@ -53,5 +53,13 @@
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     {% block tail %}{% endblock tail %}
+    {% assets filters="yui_js", output="gen/vendor.js", "js/vendor/andlog.js", "js/vendor/jquery-1.8.2.js", "js/vendor/bootstrap.js", "js/vendor/moment.js", "js/vendor/detect_timezone.js", "js/vendor/jquery.highlight.js", "js/vendor/waypoints.js", "js/vendor/underscore.js", "js/vendor/backbone.js" %}
+    <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% assets filters="yui_js", output="gen/app.js", "js/app/common.js", "js/app/app.js" %}
+    <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% block extra_js %}
+    {% endblock %}
 </body>
 </html>

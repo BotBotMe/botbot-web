@@ -1,5 +1,5 @@
 {% extends "landing/base.html" %}
-{% load channel_url %}
+{% load channel_url assets %}
 {% block content %}
     <section class="preview-box">
         <h3>Featured channels</h3>
@@ -11,6 +11,8 @@
 
         <p><strong>New to IRC?</strong> <a href="/how-to-setup-irc-channel/">Check out our quick start guide</a></p>
     </section>
+
+    <div id="Glob"></div>
 
     <form method="post" action="." class="teaser-form">{% csrf_token %}
 
@@ -91,3 +93,9 @@
     });
 </script>
 {% endblock tail %}
+
+{% block extra_js %}
+{% assets filters="yui_js", output="gen/glob.js", "js/app/glob/default.js" %}
+    <script src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% endblock %}
