@@ -220,7 +220,7 @@ class PluginRunner(object):
                     if hasattr(self, 'gevent'):
                         self.gevent.Greenlet.spawn(new_func, line)
                     else:
-                        new_func(line)
+                        channel_plugin.respond(new_func(line))
 
         # pass line to other routers
         if line._is_message:
