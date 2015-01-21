@@ -7,6 +7,7 @@ from django.utils.timezone import utc
 import re
 import redis
 import botbot_plugins.plugins
+from botbot_plugins.base import PrivateMessage
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -19,6 +20,7 @@ from .plugin import RealPluginMixin
 
 CACHE_TIMEOUT_2H = 7200
 LOG = logging.getLogger('botbot.plugin_runner')
+
 
 class Line(object):
     """
@@ -220,7 +222,7 @@ class PluginRunner(object):
                     if hasattr(self, 'gevent'):
                         self.gevent.Greenlet.spawn(new_func, line)
                     else:
-                        new_func(line)
+                        channel_plugin.respond(new_func(line))
 
         # pass line to other routers
         if line._is_message:
