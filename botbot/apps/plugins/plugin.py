@@ -1,6 +1,8 @@
 import logging
+from botbot_plugins.base import PrivateMessage
 
 LOG = logging.getLogger('botbot.plugin_runner')
+
 
 class RealPluginMixin(object):
     """
@@ -53,7 +55,6 @@ class RealPluginMixin(object):
     def respond(self, msg):
         """Writes message back to the channel the line was received on"""
         # Internal method, not part of public API
-        from botbot.apps.plugins.runner import PrivateMessage
         if msg:
             nick = self.channel_name
             if isinstance(msg, PrivateMessage):

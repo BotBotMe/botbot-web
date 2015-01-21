@@ -7,6 +7,7 @@ from django.utils.timezone import utc
 import re
 import redis
 import botbot_plugins.plugins
+from botbot_plugins.base import PrivateMessage
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -19,12 +20,6 @@ from .plugin import RealPluginMixin
 
 CACHE_TIMEOUT_2H = 7200
 LOG = logging.getLogger('botbot.plugin_runner')
-
-
-class PrivateMessage(object):
-    def __init__(self, nick, msg):
-        self.nick = nick
-        self.msg = msg
 
 
 class Line(object):
