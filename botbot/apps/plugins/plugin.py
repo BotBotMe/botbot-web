@@ -48,11 +48,17 @@ class RealPluginMixin(object):
     def respond(self, msg):
         """Writes message back to the channel the line was received on"""
         # Internal method, not part of public API
+        from botbot.apps.plugins.runner import PrivateMessage
         if msg:
-            lines = msg.split('\n')
+            nick = self.channel_name
+            if isinstance(msg, PrivateMessage):
+                lines= msg.msg.split('\n')
+                nick = msg.nick
+            else:
+                lines = msg.split('\n')
             for response_line in lines:
-                LOG.info('Write to %s: %s', self.channel_name, response_line)
+                LOG.info('Write to %s: %s', nick, response_line)
                 response_cmd = u'WRITE {0} {1} {2}'.format(self.chatbot_id,
-                                                           self.channel_name,
+                                                           nick,
                                                            response_line)
                 self.app.bot_bus.lpush('bot', response_cmd)

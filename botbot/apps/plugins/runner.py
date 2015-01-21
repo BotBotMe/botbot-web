@@ -20,6 +20,13 @@ from .plugin import RealPluginMixin
 CACHE_TIMEOUT_2H = 7200
 LOG = logging.getLogger('botbot.plugin_runner')
 
+
+class PrivateMessage(object):
+    def __init__(self, nick, msg):
+        self.nick = nick
+        self.msg = msg
+
+
 class Line(object):
     """
     All the methods and data necessary for a plugin to act on a line
