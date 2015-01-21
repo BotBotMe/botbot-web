@@ -40,6 +40,11 @@ class RealPluginMixin(object):
             LOG.info('Retrieved: %s=%s', key, value)
         return value
 
+    def delete(self, key):
+        """ Delete the value from Redis"""
+        ukey = self.unique_key(key)
+        return self.app.storage.delete(ukey) == 1
+
     def greenlet_respond(self, grnlt):
         """Callback for gevent return values"""
         msg = grnlt.value
