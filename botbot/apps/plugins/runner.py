@@ -7,6 +7,7 @@ from django.utils.timezone import utc
 import re
 import redis
 import botbot_plugins.plugins
+from botbot_plugins.base import PrivateMessage
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -19,6 +20,7 @@ from .plugin import RealPluginMixin
 
 CACHE_TIMEOUT_2H = 7200
 LOG = logging.getLogger('botbot.plugin_runner')
+
 
 class Line(object):
     """
@@ -59,10 +61,22 @@ class Line(object):
         if not hasattr(self, '_channel_cache'):
             cache_key = 'channel:{0}-{1}'.format(self._chatbot_id, self._channel_name)
             channel = cache.get(cache_key)
+
             if not channel and self._channel_name.startswith("#"):
                 channel = self._chatbot.channel_set.get(
                     name=self._channel_name)
                 cache.set(cache_key, channel, CACHE_TIMEOUT_2H)
+
+                """
+                The following logging is to help out in sentry. For some
+                channels, we are getting occasional issues with the
+                ``channel_set.get()`` lookup above
+                """
+                LOG.debug(channel)
+                LOG.debug(self._channel_name)
+                LOG.debug(cache_key)
+                LOG.debug("%s", ", ".join(self._chatbot.channel_set.values_list('name', flat=True)))
+
             self._channel_cache = channel
         return self._channel_cache
 
@@ -209,7 +223,7 @@ class PluginRunner(object):
                     if hasattr(self, 'gevent'):
                         self.gevent.Greenlet.spawn(new_func, line)
                     else:
-                        new_func(line)
+                        channel_plugin.respond(new_func(line))
 
         # pass line to other routers
         if line._is_message:

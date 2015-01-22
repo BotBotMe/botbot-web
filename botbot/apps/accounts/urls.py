@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url, include
 from . import views
 
 urlpatterns = patterns('',
-    # url(r'channels/$', views.Channels.as_view(), name='account_channels'),
+    url(r'channels/$', views.Channels.as_view(), name='account_channels'),
     url(r'^$', views.Dashboard.as_view(), name='settings_dashboard'),
 
     url(r'account/$', views.ManageAccount.as_view(), name='settings_account'),

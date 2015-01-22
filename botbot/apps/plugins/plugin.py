@@ -1,6 +1,8 @@
 import logging
+from botbot_plugins.base import PrivateMessage
 
 LOG = logging.getLogger('botbot.plugin_runner')
+
 
 class RealPluginMixin(object):
     """
@@ -40,6 +42,11 @@ class RealPluginMixin(object):
             LOG.info('Retrieved: %s=%s', key, value)
         return value
 
+    def delete(self, key):
+        """ Delete the value from Redis"""
+        ukey = self.unique_key(key)
+        return self.app.storage.delete(ukey) == 1
+
     def greenlet_respond(self, grnlt):
         """Callback for gevent return values"""
         msg = grnlt.value
@@ -49,10 +56,15 @@ class RealPluginMixin(object):
         """Writes message back to the channel the line was received on"""
         # Internal method, not part of public API
         if msg:
-            lines = msg.split('\n')
+            nick = self.channel_name
+            if isinstance(msg, PrivateMessage):
+                lines= msg.msg.split('\n')
+                nick = msg.nick
+            else:
+                lines = msg.split('\n')
             for response_line in lines:
-                LOG.info('Write to %s: %s', self.channel_name, response_line)
+                LOG.info('Write to %s: %s', nick, response_line)
                 response_cmd = u'WRITE {0} {1} {2}'.format(self.chatbot_id,
-                                                           self.channel_name,
+                                                           nick,
                                                            response_line)
                 self.app.bot_bus.lpush('bot', response_cmd)

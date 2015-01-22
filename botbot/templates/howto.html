@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>How to Setup A Secure Private IRC Channel | BotBot.me [o_o]</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/screen.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/howto.css" />
+    <!-- Font Awesome - http://fortawesome.github.com/Font-Awesome -->
+
+    <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Droid+Serif:400,700,700italic,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" />
+
+    </head>
+<body>
+
+<article class="markdown-body entry-content container">
+    <header id="Page-Header">
+        <div class="wrap clearfix">
+            <object data="{{ STATIC_URL }}img/evil-logo.svg" type="image/svg+xml" class="logo-standalone"></object>
+            <h1>How to Setup a <br />Secure Private IRC Channel</h1>
+            <p class="hook-cta"><a href="https://botbot.me/">Beautiful IRC logs with BotBot.me</a></p>
+        </div>
+    </header>
+
+    <div id="Content">
+
+        <p class="introduction">Overwhelmed by trying to set yourself up on IRC? Don't worry; we've got your back. By following these simple steps, you'll be up and running in less than 10 minutes. <strong>Ok, let's dive in!</strong></p>
+        <p><em>Note:</em> This guide is geared towards the <a href="http://freenode.net/">Freenode</a> IRC network, but with a few small tweaks should work against most public IRC networks.</p>
+
+        <h2>
+            <a name="step-0-are-you-eligible" class="anchor" href="#step-0-are-you-eligible"><span class="mini-icon mini-icon-link"></span></a>
+            <strong>Step <span class="step-number">0</span> &dash;</strong> Are you Eligible?
+        </h2>
+
+        <p>Freenode is primarily a network for people involved in open source software. Read Freenode's guidelines to determine whether you are <a href="http://freenode.net/policy.shtml#ontopic">on topic</a> before getting started. Although we are a private company, we work on open source code, and that is sufficient to claim eligibility.</p>
+
+        <h2>
+            <a name="step-1-register-yourself-on-freenode" class="anchor" href="#step-1-register-yourself-on-freenode"><span class="mini-icon mini-icon-link"></span></a>
+            <strong>Step <span class="step-number">1</span> &dash;</strong> Register Yourself on Freenode
+        </h2>
+
+        <p>Open your IRC client (see <a href="#recommended-clients">our recommended clients</a>), and setup a connection to Freenode. If there isn't already a preset for it, use the following settings:</p>
+
+        <ul>
+            <li>Server: <code>chat.freenode.net</code></li>
+            <li>Port: <code>7000</code></li>
+            <li>SSL: <code>enabled</code></li>
+        </ul>
+
+        <p>Choose a preferred nickname or <code>nick</code> and enter your desired password. Freenode has good <a href="http://freenode.net/faq.shtml#nicksetup">docs on registering a nick</a>, but it boils down to this command:</p>
+
+        <pre><code>/msg NickServ REGISTER &lt;password&gt; &lt;youremail@example.com&gt;</code></pre>
+
+        <p>Replace <code>&lt;password&gt;</code> with the password you entered in your client and <code>&lt;youremail@example.com&gt;</code> with your email address. In case the nick you want is registered, you can change your nick using this command:</p>
+
+        <pre><code>/nick &lt;newnick&gt;</code></pre>
+
+        <p>If it is available, register it and update your IRC client settings.</p>
+
+        <p>Once you've registered a nick and confirmed your email address, login to IRC. The easiest way to do this is to just restart your IRC client and make sure it logs in correctly. Alternatively, you can run this command:</p>
+
+        <pre><code>/msg NickServ IDENTIFY &lt;nick&gt; &lt;password&gt;</code></pre>
+
+        <p>After logging in the first time, use this command to force anyone using your nick to login, preventing potential abuse:</p>
+
+        <pre><code>/msg NickServ SET ENFORCE ON</code></pre>
+
+        <h2>
+            <a name="step-2-register-a-channel" class="anchor" href="#step-2-register-a-channel"><span class="mini-icon mini-icon-link"></span></a>
+            <strong>Step <span class="step-number">2</span> &dash;</strong> Register a Channel
+        </h2>
+
+        <p>Unfortunately <a href="http://blog.freenode.net/2012/06/group-registration-closure/">group registration is currently closed</a>, but don't let that stop you from registering and using a channel. Pick a channel name based on the <a href="http://freenode.net/policy.shtml#channelnaming">naming guidelines</a> and check if it is already in use via <code>/msg ChanServ INFO #channelname</code>. Once you've found an available channel, join it and register it:</p>
+
+        <pre><code>/join #channelname
+/msg ChanServ REGISTER #channelname</code></pre>
+
+        <p>Now you want to put some safeguards in place to make sure you don't lose access to your channel in the future. First, tell <code>ChanServ</code> to guard your channel. This ensures that your channel is never completely empty (at which point, all it's settings are lost).</p>
+
+        <pre><code>/msg ChanServ SET #channelname GUARD ON</code></pre>
+
+        <p>Next, lock down your channel via the following flags:</p>
+
+        <ul>
+            <li>
+                <code>p</code> (paranoid): don't show channel membership and don't allow people to request invites
+            </li>
+            <li>
+                <code>r</code> (block unidentified): only registered users can join
+            </li>
+            <li>
+                <code>s</code> (secret): don't show the channel in the channel lists
+            </li>
+            <li>
+                <code>i</code> (invite-only): only invited users can join
+            </li>
+        </ul>
+
+        <pre><code>/msg Chanserv SET #channelname MLOCK +prsi</code></pre>
+
+        <h2>
+            <a name="step-3-invite-users" class="anchor" href="#step-3-invite-users"><span class="mini-icon mini-icon-link"></span></a>
+            <strong>Step <span class="step-number">3</span> &dash;</strong> Invite Users
+        </h2>
+
+        <p>For each user, you want to allow in your room, add them to the invitation list (make sure they've registered their nick first):</p>
+
+        <pre><code>/mode #channelname +I $a:&lt;nickofperson&gt;</code></pre>
+
+        <p>Also considering giving somebody else admin privileges or "ops" in case something is needed when you're not around:</p>
+
+        <pre><code>/msg ChanServ flags #channelname &lt;nickofperson&gt; +voAti</code></pre>
+
+        <ul>
+            <li>
+                <code>v</code> (voice): Enables use of the voice/devoice commands, allowing the user to send messages in a moderated channel.
+            </li>
+            <li>
+                <code>o</code> (op): Enables use of the op/deop commands.
+            </li>
+            <li>
+                <code>A</code> (access list): Enables viewing of channel access lists.
+            </li>
+            <li>
+                <code>t</code> (topic): Enables use of the topic and topicappend commands.
+            </li>
+            <li>
+                <code>i</code> (invite): Enables use of the invite and getkey commands.
+            </li>
+        </ul>
+
+
+        <h2>
+            <a name="done" class="anchor" href="#done"><span class="mini-icon mini-icon-link"></span></a><strong>Done!</strong>
+        </h2>
+
+        <p>Congratulations, you now have your own private chatroom! There's a lot more functionality than what's explained here though. See the references below for more information and also consider <a href="http://freenode.net/pdpc_donations.shtml">donating to Freenode's parent organization, the PDPC</a> to help keep the service running.</p>
+    </div>
+
+    <footer class="references">
+        <h4 id="recommended-clients">Recommended Clients</h4>
+
+        <ul>
+            <li><strong>OS X:</strong> <a href="http://codeux.com/textual/">Textual</a> (paid) or <a href="http://limechat.net/mac/">LimeChat</a> (free)</li>
+            <li><strong>Windows:</strong> <a href="http://www.mirc.com/get.html">mIRC</a> (paid) or <a href="http://www.hexchat.org/">HexChat</a> (free)</li>
+            <li><strong>Linux:</strong> <a href="http://xchat.org/">XChat</a></li>
+        </ul>
+        <h4>References</h4>
+
+        <ul>
+            <li><a href="http://freenode.net/using_the_network.shtml">http://freenode.net/using_the_network.shtml</a></li>
+            <li><a href="http://blog.freenode.net/2008/04/registering-a-channel-on-freenode/">http://blog.freenode.net/2008/04/registering-a-channel-on-freenode/</a></li>
+            <li><a href="http://en.wikipedia.org/wiki/Wikipedia:IRC/Channel_access_and_configuration_guide">http://en.wikipedia.org/wiki/Wikipedia:IRC/Channel_access_and_configuration_guide</a></li>
+            <li><a href="http://meta.wikimedia.org/wiki/IRC/Instructions">http://meta.wikimedia.org/wiki/IRC/Instructions</a></li>
+        </ul>
+    </footer>
+
+    <!--
+    <div id="Built-By" class="wiggler">
+        <object data="img/ll.svg" type="image/svg+xml" id="LL-Logo"></object>
+    </div>
+    -->
+</article>
+{% include "includes/google-analytics.html" %}
+
+</body>
+</html>
+

@@ -157,7 +157,7 @@ class DeleteChannel(ChannelMixin, DeleteView):
     Delete a channel.
     """
     template_name = 'bots/confirm_delete_channel.html'
-    success_url = reverse_lazy("dashboard")
+    success_url = reverse_lazy("settings_dashboard")
     only_channel_owners = True
 
     def get_object(self):

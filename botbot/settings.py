@@ -36,7 +36,6 @@ INSTALLED_APPS = (
     'botbot.apps.kudos',
     'botbot.core',
 
-    'south',
     'launchpad',
     'django_assets',
     'django_statsd',
@@ -55,6 +54,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.sitemaps',
 
     'bootstrap_toolkit',
 )
@@ -147,13 +147,18 @@ TEMPLATE_CONTEXT_PROCESSORS += (
 MIDDLEWARE_CLASSES = (
     'django_statsd.middleware.GraphiteRequestTimingMiddleware',
     'django_statsd.middleware.GraphiteMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
 ) + MIDDLEWARE_CLASSES + (
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'botbot.core.middleware.TimezoneMiddleware',
 )
 
 #==============================================================================
 # Auth / security
-#==============================================================================
+#============================================================================
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 AUTHENTICATION_BACKENDS += (
@@ -230,6 +235,8 @@ CACHES = {
     'default': DEFAULT_CACHE
 }
 
+CACHE_MIDDLEWARE_SECONDS = 600  # Unit is second
+
 #=============================================================================
 # Email
 #=============================================================================
@@ -265,7 +272,7 @@ SSE_ENDPOINT = SSE_ENDPOINT_URL + 'push/{token}'
 # Third party app settings
 # ==============================================================================
 
-SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
+# SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
 
 SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
