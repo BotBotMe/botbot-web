@@ -17,8 +17,8 @@ $$.Views.Glob = Backbone.View.extend({
         this.svg = d3.select(this.el).append("svg")
             .attr("width", width)
             .attr("height", height);
-        this.svg.map = this.svg.append("g");
-        this.svg.circles = this.svg.append("g");
+        this.svg.map = this.svg.append("g").attr('class', 'map');
+        this.svg.circles = this.svg.append("g").attr('class', 'map');
         this.projection = d3.geo.mercator()
             .center([0, 33 ])
             .scale(150)
@@ -83,8 +83,11 @@ $$.Views.Glob = Backbone.View.extend({
         var projection = this.projection;
         var zoom = d3.behavior.zoom()
             .on("zoom",function() {
-                g.attr("transform","translate("+
-                       d3.event.translate.join(",")+")scale("+d3.event.scale+")");
+                d3.selectAll('g.map')
+                    .attr("transform","translate("+
+                          d3.event.translate.join(",")+")scale("+d3.event.scale+")");
+                g.selectAll("circle")
+                    .attr("d", path.projection(projection));
                 g.selectAll("path")
                     .attr("d", path.projection(projection));
             });
