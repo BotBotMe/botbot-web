@@ -20,7 +20,7 @@
   </head>
 
   <body>
-    <div id="Glob"></div>
+    <div id="Glob" data-source="{{ source }}"></div>
 
 
     {% assets filters="yui_js", output="gen/vendor.js", "js/vendor/andlog.js", "js/vendor/jquery-1.8.2.js", "js/vendor/bootstrap.js", "js/vendor/moment.js", "js/vendor/detect_timezone.js", "js/vendor/jquery.highlight.js", "js/vendor/waypoints.js", "js/vendor/underscore.js", "js/vendor/backbone.js" "js/vendor/d3.v3.min.js" "js/vendor/topojson.v1.min.js" %}

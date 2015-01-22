@@ -40,7 +40,7 @@ urlpatterns += patterns('',
     url(r'^request/success/$', 'django.shortcuts.render',
         {'template_name': 'bots/request_success.html'}, name='request_channel_success'),
     url(r'^map/$', 'django.shortcuts.render',
-        {'template_name': 'map.html', 'dictionary': {'source': settings.SSE_ENDPOINT}} ,
+        {'template_name': 'map.html', 'dictionary': {'source': settings.SSE_ENDPOINT.format(token='glob')}} ,
         name='realtime_map'),
 
     (r'^settings/', include('botbot.apps.accounts.urls')),

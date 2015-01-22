@@ -100,6 +100,6 @@ $$.Views.Glob = Backbone.View.extend({
 $(document).ready(function () {
     v = new $$.Views.Glob({
         el: $('#Glob'),
-        source: 'http://localhost:3000/push/glob'
+        source: $('#Glob').data('source')
     })
 })
