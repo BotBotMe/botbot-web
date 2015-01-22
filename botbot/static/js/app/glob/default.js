@@ -50,7 +50,7 @@ $$.Views.Glob = Backbone.View.extend({
                 .attr("cy", function(d) {
                     return projection([d[1], d[0]])[1];
                 })
-                .style("fill", "lime")
+                .style("fill", "#0892d0")
                 .attr("r", 0)
                 .transition()
                 .duration(100)
