@@ -23,14 +23,12 @@
     <div id="Glob"></div>
 
 
-    {% assets filters="yui_js", output="gen/vendor.js", "js/vendor/andlog.js", "js/vendor/jquery-1.8.2.js", "js/vendor/bootstrap.js", "js/vendor/moment.js", "js/vendor/detect_timezone.js", "js/vendor/jquery.highlight.js", "js/vendor/waypoints.js", "js/vendor/underscore.js", "js/vendor/backbone.js" %}
+    {% assets filters="yui_js", output="gen/vendor.js", "js/vendor/andlog.js", "js/vendor/jquery-1.8.2.js", "js/vendor/bootstrap.js", "js/vendor/moment.js", "js/vendor/detect_timezone.js", "js/vendor/jquery.highlight.js", "js/vendor/waypoints.js", "js/vendor/underscore.js", "js/vendor/backbone.js" "js/vendor/d3.v3.min.js" "js/vendor/topojson.v1.min.js" %}
     <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
     {% assets filters="yui_js", output="gen/app.js", "js/app/common.js", "js/app/app.js" %}
     <script src="{{ ASSET_URL }}"></script>
   {% endassets %}
-  <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="http://d3js.org/topojson.v1.min.js"></script>
   {% assets filters="yui_js", output="gen/glob.js", "js/app/glob/default.js" %}
   <script src="{{ ASSET_URL }}"></script>
   {% endassets %}
