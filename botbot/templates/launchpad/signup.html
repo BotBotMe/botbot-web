@@ -95,6 +95,15 @@
 {% endblock tail %}
 
 {% block extra_js %}
+    <style>
+        path {
+            stroke: white;
+            stroke-width: 0.25px;
+            fill: grey;
+        }
+    </style>
+        <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="http://d3js.org/topojson.v1.min.js"></script>
 {% assets filters="yui_js", output="gen/glob.js", "js/app/glob/default.js" %}
     <script src="{{ ASSET_URL }}"></script>
 {% endassets %}

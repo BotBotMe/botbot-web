@@ -40,6 +40,8 @@ urlpatterns += patterns('',
     url(r'^request/$', RequestChannel.as_view(), name='request_channel'),
     url(r'^request/success/$', 'django.shortcuts.render',
         {'template_name': 'bots/request_success.html'}, name='request_channel_success'),
+    url(r'^map/$', 'django.shortcuts.render',
+        {'template_name': 'bots/request_success.html'}, name='request_channel_success'),
 
     (r'^settings/', include('botbot.apps.accounts.urls')),
     url(r'^_suggest_users/$', SuggestUsers.as_view(), name='suggest_users'),
@@ -48,4 +50,3 @@ urlpatterns += patterns('',
         include(channel_patterns)),
     url(r'^(?P<network_slug>[\-\w\.]+)/$', ChannelList.as_view())
 )
-

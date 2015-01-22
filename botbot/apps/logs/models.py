@@ -65,22 +65,18 @@ class Log(models.Model):
                                 {
                                     'message_list': [self],
                                 })
-    def get_ip(self):
+    def get_cleaned_host(self):
         if self.host:
             if '@' in self.host:
-                h = self.host.split('@')[1]
+                return self.host.split('@')[1]
             else:
-                h = self.host
-        try:
-            return socket.gethostbyname(h)
-        except:
-            return ""
+                return self.host
 
 
     def notify(self):
         """Send update to Redis queue to be picked up by SSE"""
         utils.send_event_with_id("log", self.as_html(),
-            self.timestamp.isoformat(), self.get_ip(),
+                                 self.timestamp.isoformat(), self.get_cleaned_host(),
             channel="channel_update:{0}".format(self.channel_id))
 
     def get_nick_color(self):
