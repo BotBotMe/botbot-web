@@ -71,11 +71,11 @@ class ChannelMixin(object):
         if not self._channel:
             channel_pk = kwargs.get('channel_pk')
             if channel_pk:
-                channel = get_object_or_404(models.Channel, pk=channel_pk)
+                channel = get_object_or_404(self._channel_queryset(), pk=channel_pk)
 
             elif kwargs['bot_slug'] == 'private':
                 channel = get_object_or_404(
-                    models.Channel, private_slug=kwargs['channel_slug'])
+                    self._channel_queryset(), private_slug=kwargs['channel_slug'])
 
             else:
                 channel = self._get_identifiable_channel(
@@ -88,13 +88,16 @@ class ChannelMixin(object):
 
         return self._channel
 
+    def _channel_queryset(self):
+        return models.Channel.objects.filter(is_active=True)
+
     def _get_identifiable_channel(self, bot_slug, channel_slug):
         """
         Return the channel object for an identifiable channel URL.
 
         If no matching channel is found, raises 404.
         """
-        candidates = models.Channel.objects\
+        candidates = self._channel_queryset()\
             .filter(slug=channel_slug, is_public=True)\
             .select_related('chatbot')
 
