@@ -296,7 +296,7 @@ SOCIAL_AUTH_PIPELINE = (
 ACCOUNT_LOGOUT_ON_GET = (True)
 
 # Statsd
-STATSD_CLIENT = 'django_statsd.clients.normal'
+STATSD_CLIENT = 'django_statsd.clients.request_aggregate'
 
 STATSD_PATCHES = [
     'django_statsd.patches.db',
