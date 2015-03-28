@@ -54,13 +54,13 @@ Run in a terminal:
     # If your Postgres server requires a password, you'll need to override STORAGE_URL
     # The default database name is 'botbot'
     $EDITOR .env
-    
-    # Make the variables available to subprocesses 
+
+    # Make the variables available to subprocesses
     export $(cat .env | grep -v ^# | xargs)
 
     createdb botbot
     echo "create extension hstore" | psql botbot
-    manage.py syncdb --migrate
+    manage.py migrate
 
     # You'll need a staff account for creating a bot and registering channels
     manage.py createsuperuser
