@@ -63,8 +63,8 @@ less-compile:
 	lessc botbot/less/screen.less > botbot/static/css/screen.css
 
 $(WATCHMEDO_BIN):
-	# Install watchmedo to run commands when files change
-	pip install watchmedo argcomplete
+	# Install watchdog to run commands when files change
+	pip install watchdog argcomplete
 
 less-watch: $(WATCHMEDO_BIN)
 	watchmedo shell-command --patterns=*.less --recursive --command="make less-compile" botbot/less
