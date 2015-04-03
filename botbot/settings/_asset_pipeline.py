@@ -12,10 +12,15 @@ PIPELINE_CSS = {
         'output_filename': 'landing.css',
         'extra_context': {'media': 'screen,projection'},
     },
+    'howto': {
+        'source_filenames': ('css/howto.css',),
+        'output_filename': 'howto.css',
+        'extra_context': {'media': 'screen,projection'},
+    },
 }
 
 PIPELINE_JS = {
-    'vendor': {
+    'app': {
         'source_filenames': (
             'js/vendor/andlog.js',
             'js/vendor/jquery-1.8.2.js',
@@ -26,19 +31,11 @@ PIPELINE_JS = {
             'js/vendor/waypoints.js',
             'js/vendor/underscore.js',
             'js/vendor/backbone.js',
-        ),
-        'output_filename': 'vendor.js',
-    },
-    'app': {
-        'source_filenames': (
             'js/app/common.js',
             'js/app/app.js',
+            'js/app/logs/default.js',
         ),
         'output_filename': 'app.js',
-    },
-    'logs': {
-        'source_filenames': ('js/app/logs/default.js',),
-        'output_filename': 'logs.js',
     },
     'manage_channel': {
         'source_filenames': (

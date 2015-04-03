@@ -564,12 +564,17 @@ $$.applyFilter = function ($el) {
 };
 
 $(document).ready(function () {
-    var serverSideTz = $('#Log').data('timezone'),
+
+    var $Log = $('#Log');
+    if ($Log.length === 0) {
+        return;
+    }
+    var serverSideTz = $Log.data('timezone'),
         $timeline = $('.timeline-navigation'),
         $tzForm = $('#Timezone'),
-        isCurrent = $('#Log').data('current') === 'True';
+        isCurrent = $Log.data('current') === 'True';
     $$.clientTimezone = jstz.determine().name();
-    $$.searchTerm = $('#Log').data('search-term');
+    $$.searchTerm = $Log.data('search-term');
     if ($tzForm.length) {
         new $$.Views.TimezoneFormView({
             el: $tzForm
@@ -585,11 +590,11 @@ $(document).ready(function () {
         return {
             view: new $$.Views.LogViewer({
                 el: $("#Log-Container article"),
-                source: $('#Log').data('source'),
-                prevPage: $('#Log').data('previous'),
-                nextPage: $('#Log').data('next'),
+                source: $Log.data('source'),
+                prevPage: $Log.data('previous'),
+                nextPage: $Log.data('next'),
                 current: isCurrent,
-                newestFirst: $('#Log').data('order') === 'reversed',
+                newestFirst: $Log.data('order') === 'reversed',
                 adjustTimezone: !serverSideTz
             })
         };
