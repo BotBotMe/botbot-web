@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load verbatim channel_url assets %}
+{% load verbatim channel_url pipeline %}
 
 {% block extra_head %}
   <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
@@ -89,10 +89,6 @@
 
 {% block extra_js %}
 {{ block.super }}
-{% assets filters="yui_js", output="gen/manage_vendor.js", "js/vendor/handlebars.js", "js/vendor/jquery-ui-1.9.1.custom.js" %}
-    <script src="{{ ASSET_URL }}"></script>
-{% endassets %}
-{% assets filters="yui_js", output="gen/manage.js", "js/app/manage/default.js", "js/app/manage/models.js" %}
-    <script src="{{ ASSET_URL }}"></script>
-{% endassets %}
+{# Defined in botbot.settings._asset_pipeline #}
+{% javascript "manage_channel" %}
 {% endblock extra_js %}

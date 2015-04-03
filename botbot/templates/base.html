@@ -1,4 +1,4 @@
-{% load assets %}<!DOCTYPE html>
+{% load pipeline %}{% load static from staticfiles %}<!DOCTYPE html>
 
 <html lang="en">
 <head>
@@ -8,10 +8,8 @@
 
     <title>{% block head_title %} | BotBot.me [o__o]{% endblock %}</title>
 
-
-    {% assets filters="yui_css", output="gen/screen.css", "css/screen.css" %}
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
-    {% endassets %}
+    {# Defined in botbot.settings._asset_pipeline #}
+    {% stylesheet "screen" %}
     <!-- Font Awesome - http://fortawesome.github.com/Font-Awesome -->
 
     <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -21,7 +19,7 @@
         <link rel="stylesheet" type="text/css" href="ie-no-support.css" />
     <![endif]-->
 
-    <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico" />
+    <link rel="shortcut icon" href="{% static "img/favicon.ico" %}" />
 
     {% block extra_head %}{% endblock %}
 </head>
@@ -32,7 +30,7 @@
     <div class="navbar-inner">
         <div class="container-fluid">
             <a href="/" class="brand-btn wiggler">
-                <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
+                <object data="{% static "img/logo.svg" %}" type="image/svg+xml" id="Logo"></object>
             </a>
             <nav id="Primary-Nav">
             </nav>
@@ -60,12 +58,9 @@
 
 {% include "includes/footer.html" %}
 
-{% assets filters="yui_js", output="gen/vendor.js", "js/vendor/andlog.js", "js/vendor/jquery-1.8.2.js", "js/vendor/bootstrap.js", "js/vendor/moment.js", "js/vendor/detect_timezone.js", "js/vendor/jquery.highlight.js", "js/vendor/waypoints.js", "js/vendor/underscore.js", "js/vendor/backbone.js" %}
-    <script src="{{ ASSET_URL }}"></script>
-{% endassets %}
-{% assets filters="yui_js", output="gen/app.js", "js/app/common.js", "js/app/app.js" %}
-    <script src="{{ ASSET_URL }}"></script>
-{% endassets %}
+{# Defined in botbot.settings._asset_pipeline #}
+{% javascript "vendor" %}
+{% javascript "app" %}
 
 {% block extra_js %}{% endblock extra_js %}
 

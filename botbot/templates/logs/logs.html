@@ -1,17 +1,18 @@
 {% extends "base.html" %}
-{% load channel_url assets logs_tags %}
+{% load channel_url logs_tags %}
+{% load static from staticfiles %}
 
 
 {% block head_title %}IRC Logs for {{ channel.name }} {{ block.super }}{% endblock %}
 {% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}
 {% if channel_ads %} display_bbsponsor{% endif %}{% endblock %}
-{% load channel_url assets logs_tags%}
+{% load channel_url logs_tags%}
 
 {% block content_outer %}
 
     <header id="Log-Header">
         <a href="/dashboard/" class="brand-btn">
-            <object data="{{ STATIC_URL }}img/logo.svg" type="image/svg+xml" id="Logo"></object>
+            <object data="{% static "img/logo.svg" %}" type="image/svg+xml" id="Logo"></object>
         </a>
         <div class="log-title">
           <h1><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></h1>
@@ -111,13 +112,6 @@
     <form id="Timezone" method="post" action="{% url '_set_timezone' %}">{% csrf_token %}{{ tz_form.timezone }}</form>
 {% endblock content_outer %}
 
-{% block extra_js %}
-{{ block.super }}
-{% assets filters="yui_js", output="gen/logs.js", "js/app/logs/default.js" %}
-    <script src="{{ ASSET_URL }}"></script>
-{% endassets %}
-{% endblock %}
-
 {% block extra_head %}
 <style type="text/css">
   .log li[data-nick='{{ user.username }}'] .actor { color: #757500; }
@@ -132,3 +126,7 @@
 
 <link rel="canonical" href="{{ current_page }}"/>
 {% endblock %}
+
+{% block extra_js %}
+{# Defined in botbot.settings._asset_pipeline #}
+{% javascript "logs" %}

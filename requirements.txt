@@ -10,8 +10,8 @@ git+https://github.com/vbabiy/django-statsd.git@request-aggregation
 
 markdown==2.3.1
 redis==2.9.1
-webassets==0.9.0
-django-assets==0.8.0
+django-pipeline==1.4.7
+    # Requires java runtime
     yuicompressor==2.4.8
 honcho==0.5.0
 

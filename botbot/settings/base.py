@@ -11,7 +11,6 @@ import dj_database_url
 
 DEBUG = ast.literal_eval(os.environ.get('DEBUG', 'True'))
 TEMPLATE_DEBUG = DEBUG
-ASSETS_DEBUG = True
 
 SITE_ID = 1
 # Local time zone for this installation. Choices can be found here:
@@ -37,7 +36,7 @@ INSTALLED_APPS = (
     'botbot.core',
 
     'launchpad',
-    'django_assets',
+    'pipeline',
     'django_statsd',
 
     'allauth',
@@ -110,9 +109,18 @@ MEDIA_URL = '/uploads/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT', os.path.join(VAR_ROOT, 'static'))
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(VAR_ROOT, 'uploads'))
 
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
+)
 STATICFILES_DIRS = (
     os.path.join(PROJECT_DIR, 'static'),
 )
+
+# Defines PIPELINE settings and bundles
+from ._asset_pipeline import *
 
 DATABASES = {'default': dj_database_url.config(env='STORAGE_URL')}
 # Reuse database connections
@@ -204,11 +212,6 @@ LOGGING = {
             'handlers': ['null'],
             'propagate': True,
             'level': 'INFO',
-        },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': False,
         },
         'botbot.plugin_runner': {
             'handlers': ['console'],
