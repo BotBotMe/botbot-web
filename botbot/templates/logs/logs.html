@@ -26,8 +26,9 @@
           <a href="#Log-Nav" class="nav-toggle"><i class="icon-calendar icon-large"></i></a>
         </nav>
 
-        <form id="Search" method="get" action="{% channel_url channel 'log_search' %}">
+        <form id="Search" method="get" class="well form-search" action="{% channel_url channel 'log_search' %}">
             {{ search_form.q }}
+            <button class="btn" type="submit"><i class="icon icon-search"></i> Search</button>
             {# <a href="#" class="context-help"> <i class="icon-question-sign icon-large"></i></a> #}
         </form>
 
