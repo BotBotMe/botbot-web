@@ -74,10 +74,13 @@ class Log(models.Model):
 
 
     def notify(self):
-        """Send update to Redis queue to be picked up by SSE"""
-        utils.send_event_with_id("log", self.as_html(),
-                                 self.timestamp.isoformat(), self.get_cleaned_host(),
-            channel="channel_update:{0}".format(self.channel_id))
+        """Send update to Nginx to be sent out via SSE"""
+        utils.send_event_with_id(
+            "log",
+            self.as_html(),
+            self.timestamp.isoformat(),
+            self.get_cleaned_host(),
+            channel=self.channel_id)
 
     def get_nick_color(self):
         return hash(self.nick) % 32

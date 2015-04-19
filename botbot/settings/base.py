@@ -129,6 +129,8 @@ DATABASES['default'].update({
     'ATOMIC_REQUESTS': True,
     'OPTIONS': {"application_name": "django"},
 })
+GEOIP_CITY_DB_PATH = os.environ.get('GEOIP_CITY_DB_PATH',
+    os.path.join(VAR_ROOT, 'GeoLite2-City.mmdb'))
 
 #==============================================================================
 # Templates
@@ -263,12 +265,8 @@ if EXCLUDE_NICKS == ['']:
 
 REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL')
 REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL')
-REDIS_SSE_URL = os.environ.get('REDIS_SSEQUEUE_URL')
 
-# Life span of auth token for realtime endpoint in seconds
-TOKEN_TTL = 120
-
-PUSH_STREAM_URL = os.environ.get(PUSH_STREAM_URL, 'http://localhost:8080/pub/?id={id}')
+PUSH_STREAM_URL = os.environ.get('PUSH_STREAM_URL', 'http://localhost:8080/pub/?id={id}')
 
 # ==============================================================================
 # Third party app settings

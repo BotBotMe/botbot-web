@@ -11,6 +11,9 @@ LOCAL_BIN=$(VIRTUAL_ENV)/bin
 # where source files are stored
 LOCAL_SRC=$(VIRTUAL_ENV)/src
 
+# where misc files are stored
+LOCAL_VAR=$(VIRTUAL_ENV)/var
+
 NPM_BIN := $(or $(shell command -v npm),$(LOCAL_BIN)/npm)
 LESS_BIN := $(or $(shell command -v lessc),$(LOCAL_BIN)/lessc)
 JSHINT_BIN := $(or $(shell command -v jshint),$(LOCAL_BIN)/jshint)
@@ -89,10 +92,15 @@ local-settings: .env
 ### General Tasks
 dependencies: less-install pip-install local-settings $(LOCAL_BIN)/botbot-bot $(LOCAL_BIN)/botbot-eventsource
 
+$(LOCAL_VAR)/GeoLite2-City.mmdb:
+	curl http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz | gunzip -c > $@
+
+geoip-db: $(LOCAL_VAR)/GeoLite2-City.mmdb
+
 run: dependencies
 	honcho start
 
 docs: $(LOCAL_BIN)/sphinx-build
 	cd docs && make html
 
-.PHONY: clean-pyc run pip-install less-install jshint-install dependencies local-settings docs
+.PHONY: clean-pyc run pip-install less-install jshint-install dependencies local-settings docs geoip-db
