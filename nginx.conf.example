@@ -1,0 +1,72 @@
+worker_processes  1;
+daemon off;
+error_log /dev/stdout debug;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /usr/local/etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    #access_log  logs/access.log  main;
+    access_log /dev/stdout;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    push_stream_shared_memory_size 32M;
+
+    upstream django {
+        server localhost:8000;
+    }
+    server {
+       listen 127.0.0.1:8080;
+       location /channels-stats {
+            # activate channels statistics mode for this location
+            push_stream_channels_statistics;
+
+            # query string based channel id
+            push_stream_channels_path               $arg_id;
+        }
+
+        location /pub {
+            # activate publisher (admin) mode for this location
+            push_stream_publisher admin;
+
+            # query string based channel id
+            push_stream_channels_path               $arg_id;
+            push_stream_store_messages              on;
+            allow 127.0.0.1;
+            deny  all;
+        }
+
+        location ~ /internal-channel-stream/(.*) {
+            internal;
+            # activate subscriber (streaming) mode for this location
+            push_stream_subscriber eventsource;
+
+            # positional channel path
+            push_stream_channels_path                   $1;
+
+
+            #push_stream_allowed_origins botbot.me;
+            # ping frequency
+            push_stream_ping_message_interval           30s;
+        }
+
+        try_files $uri @django;
+
+        # Setup named location for Django requests and handle proxy details
+        location @django {
+            proxy_pass         http://django;
+            proxy_redirect     off;
+            proxy_set_header   Host             $host;
+            proxy_set_header   X-Real-IP        $remote_addr;
+            proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+        }
+    }
+}

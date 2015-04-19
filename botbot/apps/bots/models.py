@@ -154,18 +154,8 @@ class Channel(TimeStampedModel):
         return reverse_channel(self, 'log_current')
 
     def get_eventsource_url(self):
-        """
-        Provides URL for the SSE endpoint
-
-        It creates a short-lived unique token that is shared
-        with the endpoint over Redis which is used to verify the
-        user can access the channel.
-        """
-        token = uuid.uuid4().hex
-        redis_channel = 'channel_update:{0}'.format(self.pk)
-        log_utils.REDIS.setex(token, settings.TOKEN_TTL, redis_channel)
-        endpoint_url = settings.SSE_ENDPOINT.format(token=token)
-        return endpoint_url
+        from botbot.apps.bots.utils import reverse_channel
+        return reverse_channel(self, 'log_stream')
 
     def create_default_plugins(self):
         """

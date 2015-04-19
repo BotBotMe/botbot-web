@@ -268,8 +268,7 @@ REDIS_SSE_URL = os.environ.get('REDIS_SSEQUEUE_URL')
 # Life span of auth token for realtime endpoint in seconds
 TOKEN_TTL = 120
 
-SSE_ENDPOINT_URL = os.environ.get('SSE_ENDPOINT_URL')
-SSE_ENDPOINT = SSE_ENDPOINT_URL + 'push/{token}'
+PUSH_STREAM_URL = os.environ.get(PUSH_STREAM_URL, 'http://localhost:8080/pub/?id={id}')
 
 # ==============================================================================
 # Third party app settings

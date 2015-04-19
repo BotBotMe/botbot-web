@@ -118,6 +118,15 @@ class LogDateMixin(object):
         return qs.filter(timestamp__gte=date,
                          timestamp__lt=date + datetime.timedelta(days=1))
 
+class LogStream(ChannelMixin, View):
+    def get(self, request, channel_slug, bot_slug):
+        response = HttpResponse()
+        response['X-Accel-Redirect'] = '/internal-channel-stream/{}'.format(
+            self.channel.pk)
+        if 'HTTP_LAST_EVENT_ID' in request.META:
+            response['Last-Event-ID'] = request.META['HTTP_LAST_EVENT_ID']
+        return response
+
 
 class LogViewer(ChannelMixin, object):
     context_object_name = "message_list"
