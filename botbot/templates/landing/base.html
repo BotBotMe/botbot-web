@@ -37,8 +37,8 @@
 
 {% include "includes/ie-no-support.html" %}
 {% include "includes/google-analytics.html" %}
-    {% block tail %}{% endblock tail %}
     {# Defined in botbot.settings._asset_pipeline #}
     {% javascript "app" %}
+    {% block tail %}{% endblock tail %}
 </body>
 </html>
