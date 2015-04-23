@@ -46,9 +46,6 @@ $(LOCAL_BIN)/botbot-bot:
 test-bot:
 	GOPATH=$(VIRTUAL_ENV) go test github.com/BotBotMe/botbot-bot
 
-$(LOCAL_BIN)/botbot-eventsource:
-	GOPATH=$(VIRTUAL_ENV) go get github.com/BotBotMe/botbot-eventsource
-
 ### LOCAL LESS SUPPORT
 $(NPM_BIN):
 	@echo "Installing node.js..."

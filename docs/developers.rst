@@ -10,7 +10,7 @@ Several loosely coupled pieces make up the whole of BotBot:
 1. **botbot-bot:** An IRC client capable of connecting to multiple IRC networks, and connecting multiple channels and nicks per network. (Go)
 2. **botbot-plugins:** A plugin framework - plugins receive messages from IRC channels and can respond within the channel. (Python)
 3. **botbot-web:** A web site for managing bots/channels as well as a beautiful public interface for channel logs. (Python/Django)
-4. **botbot-eventsource:** A basic SSE provider that the web site can connect to for real-time logs. (Go)
+4. **nginx + push-stream-module:** An SSE provider that the web site can connect to for real-time logs.
 
 .. image:: /images/botbot-architecture.png
 
@@ -40,14 +40,13 @@ Honcho is great for getting everything started quickly. Running this command wil
 Run Services Individually
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When working on code changes or debugging, it is often desirable to manage one or more of the services (bot, plugin runner, runserver, eventsource) independently.
+When working on code changes or debugging, it is often desirable to manage one or more of the services (bot, plugin runner, runserver, nginx) independently.
 
 If you'd like to make use of the ``.env`` file, you can still start services individually using Honcho::
 
     honcho start web  # Starts Django site
     honcho start bot  # Starts IRC client
     honcho start plugins  # Starts plugin runner
-    honcho start realtime # Starts event source (SSE)
 
 If you would prefer not to use Honcho, you'll need to manage the environment variables. Many developers use the virtualenv ``postactivate`` feature to set required environment variables whenever a virtualenv is activated. An alternative approach could be to attempt to set variables directly from the ``.env`` file. As an example, you could put the following into a ``set_env.sh`` file::
 
@@ -57,7 +56,7 @@ Then you could invoke commands and individual services like::
 
     source set_env.sh && manage.py runserver
     source set_env.sh && botbot-bot -v=2 -logtostderr=true
-    source set_env.sh && botbot-eventsource
+    nginx -c `pwd`/nginx.conf.example
     source set_env.sh && manage.py run_plugins
 
 If you've explicitly set the environment through your own methods, services can be invoked like usual::
