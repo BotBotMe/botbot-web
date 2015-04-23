@@ -23,13 +23,13 @@ def ip_lookup(ip):
         try:
             location = GEOIP.city(ip).location
             coords = (location.latitude, location.longitude)
-        except geoip2.errors.AddressNotFoundError:
+        except (geoip2.errors.AddressNotFoundError, ValueError):
             coords = (0, 0)
         cache.set(cache_key, coords)
     return coords
 
 
-def send_event_with_id(event_name, data, event_id, ip, channel):
+def _send_event_with_id(event_name, data, event_id, ip, channel):
     """HTTP POST to Nginx which manages the Server-Sent Events"""
     requests.post(settings.PUSH_STREAM_URL.format(id=channel),
                   headers={'Event-Id': event_id, 'Event-Type': event_name},
@@ -38,4 +38,10 @@ def send_event_with_id(event_name, data, event_id, ip, channel):
         requests.post(settings.PUSH_STREAM_URL.format(id='glob'),
                       headers={'Event-Id': event_id, 'Event-Type': 'loc'},
                       data=json.dumps(ip_lookup(ip)))
+
+if settings.PUSH_STREAM_URL:
+    send_event_with_id = _send_event_with_id
+else:
+    LOG.info('PUSH_STREAM_URL setting not defined. Realtime updates disabled.')
+    send_event_with_id = lambda *a,**kw: None
 

@@ -266,7 +266,7 @@ if EXCLUDE_NICKS == ['']:
 REDIS_PLUGIN_QUEUE_URL = os.environ.get('REDIS_PLUGIN_QUEUE_URL')
 REDIS_PLUGIN_STORAGE_URL = os.environ.get('REDIS_PLUGIN_STORAGE_URL')
 
-PUSH_STREAM_URL = os.environ.get('PUSH_STREAM_URL', 'http://localhost:8080/pub/?id={id}')
+PUSH_STREAM_URL = os.environ.get('PUSH_STREAM_URL', None)
 
 # ==============================================================================
 # Third party app settings
