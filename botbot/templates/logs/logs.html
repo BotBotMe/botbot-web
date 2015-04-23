@@ -109,7 +109,7 @@
       {% endblock content %}
     </div>
     {# not visible to end-user, but used to determine/post timezone #}
-    <form id="Timezone" method="post" action="{% url '_set_timezone' %}">{% csrf_token %}{{ tz_form.timezone }}</form>
+    <form id="Timezone" method="post" action="{% url '_set_timezone' %}">{{ tz_form.timezone }}</form>
 {% endblock content_outer %}
 
 {% block extra_head %}

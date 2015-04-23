@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView, View
+from django.views.decorators.csrf import csrf_exempt
 
 from botbot.apps.bots import models as bots_models
 from . import forms
@@ -134,6 +135,10 @@ class SetTimezone(View):
     """
     Set the current timezone.
     """
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SetTimezone, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """
