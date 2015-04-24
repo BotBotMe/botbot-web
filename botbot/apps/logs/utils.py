@@ -33,7 +33,7 @@ def _send_event_with_id(event_name, data, event_id, ip, channel):
     """HTTP POST to Nginx which manages the Server-Sent Events"""
     requests.post(settings.PUSH_STREAM_URL.format(id=channel),
                   headers={'Event-Id': event_id, 'Event-Type': event_name},
-                  data=data)
+                  data=data.encode('utf-8'))
     if GEOIP:
         requests.post(settings.PUSH_STREAM_URL.format(id='glob'),
                       headers={'Event-Id': event_id, 'Event-Type': 'loc'},
