@@ -50,7 +50,7 @@ class ChannelMixin(object):
         """
         try:
             self.channel = self.get_channel(user=request.user, **kwargs)
-        except self.LegacySlugUsage, e:
+        except self.LegacySlugUsage as e:
             return http.HttpResponsePermanentRedirect(e.url)
 
         return super(ChannelMixin, self).dispatch(request, *args, **kwargs)
