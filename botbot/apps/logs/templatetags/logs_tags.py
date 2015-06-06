@@ -1,5 +1,8 @@
 """Near duplicate of Django's `urlizetrunc` with support for image classes"""
-import urlparse
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 
 from django.template.base import Library, Node
 from django.template.defaultfilters import stringfilter
