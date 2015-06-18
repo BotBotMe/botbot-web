@@ -49,9 +49,6 @@ $$.Cache = Backbone.Model.extend({
         if (this.url) {
             this.isFinished = false;
             this.fetch();
-        // If a timezone is missing on first page load, we know we need to adjust
-        } else {
-            this.adjustTimezone = options.adjustTimezone;
         }
     },
     fetch: function () {
@@ -61,16 +58,11 @@ $$.Cache = Backbone.Model.extend({
             $.ajax({
                 url: this.url,
                 success: _.bind(function (data, textStatus, jqXHR) {
-                    var serverTimezone = jqXHR.getResponseHeader('X-Timezone');
                     this.url = jqXHR.getResponseHeader(this.pageHeader);
                     if (this.url === "" || this.url === null) {
                         this.isLoading = false;
                         this.isFinished = true;
                     } else {
-                        // if the server/client timezones do not match and a specific one was not requested
-                        if ($$.clientTimezone !== serverTimezone && this.url.indexOf('tz=') === -1) {
-                            this.adjustTimezone = true;
-                        }
                         this.prepPage(data);
                         this.isLoading = false;
                         this.trigger('loaded', this);
@@ -100,19 +92,16 @@ $$.Cache = Backbone.Model.extend({
         if (html) {
             this.$el.html(html);
         }
-        if (this.adjustTimezone) {
-            this.$el.find('h3').remove();
-            $.each(this.$el.children('li'), function (idx, el) {
-                prevDate = $$.changeLineTimezone($(el), prevDate);
-            });
-        }
+        log('adjustTimezone');
+        this.$el.find('h3').remove();
+        $.each(this.$el.children('li'), function (idx, el) {
+            prevDate = $$.changeLineTimezone($(el), prevDate);
+        });
         if ($$.searchTerm) {
             this.$el.find('.message').highlight($$.searchTerm.split(" "));
         }
         $$.imagePreviews(this.$el);
-        $$.applyFilter(this.$el)
-        // check timezone again on next fetch
-        this.adjustTimezone = false;
+        $$.applyFilter(this.$el);
     },
     refetch: function () {
         log('Cache:reFetch', this.url);
@@ -150,8 +139,7 @@ $$.Views.LogViewer = Backbone.View.extend({
 
         // initialize lines already in the DOM
         new $$.Cache({
-            $el: this.$logEl,
-            adjustTimezone: options.adjustTimezone
+            $el: this.$logEl
         }).prepPage();
 
         // Prep caches
@@ -375,12 +363,14 @@ $$.Views.LogViewer = Backbone.View.extend({
         // Finally, refill the cache
         log('LogViewer:Insert', cache.direction);
         var height;
+        var $firstChild;
         cache.$el.find('li').hide()
         $$.applyFilter(cache.$el);
         if (cache.direction === 'prev') {
             // if there isn't already a date header at the top
             // see if we need to add one
-            if (this.$logEl.children()[0].nodeName !== 'H3') {
+            $firstChild = this.$logEl.children()[0];
+            if ($firstChild && $firstChild.nodeName !== 'H3') {
                 this.checkPageSplit(cache.$el.find('li:last'),
                     this.$logEl.find('li:first'));
             }
@@ -396,21 +386,6 @@ $$.Views.LogViewer = Backbone.View.extend({
             cache.$el.children().appendTo(this.$logEl);
         }
         cache.refetch();
-    }
-});
-
-$$.Views.TimezoneFormView = Backbone.View.extend({
-    /* Submit guessed timezone if we haven't already */
-    initialize: function (options) {
-        var $tzField = this.$('#id_timezone');
-        if ($tzField.val() !== $$.clientTimezone) {
-            $tzField.val($$.clientTimezone);
-            $.ajax({
-                url: options.el.attr('action'),
-                type: options.el.attr('method'),
-                data: options.el.serialize()
-            });
-        }
     }
 });
 
@@ -513,8 +488,8 @@ $$.changeLineTimezone = function ($el, prevDate) {
     // adjust tz for an individual line
     var $time = $el.find('time'),
         thisDate = moment($time.attr('datetime'));
-    $time.html(thisDate.format("h:mm a"));
     $$.checkForDateHeader($el, thisDate, prevDate);
+    $time.html(thisDate.format("h:mm a")).show();
     return thisDate;
 };
 
@@ -570,17 +545,10 @@ $(document).ready(function () {
     if ($Log.length === 0) {
         return;
     }
-    var serverSideTz = $Log.data('timezone'),
-        $timeline = $('.timeline-navigation'),
-        $tzForm = $('#Timezone'),
+    var $timeline = $('.timeline-navigation')
         isCurrent = $Log.data('current') === 'True';
     $$.clientTimezone = jstz.determine().name();
     $$.searchTerm = $Log.data('search-term');
-    if ($tzForm.length) {
-        new $$.Views.TimezoneFormView({
-            el: $tzForm
-        });
-    }
     if ($timeline.length) {
         new $$.Views.TimelineView({
             el: $timeline,
@@ -595,8 +563,7 @@ $(document).ready(function () {
                 prevPage: $Log.data('previous'),
                 nextPage: $Log.data('next'),
                 current: isCurrent,
-                newestFirst: $Log.data('order') === 'reversed',
-                adjustTimezone: !serverSideTz
+                newestFirst: $Log.data('order') === 'reversed'
             })
         };
     }());

@@ -1,8 +1,7 @@
 {% spaceless %}
-{% load tz %}
 {% load logs_tags %}
-{% load cache %}
-{% timezone timezone %}
+{% load tz cache %}
+{% timezone "UTC" %}
 {% for line in message_list %}
     {% ifchanged line.timestamp|date:"Ymd" %}
     {% if show_first_header or not forloop.first %}
@@ -11,7 +10,7 @@
     {% endifchanged %}
     <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{% if same_nick %}same {% endif %}{{ line.command|lower }} {% if line.pk == highlight.pk %}highlight{% endif %}" data-nick="{{ line.nick }}" data-type="{% if line.command = "PRIVMSG" %}message{% else %}info{% endif %}">
     <a href="{{ line.get_absolute_url }}" class="moment" rel="nofollow">
-        <time datetime="{{ line.timestamp|date:"c" }}">{{ line.timestamp|date:"g:i A" }}</time>
+        <time class="hide" datetime="{{ line.timestamp|date:"c" }}">{{ line.timestamp|date:"g:i A" }}</time>
     </a>
     {% if line.action %}
         <div class="actor">{{ line.nick }} {{ line.text|bbme_urlizetrunc:50 }}</div>

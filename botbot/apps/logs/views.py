@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.views.generic import ListView, TemplateView, View
 from django.views.decorators.cache import patch_cache_control
@@ -94,15 +95,24 @@ class LogDateMixin(object):
         }
         return kwargs
 
+    def _local_date_at_midnight(self, timestamp):
+        # cast timestamp into local timezone
+        localized = timestamp.astimezone(self.request_timezone)
+        # create a new date object starting at midnight in that timezone
+        return timezone.datetime(localized.year,
+                                 localized.month,
+                                 localized.day,
+                                 tzinfo=localized.tzinfo)
+
     def _get_previous_date(self):
         """
         Find the previous day, that has content.
         """
         date = None
         try:
-            timestamp = (self._get_base_queryset()
-                        .filter(timestamp__lt=self.date)[0].timestamp)
-            date = timestamp.astimezone(self.tz).date()
+            ts = (self._get_base_queryset()
+                      .filter(timestamp__lt=self.date)[0].timestamp)
+            date = self._local_date_at_midnight(ts)
         except IndexError:
             pass
         return date
@@ -113,10 +123,10 @@ class LogDateMixin(object):
         """
         date = None
         try:
-            timestamp = (self._get_base_queryset()
+            ts = (self._get_base_queryset()
                 .filter(timestamp__gte=timezone.timedelta(days=1) + self.date)
                 .order_by('timestamp')[0].timestamp)
-            date = timestamp.astimezone(self.tz).date()
+            date = self._local_date_at_midnight(ts)
         except IndexError:
             pass
         return date
@@ -152,7 +162,6 @@ class LogViewer(ChannelMixin, object):
     def dispatch(self, request, *args, **kwargs):
         self.form = forms.SearchForm(request.GET)
         self._setup_response_format()
-        self._setup_timezone()
         return super(LogViewer, self).dispatch(request, *args, **kwargs)
 
     def _setup_response_format(self):
@@ -168,23 +177,6 @@ class LogViewer(ChannelMixin, object):
             self.format == 'html'
             self.include_timeline = True
             self.template_name = "logs/logs.html"
-
-    def _setup_timezone(self):
-        self.tz = None
-        tz_prefs = [
-            self.request.GET.get('tz', ''),
-            self.request.session.get('django_timezone', ''),
-            'UTC',
-        ]
-        for tz in tz_prefs:
-            try:
-                self.tz = pytz.timezone(tz)
-                break
-            except (pytz.UnknownTimeZoneError):
-                pass
-        self.timezone = self.tz.zone
-        timezone.activate(self.tz)
-        #self.request.session['django_timezone'] = self.timezone
 
 
     def get_ordered_queryset(self, queryset):
@@ -215,7 +207,6 @@ class LogViewer(ChannelMixin, object):
                 'highlight': highlight,
                 'is_current': getattr(self, 'is_current', False),
                 'search_form': self.form,
-                'tz_form': accounts_forms.TimezoneForm(self.request),
                 'show_first_header': self.show_first_header,
                 'newest_first': self.newest_first,
                 'show_kudos': self.channel.user_can_access_kudos(
@@ -224,7 +215,6 @@ class LogViewer(ChannelMixin, object):
 
         size = self.channel.current_size()
         context.update({
-            'timezone': self.timezone,
             'size': size,
             'big': (size >= settings.BIG_CHANNEL),
             'prev_page': self.prev_page,
@@ -292,7 +282,6 @@ class LogViewer(ChannelMixin, object):
             if self.prev_page:
                 response['X-PrevPage'] = self.prev_page
 
-        response['X-Timezone'] = self.timezone
         if has_next_page and self.request.user.is_anonymous():
             patch_cache_control(
                 response, public=True,
@@ -371,7 +360,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         try:
             self.highlight_line = get_object_or_404(
                 Log.objects, pk=msg_pk)
-            date = self.highlight_line.timestamp.astimezone(self.tz)
+            date = self.highlight_line.timestamp
         except ValueError:
             raise Http404
         return date
@@ -453,20 +442,32 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     def _message_redirect_cache_key(self, line):
         return "line:{0}:permalink".format(line.pk)
 
-    def set_view_date(self, date=None):
-        if not date:
-            if all([field in self.kwargs for field in ['year', 'month', 'day']]):
-                year = int(self.kwargs['year'])
-                month = int(self.kwargs['month'])
-                day = int(self.kwargs['day'])
-                date = self.tz.localize(
-                    timezone.datetime(year=year, month=month, day=day))
-            else:
-                date = timezone.now().date()
+    @cached_property
+    def request_timezone(self):
+        """
+        Read timezone in from GET param otherwise use UTC
+        """
+        try:
+            tz = pytz.timezone(self.request.GET.get('tz', ''))
+        except (pytz.UnknownTimeZoneError):
+            tz = pytz.timezone('UTC')
+        return tz
 
-                # Use the last page.
-                self.kwargs['page'] = 'last'
-        self.date = date
+    def set_view_date(self, date=None):
+        if date:
+            self.date = date
+        elif all([field in self.kwargs for field in ['year', 'month', 'day']]):
+            self.date = timezone.datetime(
+                year=int(self.kwargs['year']),
+                month=int(self.kwargs['month']),
+                day=int(self.kwargs['day']))
+
+            # localize date so logs start at local time
+            self.date = self.request_timezone.localize(self.date)
+        else:
+            # Use the last page.
+            self.kwargs['page'] = 'last'
+            self.date = timezone.now().date()
 
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
