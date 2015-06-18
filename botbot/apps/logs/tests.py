@@ -4,7 +4,7 @@ import datetime
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-from django.utils.timezone import now
+from django.utils import timezone
 import pytz
 
 from botbot.apps.accounts import models as account_models
@@ -14,7 +14,6 @@ from .management.commands import redact as redact_cmd
 from botbot.apps.bots.models import ChatBot, Channel
 from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.kudos.models import Kudos, KudosTotal
-
 
 class BaseTestCase(TestCase):
     def setUp(self):
@@ -29,17 +28,24 @@ class BaseTestCase(TestCase):
         self.log = log_models.Log.objects.create(
             channel=self.public_channel,
             command='PRIVMSG',
-            timestamp=pytz.utc.localize(datetime.datetime.now()))
+            timestamp=timezone.now())
 
 
 class UrlTests(BaseTestCase):
-    def test_current_redirects_to_today(self):
+
+    def test_day_log_viewer(self):
         url = reverse_channel(self.public_channel, "log_current")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
 
-    def test_day_log_viewer(self):
-        url = reverse_channel(self.public_channel, "log_current")
+    def test_day_log_text_viewer(self):
+        url = reverse_channel(
+            self.public_channel,
+            "log_day_text",
+            kwargs=dict(
+            year=self.log.timestamp.year,
+            month="%02d" % self.log.timestamp.month,
+            day="%02d" % self.log.timestamp.day))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
 
@@ -48,11 +54,11 @@ class UrlTests(BaseTestCase):
             channel=self.public_channel,
             command='QUIT',
             nick="test",
-            timestamp=pytz.utc.localize(datetime.datetime.now()))
+            timestamp=timezone.now())
         log_models.Log.objects.create(
             channel=self.public_channel,
             nick="test",
-            timestamp=pytz.utc.localize(datetime.datetime.now() + datetime.timedelta(seconds=1)))
+            timestamp=timezone.now() + datetime.timedelta(seconds=1))
         url = "%smissed/test/" % reverse_channel(self.public_channel, "log_current")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
@@ -62,7 +68,7 @@ class UrlTests(BaseTestCase):
             channel=self.public_channel,
             nick="test",
             text="This is a test",
-            timestamp=pytz.utc.localize(datetime.datetime.now() + datetime.timedelta(seconds=1)))
+            timestamp=timezone.now() + datetime.timedelta(seconds=1))
         url = "%ssearch/?q=test" % reverse_channel(self.public_channel, "log_current")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
@@ -79,8 +85,8 @@ class SearchTestCase(TestCase):
 
     def _add_log_line(self, text, nick="Nick"):
         obj = log_models.Log.objects.create(
-            bot=self.chatbot, channel=self.public_channel, timestamp=now(),
-            nick=nick, text=text, command='PRIVMSG')
+            bot=self.chatbot, channel=self.public_channel,
+            timestamp=timezone.now(), nick=nick, text=text, command='PRIVMSG')
         obj.update_search_field()
         return obj
 
@@ -226,13 +232,13 @@ class RedactTests(TestCase):
             command='PRIVMSG',
             text='this is a test',
             nick='not-redact',
-            timestamp=now())
+            timestamp=timezone.now())
         log_models.Log.objects.create(
             channel=self.public_channel,
             command='PRIVMSG',
             text='this is a test',
             nick='redact',
-            timestamp=now())
+            timestamp=timezone.now())
         redacted = log_models.Log.objects.filter(text=log_models.REDACTED_TEXT)
         self.assertFalse(redacted.exists())
         count = redact_cmd._redact_logs_for_nick('redact')
@@ -247,14 +253,14 @@ class RedactTests(TestCase):
             command='PRIVMSG',
             text='this is a test',
             nick='not-redact',
-            timestamp=now())
+            timestamp=timezone.now())
         self.assertNotEqual(not_redacted.text, log_models.REDACTED_TEXT)
         redacted = log_models.Log.objects.create(
             channel=self.public_channel,
             command='PRIVMSG',
             text='this is a test',
             nick='redact',
-            timestamp=now())
+            timestamp=timezone.now())
         self.assertEqual(redacted.text, log_models.REDACTED_TEXT)
 
 
@@ -266,7 +272,8 @@ class KudosTests(BaseTestCase):
         for i, letter in enumerate('abcdefghijklmnopqrstuvwxyz'):
             kudos.append(Kudos(
                 nick=letter*3, count=1+i+(i % 5), channel=self.public_channel,
-                first=now()-datetime.timedelta(days=100), recent=now()))
+                first=timezone.now()-datetime.timedelta(days=100),
+                recent=timezone.now()))
         Kudos.objects.bulk_create(kudos)
         self.url = reverse_channel(self.public_channel, "kudos")
 

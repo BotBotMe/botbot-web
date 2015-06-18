@@ -1,4 +1,3 @@
-import datetime
 import json
 import math
 import random
@@ -10,7 +9,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.utils.timezone import get_current_timezone_name, now
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.views.generic import ListView, TemplateView, View
 from django.views.decorators.cache import patch_cache_control
@@ -83,8 +82,9 @@ class LogDateMixin(object):
     def channel_date_url(self, date=None):
         if not date:
             date = self.date
+        viewname = self.format == 'text' and 'log_day_text' or 'log_day'
         return reverse_channel(
-            self.channel, 'log_day', kwargs=self._kwargs_with_date(date))
+            self.channel, viewname, kwargs=self._kwargs_with_date(date))
 
     def _kwargs_with_date(self, date):
         kwargs = {
@@ -98,25 +98,33 @@ class LogDateMixin(object):
         """
         Find the previous day, that has content.
         """
-        qs = self._get_base_queryset().filter(timestamp__lt=self.date)
-        if qs.exists():
-            return qs[0].timestamp.date()
+        date = None
+        try:
+            timestamp = (self._get_base_queryset()
+                        .filter(timestamp__lt=self.date)[0].timestamp)
+            date = timestamp.astimezone(self.tz).date()
+        except IndexError:
+            pass
+        return date
 
     def _get_next_date(self):
         """
-        Find the previous day, that has content.
+        Find the next day, that has content.
         """
-        qs = (
-            self._get_base_queryset()
-            .filter(timestamp__gte=datetime.timedelta(days=1) + self.date)
-            .order_by('timestamp'))
-        if qs.exists():
-            return qs[0].timestamp.date()
+        date = None
+        try:
+            timestamp = (self._get_base_queryset()
+                .filter(timestamp__gte=timezone.timedelta(days=1) + self.date)
+                .order_by('timestamp')[0].timestamp)
+            date = timestamp.astimezone(self.tz).date()
+        except IndexError:
+            pass
+        return date
 
     def _date_query_set(self, date):
         qs = self._get_base_queryset()
         return qs.filter(timestamp__gte=date,
-                         timestamp__lt=date + datetime.timedelta(days=1))
+                         timestamp__lt=date + timezone.timedelta(days=1))
 
 class LogStream(ChannelMixin, View):
     def get(self, request, channel_slug, bot_slug):
@@ -130,11 +138,10 @@ class LogStream(ChannelMixin, View):
 
 class LogViewer(ChannelMixin, object):
     context_object_name = "message_list"
-    template_name = "logs/logs.html"
     newest_first = False
-    show_timeline = True
     show_first_header = False   # Display date header above first line
     paginate_by = 150
+    format = 'html'
 
     def __init__(self, *args, **kwargs):
         super(LogViewer, self).__init__(*args, **kwargs)
@@ -144,13 +151,41 @@ class LogViewer(ChannelMixin, object):
 
     def dispatch(self, request, *args, **kwargs):
         self.form = forms.SearchForm(request.GET)
-        self.timezone = get_current_timezone_name()
-
-        if request.is_ajax():
-            self.show_timeline = False
-            self.template_name = 'logs/log_display.html'
-
+        self._setup_response_format()
+        self._setup_timezone()
         return super(LogViewer, self).dispatch(request, *args, **kwargs)
+
+    def _setup_response_format(self):
+        if self.format == 'text':
+            self.include_timeline = False
+            self.template_name = 'logs/logs.txt'
+        elif self.request.is_ajax():
+            self.format = 'ajax'
+            self.include_timeline = False
+            self.template_name = 'logs/log_display.html'
+        # Default to HTML view
+        else:
+            self.format == 'html'
+            self.include_timeline = True
+            self.template_name = "logs/logs.html"
+
+    def _setup_timezone(self):
+        self.tz = None
+        tz_prefs = [
+            self.request.GET.get('tz', ''),
+            self.request.session.get('django_timezone', ''),
+            'UTC',
+        ]
+        for tz in tz_prefs:
+            try:
+                self.tz = pytz.timezone(tz)
+                break
+            except (pytz.UnknownTimeZoneError):
+                pass
+        self.timezone = self.tz.zone
+        timezone.activate(self.tz)
+        #self.request.session['django_timezone'] = self.timezone
+
 
     def get_ordered_queryset(self, queryset):
         order = 'timestamp'
@@ -171,13 +206,10 @@ class LogViewer(ChannelMixin, object):
     def get_context_data(self, **kwargs):
         context = super(LogViewer, self).get_context_data(**kwargs)
 
-        if self.show_timeline:
+        if self.include_timeline:
             context.update(self._timeline_context())
 
-        context["size"] = self.channel.current_size()
-        context["big"] = (context["size"] >= settings.BIG_CHANNEL)
-
-        if not self.request.is_ajax():
+        if self.format == 'html':
             highlight = self.find_highlight(self.object_list)
             context.update({
                 'highlight': highlight,
@@ -189,7 +221,12 @@ class LogViewer(ChannelMixin, object):
                 'show_kudos': self.channel.user_can_access_kudos(
                     self.request.user),
             })
+
+        size = self.channel.current_size()
         context.update({
+            'timezone': self.timezone,
+            'size': size,
+            'big': (size >= settings.BIG_CHANNEL),
             'prev_page': self.prev_page,
             'next_page': self.next_page,
             'current_page': self.current_page,
@@ -206,19 +243,19 @@ class LogViewer(ChannelMixin, object):
         if not timeline:
             return {}
 
-        today = datetime.date.today()
-        last_monday = today - datetime.timedelta(days=today.weekday())
-        last_week = last_monday - datetime.timedelta(days=7)
+        today = timezone.now().date()
+        last_monday = today - timezone.timedelta(days=today.weekday())
+        last_week = last_monday - timezone.timedelta(days=7)
 
         # the last month in the timeline needs special treatment so it
         # doesn't get ordered ahead of the last/current weeks
         last_month = timeline[timeline.keyOrder[-1]].pop()
         if last_month >= last_week:
             last_month_adjusted = (last_week -
-                                   datetime.timedelta(days=1))
+                                   timezone.timedelta(days=1))
         elif last_month >= last_monday:
             last_month_adjusted = (last_monday -
-                                   datetime.timedelta(days=1))
+                                   timezone.timedelta(days=1))
         else:
             last_month_adjusted = last_month
 
@@ -236,15 +273,7 @@ class LogViewer(ChannelMixin, object):
             context, **response_kwargs)
 
         has_next_page = False
-        if self.request.is_ajax():
-            # easily parsed with Javascript
-            if self.next_page:
-                response['X-NextPage'] = self.next_page
-                has_next_page = True
-
-            if self.prev_page:
-                response['X-PrevPage'] = self.prev_page
-        else:
+        if self.format == 'html':
             # Official SEO header
             links = []
             if self.next_page:
@@ -254,6 +283,15 @@ class LogViewer(ChannelMixin, object):
             if self.prev_page:
                 links.append('{0}; rel="prev"'.format(self.prev_page))
             response['Link'] = ','.join(links)
+        else:
+            # No HTML, pass page info in easily parseable headers
+            if self.next_page:
+                response['X-NextPage'] = self.next_page
+                has_next_page = True
+
+            if self.prev_page:
+                response['X-PrevPage'] = self.prev_page
+
         response['X-Timezone'] = self.timezone
         if has_next_page and self.request.user.is_anonymous():
             patch_cache_control(
@@ -271,32 +309,14 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     show_first_header = False
     allow_empty = True
 
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.tz = pytz.timezone(self.request.GET.get('tz', 'UTC'))
-        except (KeyError, pytz.UnknownTimeZoneError):
-            self.tz = pytz.utc
-
-        try:
-            # Handle the case we we are trying to find a single message.
-            if 'msg_pk' in self.kwargs:
-                self.highlight_line = get_object_or_404(
-                    Log.objects, pk=self.kwargs['msg_pk'])
-                date = datetime.datetime(
-                    year=self.highlight_line.timestamp.year,
-                    month=self.highlight_line.timestamp.month,
-                    day=self.highlight_line.timestamp.day)
-                self.date = self.tz.localize(date)
-            else:
-                self.set_view_date()
-        except ValueError:
-            raise Http404
-
-        return super(DayLogViewer, self).dispatch(request, *args, **kwargs)
-
     def get(self, request, *args, **kwargs):
+        # Check if this is a single message lookup
+        if 'msg_pk' in self.kwargs:
+            self.set_view_date(
+                self._get_single_message_date(self.kwargs['msg_pk']))
+        else:
+            self.set_view_date()
         self.object_list = self.get_queryset()
-
         # Handle finding the page a message is located on.
         if getattr(self, 'highlight_line', None):
             # Maybe one day we can push this to varnish
@@ -347,11 +367,20 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         context = self.get_context_data()
         return self.render_to_response(context)
 
+    def _get_single_message_date(self, msg_pk):
+        try:
+            self.highlight_line = get_object_or_404(
+                Log.objects, pk=msg_pk)
+            date = self.highlight_line.timestamp.astimezone(self.tz)
+        except ValueError:
+            raise Http404
+        return date
+
     def get_queryset(self):
         qs = self.channel.filtered_logs()
         qs = self.get_ordered_queryset(qs)
         start = self.date
-        end = start + datetime.timedelta(days=1)
+        end = start + timezone.timedelta(days=1)
         return qs.filter(timestamp__gte=start, timestamp__lt=end)
 
     def _date_paginator(self, date):
@@ -416,7 +445,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     def get_current_page_link(self, page):
         # copy, to maintain any params that came in to original request.
         params = self.request.GET.copy()
-        date = self.tz.localize(datetime.datetime.now())
+        date = timezone.now()
         url = self.channel_date_url(date)
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
@@ -424,31 +453,27 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     def _message_redirect_cache_key(self, line):
         return "line:{0}:permalink".format(line.pk)
 
-    def set_view_date(self):
-        if all([field in self.kwargs for field in ['year', 'month', 'day']]):
-            year = int(self.kwargs['year'])
-            month = int(self.kwargs['month'])
-            day = int(self.kwargs['day'])
+    def set_view_date(self, date=None):
+        if not date:
+            if all([field in self.kwargs for field in ['year', 'month', 'day']]):
+                year = int(self.kwargs['year'])
+                month = int(self.kwargs['month'])
+                day = int(self.kwargs['day'])
+                date = self.tz.localize(
+                    timezone.datetime(year=year, month=month, day=day))
+            else:
+                date = timezone.now().date()
 
-            self.date = self.tz.localize(
-                datetime.datetime(year=year, month=month, day=day))
-        else:
-            current = now()
-            self.date = self.tz.localize(
-                datetime.datetime(
-                    year=current.year,
-                    month=current.month,
-                    day=current.day))
-
-            # Use the last page.
-            self.kwargs['page'] = 'last'
+                # Use the last page.
+                self.kwargs['page'] = 'last'
+        self.date = date
 
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
     show_first_header = True
     newest_first = True
     allow_empty = True
-    show_timeline = False
+    include_timeline = False
 
     def get_context_data(self, **kwargs):
         """
@@ -481,7 +506,7 @@ class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
 
 
 class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
-    show_timeline = False
+    include_timeline = False
     show_first_header = True
     newest_first = False
 
@@ -516,7 +541,7 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
             date_filter = {'timestamp__gte': last_exit.timestamp}
         # Only fetch results from when the user logged out.
         self.fetch_after = (
-            last_exit.timestamp - datetime.timedelta(milliseconds=1))
+            last_exit.timestamp - timezone.timedelta(milliseconds=1))
         return queryset.filter(**date_filter)
 
 

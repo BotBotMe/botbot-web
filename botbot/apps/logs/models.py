@@ -64,6 +64,7 @@ class Log(models.Model):
         return render_to_string("logs/log_display.html",
                                 {
                                     'message_list': [self],
+                                    'timezone': 'UTC',
                                 })
     def get_cleaned_host(self):
         if self.host:

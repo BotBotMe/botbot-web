@@ -1,6 +1,8 @@
 {% spaceless %}
+{% load tz %}
 {% load logs_tags %}
 {% load cache %}
+{% timezone timezone %}
 {% for line in message_list %}
     {% ifchanged line.timestamp|date:"Ymd" %}
     {% if show_first_header or not forloop.first %}
@@ -32,4 +34,5 @@
     </li>
 
 {% endfor %}
+{% endtimezone %}
 {% endspaceless %}

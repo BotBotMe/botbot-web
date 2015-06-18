@@ -1,0 +1,17 @@
+{% load tz logs_tags %}{% whitelineless %}
+{% timezone timezone %}
+{% for line in message_list %}
+    {% if line.action %}
+        [{{ line.timestamp|date:"H:i:s" }}] * {{ line.nick }} {{ line.text }}
+    {% else %}
+        {% if line.command == "PRIVMSG" %}
+            [{{ line.timestamp|date:"H:i:s" }}] {% if line.nick %}<{{ line.nick }}>{% else %}*{% endif %} {{ line.text }}
+        {% else %}
+            {# JOIN, PART, QUIT, NICK, etc #}
+            [{{ line.timestamp|date:"H:i:s" }}] * {{ line }}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+{% endtimezone %}
+{% endwhitelineless %}
+

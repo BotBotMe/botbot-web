@@ -67,7 +67,8 @@ $$.Cache = Backbone.Model.extend({
                         this.isLoading = false;
                         this.isFinished = true;
                     } else {
-                        if ($$.clientTimezone !== serverTimezone) {
+                        // if the server/client timezones do not match and a specific one was not requested
+                        if ($$.clientTimezone !== serverTimezone && this.url.indexOf('tz=') === -1) {
                             this.adjustTimezone = true;
                         }
                         this.prepPage(data);
@@ -402,7 +403,7 @@ $$.Views.TimezoneFormView = Backbone.View.extend({
     /* Submit guessed timezone if we haven't already */
     initialize: function (options) {
         var $tzField = this.$('#id_timezone');
-        if (!$tzField.val()) {
+        if ($tzField.val() !== $$.clientTimezone) {
             $tzField.val($$.clientTimezone);
             $.ajax({
                 url: options.el.attr('action'),

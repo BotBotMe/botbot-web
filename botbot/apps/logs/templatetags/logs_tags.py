@@ -1,7 +1,7 @@
 """Near duplicate of Django's `urlizetrunc` with support for image classes"""
 import urlparse
 
-from django.template.base import Library
+from django.template.base import Library, Node
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe, SafeData
 from django.utils.encoding import force_text
@@ -238,3 +238,21 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
     except ValueError:
         return text
 bbme_urlizetrunc = allow_lazy(bbme_urlizetrunc, six.text_type)
+
+def strip_empty_lines(block):
+    return '\n'.join(
+        [l.strip() for l in block.splitlines() if l.strip()]).strip()
+strip_empty_lines = allow_lazy(strip_empty_lines, six.text_type)
+
+class WhiteLinelessNode(Node):
+    def __init__(self, nodelist):
+        self.nodelist = nodelist
+
+    def render(self, context):
+        return strip_empty_lines(self.nodelist.render(context))
+
+@register.tag
+def whitelineless(parser, token):
+    nodelist = parser.parse(('endwhitelineless',))
+    parser.delete_first_token()
+    return WhiteLinelessNode(nodelist)
