@@ -1,6 +1,7 @@
 {% extends "landing/base.html" %}
-{% load channel_url %}
+{% load cache channel_url %}
 {% block content %}
+    {% cache 600 "signup-featured-channels" %}
     <section class="preview-box">
         <h3>Featured channels</h3>
         <ul class="channel-list">
@@ -11,6 +12,7 @@
 
         <p><strong>New to IRC?</strong> <a href="/how-to-setup-irc-channel/">Check out our quick start guide</a></p>
     </section>
+    {% endcache %}
 
     <div id="Glob"></div>
 
@@ -49,11 +51,13 @@
      Don't see your channel listed?<br><span class="op">If you're a channel op:</span><br><a class="request-here" href="{% url 'request_channel' %}">Request it here</a>
     </p>
 
+    {% cache 600 "signup-public-channels" %}
     <ul class="channel-list-compact">
     {% for channel in public_not_featured_channels %}
         <li><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></li>
     {% endfor %}
     </ul>
+    {% endcache %}
 {% endblock content %}
 {% block tail %}
 <script>
