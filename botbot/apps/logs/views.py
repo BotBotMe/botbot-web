@@ -208,6 +208,7 @@ class LogViewer(ChannelMixin, object):
         if self.format == 'text':
             self.include_timeline = False
             self.template_name = 'logs/logs.txt'
+            self.content_type = 'text/plain; charset=utf-8'
         elif self.request.is_ajax():
             self.format = 'ajax'
             self.include_timeline = False
