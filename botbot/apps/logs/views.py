@@ -16,7 +16,6 @@ from django.views.generic import ListView, TemplateView, View
 from django.views.decorators.cache import patch_cache_control
 import pytz
 
-from botbot.apps.accounts import forms as accounts_forms
 from botbot.apps.bots.utils import reverse_channel
 from botbot.apps.bots.views import ChannelMixin
 from . import forms
@@ -145,13 +144,55 @@ class LogStream(ChannelMixin, View):
             response['Last-Event-ID'] = request.META['HTTP_LAST_EVENT_ID']
         return response
 
+def _find_pk(pk, queryset):
+    """Find a PK in a queryset in memory"""
+    found = None
+    try:
+        pk = int(pk)
+        found = next(obj for obj in queryset if obj.pk == pk)
+    except (ValueError, StopIteration):
+        pass
+    return found
+
+def _timeline_context(timeline):
+    """
+    Context (template) vars needed for timeline display.
+    """
+
+    if not timeline:
+        return {}
+
+    today = timezone.now().date()
+    last_monday = today - timezone.timedelta(days=today.weekday())
+    last_week = last_monday - timezone.timedelta(days=7)
+
+    # the last month in the timeline needs special treatment so it
+    # doesn't get ordered ahead of the last/current weeks
+    last_month = timeline[timeline.keyOrder[-1]].pop()
+    if last_month >= last_week:
+        last_month_adjusted = (last_week -
+                               timezone.timedelta(days=1))
+    elif last_month >= last_monday:
+        last_month_adjusted = (last_monday -
+                               timezone.timedelta(days=1))
+    else:
+        last_month_adjusted = last_month
+
+    result = {
+        'timeline': timeline,
+        'this_week': last_monday,
+        'last_week': last_week,
+        'last_month': {'real': last_month,
+                       'adjusted': last_month_adjusted},
+    }
+    return result
 
 class LogViewer(ChannelMixin, object):
     context_object_name = "message_list"
     newest_first = False
     show_first_header = False   # Display date header above first line
     paginate_by = 150
-    format = 'html'
+    format = ''
 
     def __init__(self, *args, **kwargs):
         super(LogViewer, self).__init__(*args, **kwargs)
@@ -160,7 +201,6 @@ class LogViewer(ChannelMixin, object):
         self.current_page = ""
 
     def dispatch(self, request, *args, **kwargs):
-        self.form = forms.SearchForm(request.GET)
         self._setup_response_format()
         return super(LogViewer, self).dispatch(request, *args, **kwargs)
 
@@ -174,7 +214,7 @@ class LogViewer(ChannelMixin, object):
             self.template_name = 'logs/log_display.html'
         # Default to HTML view
         else:
-            self.format == 'html'
+            self.format = 'html'
             self.include_timeline = True
             self.template_name = "logs/logs.html"
 
@@ -186,27 +226,19 @@ class LogViewer(ChannelMixin, object):
 
         return queryset.order_by(order)
 
-    def find_highlight(self, messages):
-        try:
-            pk = int(self.request.GET.get('msg'))
-            for l in messages:
-                if l.pk == pk:
-                    return l
-        except (ValueError, TypeError):
-            pass
+
 
     def get_context_data(self, **kwargs):
         context = super(LogViewer, self).get_context_data(**kwargs)
 
         if self.include_timeline:
-            context.update(self._timeline_context())
+            context.update(
+                _timeline_context(self.channel.get_months_active()))
 
         if self.format == 'html':
-            highlight = self.find_highlight(self.object_list)
             context.update({
-                'highlight': highlight,
                 'is_current': getattr(self, 'is_current', False),
-                'search_form': self.form,
+                'search_form': forms.SearchForm(),
                 'show_first_header': self.show_first_header,
                 'newest_first': self.newest_first,
                 'show_kudos': self.channel.user_can_access_kudos(
@@ -224,39 +256,7 @@ class LogViewer(ChannelMixin, object):
 
         return context
 
-    def _timeline_context(self):
-        """
-        Context (template) vars needed for timeline display.
-        """
 
-        timeline = self.channel.get_months_active()
-        if not timeline:
-            return {}
-
-        today = timezone.now().date()
-        last_monday = today - timezone.timedelta(days=today.weekday())
-        last_week = last_monday - timezone.timedelta(days=7)
-
-        # the last month in the timeline needs special treatment so it
-        # doesn't get ordered ahead of the last/current weeks
-        last_month = timeline[timeline.keyOrder[-1]].pop()
-        if last_month >= last_week:
-            last_month_adjusted = (last_week -
-                                   timezone.timedelta(days=1))
-        elif last_month >= last_monday:
-            last_month_adjusted = (last_monday -
-                                   timezone.timedelta(days=1))
-        else:
-            last_month_adjusted = last_month
-
-        result = {
-            'timeline': timeline,
-            'this_week': last_monday,
-            'last_week': last_week,
-            'last_month': {'real': last_month,
-                           'adjusted': last_month_adjusted},
-        }
-        return result
 
     def render_to_response(self, context, **response_kwargs):
         response = super(LogViewer, self).render_to_response(
@@ -299,71 +299,50 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     allow_empty = True
 
     def get(self, request, *args, **kwargs):
-        # Check if this is a single message lookup
-        if 'msg_pk' in self.kwargs:
-            self.set_view_date(
-                self._get_single_message_date(self.kwargs['msg_pk']))
-        else:
-            self.set_view_date()
+        self.date = self.set_view_date()
         self.object_list = self.get_queryset()
-        # Handle finding the page a message is located on.
-        if getattr(self, 'highlight_line', None):
-            # Maybe one day we can push this to varnish
-            url, params = cache.get(
-                self._message_redirect_cache_key(self.highlight_line),
-                [None, None])
-            if not url:
-                paginator = self.get_paginator(
-                    self.object_list, self.get_paginate_by(self.object_list))
-                for n in paginator.page_range:
-                    page = paginator.page(n)
-                    if self.highlight_line in page.object_list:
-                        params = {"msg": self.highlight_line.pk, "page": n}
-                        url = self.channel_date_url()
-                        cache.set(
-                            self._message_redirect_cache_key(self.highlight_line),
-                            [url, {"msg": self.highlight_line.pk, "page": n}], None)
-                        break  # Found the page.
 
-            oparams = self.request.GET.copy()
-            oparams.update(params)
-            return redirect('{0}?{1}'.format(url, oparams.urlencode()),
-                            permanent=True)
+        # Redirect to nearby logs if this queryset is empty to avoid a 404
+        if not self.get_allow_empty() and not self.object_list.exists():
+            url = self._nearby_log_url()
+            if url:
+                return redirect(url)
+            raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
+                          % {'class_name': self.__class__.__name__})
 
-        allow_empty = self.get_allow_empty()
-        if not allow_empty:
-            is_empty = not self.object_list.exists()
-            if is_empty:
-                try:
-                    # First check if there is anything in the past
-                    closet_qs = self.channel.filtered_logs().order_by(
-                        "-timestamp").filter(timestamp__lte=self.date)
-
-                    # If not go to the future
-                    if not closet_qs.exists():
-                        closet_qs = self.channel.filtered_logs().order_by(
-                            "timestamp").filter(
-                            timestamp__gte=self.date)
-
-                    closet_date = closet_qs[0].timestamp
-
-                    url = self.channel_date_url(closet_date)
-                    return redirect(url)
-
-                except IndexError:
-                    raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
-                                  % {'class_name': self.__class__.__name__})
         context = self.get_context_data()
         return self.render_to_response(context)
 
-    def _get_single_message_date(self, msg_pk):
+    def _nearby_log_url(self):
+        """Find a date-based log URL that will not be empty"""
+        # First check if there is anything in the past
+        closet_qs = self.channel.filtered_logs().order_by(
+            "-timestamp").filter(timestamp__lte=self.date)
+
+        # If not go to the future
+        if not closet_qs.exists():
+            closet_qs = self.channel.filtered_logs().order_by(
+                "timestamp").filter(
+                timestamp__gte=self.date)
+
+        # Return the URL where the first log line found will be
         try:
-            self.highlight_line = get_object_or_404(
-                Log.objects, pk=msg_pk)
-            date = self.highlight_line.timestamp
-        except ValueError:
-            raise Http404
-        return date
+            return self.channel_date_url(closet_qs[0].timestamp)
+        except IndexError:
+            pass
+        return None
+
+
+    def get_context_data(self):
+        context = super(DayLogViewer, self).get_context_data()
+        try:
+            context.update({
+                'highlight': int(self.request.GET.get('msg')),
+            })
+        except TypeError:
+            pass
+        return context
+
 
     def get_queryset(self):
         qs = self.channel.filtered_logs()
@@ -439,9 +418,6 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
 
-    def _message_redirect_cache_key(self, line):
-        return "line:{0}:permalink".format(line.pk)
-
     @cached_property
     def request_timezone(self):
         """
@@ -449,25 +425,23 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         """
         try:
             tz = pytz.timezone(self.request.GET.get('tz', ''))
-        except (pytz.UnknownTimeZoneError):
+        except pytz.UnknownTimeZoneError:
             tz = pytz.timezone('UTC')
         return tz
 
-    def set_view_date(self, date=None):
-        if date:
-            self.date = date
-        elif all([field in self.kwargs for field in ['year', 'month', 'day']]):
+    def set_view_date(self):
+        """Determine start date for queryset"""
+        if all([field in self.kwargs for field in ['year', 'month', 'day']]):
             self.date = timezone.datetime(
                 year=int(self.kwargs['year']),
                 month=int(self.kwargs['month']),
                 day=int(self.kwargs['day']))
-
             # localize date so logs start at local time
-            self.date = self.request_timezone.localize(self.date)
-        else:
-            # Use the last page.
-            self.kwargs['page'] = 'last'
-            self.date = timezone.now().date()
+            return self.request_timezone.localize(self.date)
+
+        # Use the last page.
+        self.kwargs['page'] = 'last'
+        return timezone.now().date()
 
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
@@ -476,19 +450,26 @@ class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
     allow_empty = True
     include_timeline = False
 
+    def get(self, request, *args, **kwargs):
+        self.form = forms.SearchForm(request.GET)
+        return super(SearchLogViewer, self).get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         """
         Add the search term to the context data.
         """
-        data = super(SearchLogViewer, self).get_context_data(**kwargs)
-        data['q'] = self.search_term
-        data['use_absolute_url'] = True
-        return data
+        context = super(SearchLogViewer, self).get_context_data(**kwargs)
+        context.update({
+            'q': self.search_term,
+            'search_form': self.form,
+        })
+        return context
 
     def get_queryset(self):
         """
         Use search results rather than the standard queryset.
         """
+        self.form = forms.SearchForm(self.request.GET)
         if self.form.is_valid():
             self.search_term = self.form.cleaned_data.get("q", "")
         else:
@@ -505,6 +486,45 @@ class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
 
         return self.channel.log_set.search(self.search_term).filter(filter_args)
 
+
+class SingleLogViewer(DayLogViewer):
+    """
+    Find a single log line and redirect to a permalink to it.
+
+    This inherits from DayLogViewer because it needs to use same queryset
+    and pagination methods to ensure the page is found in the same place.
+    """
+
+    def get(self, request, *args, **kwargs):
+        try:
+            log = get_object_or_404(Log.objects, pk=self.kwargs['msg_pk'])
+        except ValueError:
+            raise Http404
+        # set date to midnight so get_queryset starts pages correctly
+        self.date = log.timestamp.date()
+        self.object_list = self.get_queryset()
+        # Find the page in the queryset the message is located on.
+        page_url = self._permalink_to_log(log)
+        return redirect(page_url, permanent=True)
+
+    def _permalink_to_log(self, log):
+        """Scan pages for a single log. Return to permalink to page"""
+        cache_key = "line:{}:permalink".format(log.pk)
+        url, params = cache.get(cache_key, [None, None])
+        if not url:
+            paginator = self.get_paginator(
+                self.object_list, self.get_paginate_by(self.object_list))
+            for n in paginator.page_range:
+                page = paginator.page(n)
+                if log in page.object_list:
+                    params = {"msg": log.pk, "page": n}
+                    url = self.channel_date_url()
+                    cache.set(cache_key, [url, params], None)
+                    break  # Found the page.
+
+        oparams = self.request.GET.copy()
+        oparams.update(params)
+        return '{0}?{1}'.format(url, oparams.urlencode())
 
 class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
     include_timeline = False

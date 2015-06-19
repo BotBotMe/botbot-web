@@ -31,10 +31,21 @@ class BaseTestCase(TestCase):
             timestamp=timezone.now())
 
 
-class UrlTests(BaseTestCase):
+class SmokeTests(BaseTestCase):
+
+    def test_current_viewer(self):
+        url = reverse_channel(self.public_channel, "log_current")
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
 
     def test_day_log_viewer(self):
-        url = reverse_channel(self.public_channel, "log_current")
+        url = reverse_channel(
+            self.public_channel,
+            "log_day",
+            kwargs=dict(
+            year=self.log.timestamp.year,
+            month="%02d" % self.log.timestamp.month,
+            day="%02d" % self.log.timestamp.day))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
 
