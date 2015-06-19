@@ -6,7 +6,6 @@
 {% block head_title %}IRC Logs for {{ channel.name }} {{ block.super }}{% endblock %}
 {% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}
 {% if channel_ads %} display_bbsponsor{% endif %}{% endblock %}
-{% load channel_url logs_tags%}
 
 {% block content_outer %}
 
