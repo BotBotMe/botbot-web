@@ -340,7 +340,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
             context.update({
                 'highlight': int(self.request.GET.get('msg')),
             })
-        except TypeError:
+        except ValueError:
             pass
         return context
 
