@@ -94,7 +94,7 @@ def embed_image(url):
 
         return link, src
 
-    elif url.hostname in "cl.ly":
+    elif url.hostname == "cl.ly":
         match = re.match(r"^/image/(?P<image_id>[\-\w\.]+)", url.path)
         if not match:
             match = re.match(r"^/(?P<image_id>[\-\w\.]+)", url.path)
