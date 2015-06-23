@@ -65,9 +65,18 @@ class ChannelRequestForm(forms.Form):
         if not channel_name.startswith("#"):
             channel_name = "#" + channel_name
 
-        if models.Channel.objects.filter(name=channel_name).exists():
-            raise forms.ValidationError(
-                "Sorry, this channel is already being monitored.")
+        try:
+            channel = models.Channel.objects.filter(name=channel_name)[0]
+            if channel.is_active:
+                msg = mark_safe('<a href="{}">{}</a> is already being '
+                                'monitored.'.format(channel.get_absolute_url(),
+                                                    channel_name))
+            else:
+                msg = ('This channel is already in the request queue. Please '
+                       'be patient while we process the request.')
+            raise forms.ValidationError(msg)
+        except IndexError:
+            pass
 
 
         return channel_name
