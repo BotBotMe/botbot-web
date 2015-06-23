@@ -1,3 +1,4 @@
+import datetime
 import json
 import math
 import random
@@ -9,7 +10,6 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.views.generic import ListView, TemplateView, View
@@ -98,7 +98,7 @@ class LogDateMixin(object):
         # cast timestamp into local timezone
         localized = timestamp.astimezone(self.request_timezone)
         # create a new date object starting at midnight in that timezone
-        return timezone.datetime(localized.year,
+        return datetime.datetime(localized.year,
                                  localized.month,
                                  localized.day,
                                  tzinfo=localized.tzinfo)
@@ -123,7 +123,7 @@ class LogDateMixin(object):
         date = None
         try:
             ts = (self._get_base_queryset()
-                .filter(timestamp__gte=timezone.timedelta(days=1) + self.date)
+                .filter(timestamp__gte=datetime.timedelta(days=1) + self.date)
                 .order_by('timestamp')[0].timestamp)
             date = self._local_date_at_midnight(ts)
         except IndexError:
@@ -133,7 +133,7 @@ class LogDateMixin(object):
     def _date_query_set(self, date):
         qs = self._get_base_queryset()
         return qs.filter(timestamp__gte=date,
-                         timestamp__lt=date + timezone.timedelta(days=1))
+                         timestamp__lt=date + datetime.timedelta(days=1))
 
 class LogStream(ChannelMixin, View):
     def get(self, request, channel_slug, bot_slug):
@@ -143,6 +143,9 @@ class LogStream(ChannelMixin, View):
         if 'HTTP_LAST_EVENT_ID' in request.META:
             response['Last-Event-ID'] = request.META['HTTP_LAST_EVENT_ID']
         return response
+
+def _utc_now():
+    return datetime.datetime.now(tz=pytz.timezone('UTC'))
 
 def _find_pk(pk, queryset):
     """Find a PK in a queryset in memory"""
@@ -162,19 +165,19 @@ def _timeline_context(timeline):
     if not timeline:
         return {}
 
-    today = timezone.now().date()
-    last_monday = today - timezone.timedelta(days=today.weekday())
-    last_week = last_monday - timezone.timedelta(days=7)
+    today = _utc_now().date()
+    last_monday = today - datetime.timedelta(days=today.weekday())
+    last_week = last_monday - datetime.timedelta(days=7)
 
     # the last month in the timeline needs special treatment so it
     # doesn't get ordered ahead of the last/current weeks
     last_month = timeline[timeline.keyOrder[-1]].pop()
     if last_month >= last_week:
         last_month_adjusted = (last_week -
-                               timezone.timedelta(days=1))
+                               datetime.timedelta(days=1))
     elif last_month >= last_monday:
         last_month_adjusted = (last_monday -
-                               timezone.timedelta(days=1))
+                               datetime.timedelta(days=1))
     else:
         last_month_adjusted = last_month
 
@@ -349,7 +352,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         qs = self.channel.filtered_logs()
         qs = self.get_ordered_queryset(qs)
         start = self.date
-        end = start + timezone.timedelta(days=1)
+        end = start + datetime.timedelta(days=1)
         return qs.filter(timestamp__gte=start, timestamp__lt=end)
 
     def _date_paginator(self, date):
@@ -414,7 +417,7 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     def get_current_page_link(self, page):
         # copy, to maintain any params that came in to original request.
         params = self.request.GET.copy()
-        date = timezone.now()
+        date = _utc_now()
         url = self.channel_date_url(date)
         params['page'] = page.number
         return '{0}?{1}'.format(url, params.urlencode())
@@ -433,16 +436,15 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     def set_view_date(self):
         """Determine start date for queryset"""
         if all([field in self.kwargs for field in ['year', 'month', 'day']]):
-            self.date = timezone.datetime(
-                year=int(self.kwargs['year']),
-                month=int(self.kwargs['month']),
-                day=int(self.kwargs['day']))
             # localize date so logs start at local time
-            return self.request_timezone.localize(self.date)
+            return datetime.datetime(year=int(self.kwargs['year']),
+                                     month=int(self.kwargs['month']),
+                                     day=int(self.kwargs['day']),
+                                     tzinfo=self.request_timezone)
 
         # Use the last page.
         self.kwargs['page'] = 'last'
-        return timezone.now().date()
+        return _utc_now().date()
 
 
 class SearchLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
@@ -563,7 +565,7 @@ class MissedLogViewer(PaginatorPageLinksMixin, LogViewer, ListView):
             date_filter = {'timestamp__gte': last_exit.timestamp}
         # Only fetch results from when the user logged out.
         self.fetch_after = (
-            last_exit.timestamp - timezone.timedelta(milliseconds=1))
+            last_exit.timestamp - datetime.timedelta(milliseconds=1))
         return queryset.filter(**date_filter)
 
 
