@@ -248,7 +248,8 @@ class UrlTests(BaseTestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, "form", "channel_name",
-                             "Sorry, this channel is already being monitored.")
+                             '<a href="{}">{}</a> is already being monitored.'.format(
+                                self.public_channel.get_absolute_url(), self.public_channel.name))
 
     def test_request_channel_form_invalid_formatted_server(self):
         url = reverse("request_channel")
