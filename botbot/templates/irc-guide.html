@@ -1,0 +1,506 @@
+{% load static from staticfiles %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="IRC Guide">
+  <meta name="keywords" content="IRC,freenode,botbot,logging,chatting,open source,chanserv">
+  <meta name="author" content="Lincoln Loop">
+  <link rel="icon" href="{% static "img/irc-guide/favbot.png" %}" type="image/x-icon">
+  <link type="text/css" rel="stylesheet" href="{% static "css/irc-guide.css" %}">
+  <link href="//fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700italic" rel="stylesheet" type="text/css">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <title>IRC Guide</title>
+</head>
+
+<body>
+  <header class="header">
+    <div class="back-to-botbot">
+      <a class="botbot-link" href="https://botbot.me/"><i class="fa fa-arrow-left"></i>Back to BotBot.me</a>
+    </div>
+    <svg class="bot-icon" width="300px" height="350px" viewBox="0 -25 300 350">
+      <desc>White BotBot logo with lightning from head animation.</desc>
+      <rect x="-130.68" y="-137.667" fill="#3A3E3F" stroke="#000000" width="591" height="594"/>
+      <path fill="#FFFFFF" d="M166.97,88.144c0-9.373-7.599-16.971-16.971-16.971c-9.371,0-16.97,7.598-16.97,16.971
+  c0,6.927,4.157,12.879,10.111,15.517l-4.025,40.104h6.877h8.394h6.877l-4.042-40.286C162.976,100.766,166.97,94.932,166.97,88.144z"
+  />
+      <path fill="#FFFFFF" d="M39.271,310.826v-19.012c0-2.47,2.001-4.477,4.477-4.477h212.507c2.474,0,4.474,2.007,4.474,4.477v19.012"/>
+      <g>
+        <path fill="#FFFFFF" d="M237.415,176.141c8.584,0,15.546,4.968,15.546,11.094v36.082c0,6.127-6.962,11.101-15.546,11.101"/>
+        <path fill="#FFFFFF" d="M62.587,176.141c-8.586,0-15.547,4.968-15.547,11.094v36.082c0,6.127,6.962,11.101,15.547,11.101"/>
+      </g>
+      <g>
+        <circle fill="#FFFFFF" cx="102.931" cy="184.392" r="14.282"/>
+        <ellipse fill="#FFFFFF" cx="196.997" cy="184.605" rx="14.28" ry="14.285"/>
+        <path fill="#FFFFFF" d="M230.343,146.374H69.657c-2.47,0-4.475,2-4.475,4.468v132.73H234.82v-132.73
+    C234.82,148.374,232.813,146.374,230.343,146.374z M102.067,269.033h-14.7c-2.47,0-4.474-2.005-4.474-4.474v-27.966
+    c0-2.467,2.005-4.468,4.474-4.468h14.7V269.033z M82.778,184.606c0-11.168,9.053-20.228,20.227-20.228
+    c11.166,0,20.221,9.059,20.221,20.228c0,11.172-9.055,20.225-20.221,20.225C91.83,204.831,82.778,195.778,82.778,184.606z
+     M130.83,269.033h-19.174v-36.908h19.174V269.033z M159.587,269.033h-19.174v-36.908h19.174V269.033z M188.347,269.033H169.17
+    v-36.908h19.177V269.033z M217.11,264.558c0,2.47-2.007,4.474-4.477,4.474h-14.7v-36.908h14.7c2.47,0,4.477,2.001,4.477,4.468
+    V264.558z M196.997,204.831c-11.168,0-20.221-9.053-20.221-20.225c0-11.168,9.053-20.228,20.221-20.228
+    c11.172,0,20.225,9.059,20.225,20.228C217.222,195.778,208.17,204.831,196.997,204.831z"/>
+      </g>
+      <g class="lightening">
+        <path class="lightening-1" fill="#0088CC" d="M113.057,70.016L92.959,42.912c-0.667-0.907-1.705-1.419-2.03-1.074l-4.919,5.224
+    c-0.371,0.394-1.755-0.443-2.214-1.34L69.57,18.381c-0.643-1.163,0.651-1.153,1.756-0.02l12.591,13.621
+    c0.644,0.7,1.567,1.104,1.846,0.808l5.847-6.21c0.418-0.444,1.755,0.443,2.329,1.449l21.058,42.233
+    C115.662,71.632,113.976,71.347,113.057,70.016z"/>
+        <path class="lightening-2" fill="#0088CC" d="M182.551,70.262l21.058-42.233c0.574-1.005,1.911-1.892,2.329-1.449l5.847,6.21
+    c0.278,0.296,1.201-0.108,1.846-0.808l12.591-13.621c1.105-1.133,2.399-1.143,1.756,0.02L213.75,45.722
+    c-0.459,0.897-1.842,1.735-2.214,1.34l-4.919-5.224c-0.325-0.345-1.363,0.167-2.03,1.074l-20.098,27.104
+    C183.572,71.347,181.886,71.632,182.551,70.262z"/>
+        <path class="lightening-3" fill="#0088CC" d="M146.507,50.432l4.265-33.471c0.147-1.116-0.248-2.204-0.721-2.18l-7.166,0.364
+    c-0.541,0.027-0.959-1.535-0.669-2.5l8.665-29.578c0.341-1.284,1.268-0.381,1.281,1.202l-0.346,18.545
+    c-0.019,0.951,0.367,1.882,0.772,1.861l8.518-0.433c0.608-0.031,0.959,1.535,0.677,2.658l-14.047,45.053
+    C147.267,53.402,146.249,52.028,146.507,50.432z"/>
+      </g>
+    </svg>
+
+    <div class="header-text">
+      <h1 class="title">BotBot's IRC Cheat Sheet</h1>
+      <h2 class="tag-line">Quickly get started with freenode.</h2>
+    </div>
+
+    <div class="git-details">
+      <span><a class="source-link"href="https://github.com/BotBotMe/botbot-web/blob/master/botbot/templates/irc-guide.html">Source Code on <i class="fa fa-github-alt"></i></a></span>
+    </div>
+
+  </header>
+
+  <div class="question-section">
+
+    <div class="contain-category" id="top">
+      <img class="icon" src="{% static "img/irc-guide/beforebegin.svg" %}" alt="Before you begin hand motion icon" />
+      <div class="contain-questions">
+        <h2 class="category-title">Before You Begin</h2>
+        <ul class="question-list">
+          <li class="question"><a href="#1-1">What <em>is</em> IRC?</a></li>
+          <li class="question"><a href="#1-2">What are the benefits of using IRC?</a></li>
+          <li class="question"><a href="#1-3">What is Freenode?</a></li>
+          <li class="question"><a href="#1-4">What's an IRC client and how do I get one?</a></li>
+          <li class="question"><a href="#1-5">What is BotBot's role in all this?</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contain-category">
+      <img class="icon" src="{% static "img/irc-guide/registericon.svg" %}" alt="Registration/clipboard icon" />
+      <div class="contain-questions">
+        <h2 class="category-title">User Registration</h2>
+        <ul class="question-list">
+          <li class="question"><a href="#2-1">How do I get started with IRC?</a></li>
+          <li class="question"><a href="#2-2">How do I register my nickname?</a></li>
+          <li class="question"><a href="#2-3">Do IRC nicknames expire?</a></li>
+          <li class="question"><a href="#2-4">Any general etiquette tips before I get started?</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contain-category">
+      <img class="icon" src="{% static "img/irc-guide/channelicon.svg" %}" alt="Channel navigation compass icon" />
+      <div class="contain-questions">
+        <h2 class="category-title">Channel Navigation</h2>
+        <ul class="question-list">
+          <li class="question"><a href="#3-1">How do I join a channel?</a></li>
+          <li class="question"><a href="#3-2">How do I leave a channel?</a></li>
+          <li class="question"><a href="#3-3">How do I leave all channels that I am in?</a></li>
+          <li class="question"><a href="#3-4">How do I clear text in my current window or all windows?</a></li>
+          <li class="question"><a href="#3-5">What do all the different channel modes mean?</a></li>
+          <li class="question"><a href="#3-6">Why can't I talk in certain channels?</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contain-category">
+      <img class="icon" src="{% static "img/irc-guide/usericon.svg" %}" alt="User/person icon" />
+      <div class="contain-questions">
+        <h2 class="category-title">User Actions</h2>
+          <ul class="question-list">
+            <li class="question"><a href="#4-1">How do I set an “away” status?</a></li>
+            <li class="question"><a href="#4-2">How do I convey an action?</li></a>
+            <li class="question"><a href="#4-3">How do I change my nickname?</a></li>
+            <li class="question"><a href="#4-4">How do I ignore someone?</a></li>
+            <li class="question"><a href="#4-5">What are user modes and how do I set mine?</a></li>
+            <li class="question"><a href="#4-6">How do I change my password?</a></li>
+          </ul>
+      </div>
+    </div>
+
+    <div class="contain-category">
+      <img class="icon" src="{% static "img/irc-guide/usernav.svg" %}" alt="User and compass icon" />
+      <div class="contain-questions">
+        <h2 class="category-title">User Navigation</h2>
+        <ul class="question-list">
+          <li class="question"><a href="#5-1">What does a channel OP (operator) do?</a></li>
+          <li class="question"><a href="#5-2">How do I know if someone is a channel OP?</a></li>
+          <li class="question"><a href="#5-3">What does a user having "voice" mean?</a></li>
+          <li class="question"><a href="#5-4">How do I see more information about a user?</a></li>
+          <li class="question"><a href="#5-5">How can I know if a specific user signs on?</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contain-category">
+      <img class="icon" src="{% static "img/irc-guide/messageicon.svg" %}" alt="Envelope and bell icon representing messaging" />
+      <div class="contain-questions">
+        <h2 class="category-title">Messaging</h2>
+        <ul class="question-list">
+          <li class="question"><a href="#6-1">How do I private message someone directly?</a></li>
+          <li class="question"><a href="#6-2">How do I send a short message without opening a private window?</a></li>
+          <li class="question"><a href="#6-3">How do I ping someone?</a></li>
+          <li class="question"><a href="#6-4">How do I message only the OPs?</a></li>
+          <li class="question"><a href="#6-5">How do I contact an offline user?</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contain-category">
+      <img class="icon" src="{% static "img/irc-guide/operator.svg" %}" alt="Crown icon to represent operator" />
+      <div class="contain-questions">
+        <h2 class="category-title">For Operators</h2>
+        <ul class="question-list">
+          <li class="question"><a href="#7-1">What are the general guidelines for a channel OP?</a></li>
+          <li class="question"><a href="#7-2">How do I set a channel topic?</a></li>
+          <li class="question"><a href="#7-3">How do I kick someone off the channel?</a></li>
+          <li class="question"><a href="#7-4">How do I set a channel mode?</a></li>
+          <li class="question"><a href="#7-5">How do I remove someone's voice status?</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contain-category">
+      <img class="icon" src="{% static "img/irc-guide/chanserv.svg" %}" alt="The at symbol to represent ChanServ"/>
+      <div class="contain-questions">
+        <h2 class="category-title">ChanServ</h2>
+        <ul class="question-list">
+          <li class="question"><a href="#8-1">What is ChanServ?</a></li>
+          <li class="question"><a href="#8-2">How do I get general help info from the server?</a></li>
+          <li class="question"><a href="#8-3">How do I know if my channel topic is appropriate for freenode?</a></li>
+          <li class="question"><a href="#8-4">How do I register a channel?</a></li>
+          <li class="question"><a href="#8-5">How do I customize my channel with ChanServ?</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="contain-category place-hold">
+      <div class="contain-questions">
+        <h2 class="category-title">More questions &amp; answers coming soon...<br>Beep!</h2>
+        <img class="full-bot" src="{% static "img/irc-guide/fullbot.svg" %}" alt="Full body illustation of BotBot" />
+      </div>
+    </div>
+
+  </div>
+
+  <div class="answer-section">
+
+    <!-- Before you begin -->
+    <div class="answer" id="1-1">
+      <h3 class="repeat-question">What <em>is</em> IRC?</h3>
+      <p class="answer-details">Internet Relay Chat (IRC) transfers text messages in a chat room setting, or a “channel”. These chat rooms are accessed through IRC clients installed on the user’s system which communicate with the chat servers. Like other forms of chat we are used to these days, you can discuss topics in a group setting or private messaging.</p>
+      <p class="answer-details">This guide specifically focuses on the basics of navigating the freenode network and especially handy commands to get you chatting with servers quickly and efficiently.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="1-2">
+      <h3 class="repeat-question">What are the benefits of using IRC?</h3>
+      <p class="answer-details">Those 80,000 Freenode users mentioned earlier know a lot about a lot of things and you can chat directly with them. This is a very powerful tool. You will finally be able to answer the age old question: “If you were in a room with <em>(insert awesome person’s name here)</em> right now, what would you ask him/her?” You are now in the room, the room just happens to have no walls and you haven’t had to leave your house.</p>
+      <p class="answer-details">IRC is where the open source community gathers. You can connect directly with these people for support and information while also contributing to the mission. It allows you to be part of something that people are very passionate about and invested in.</p>
+      <p class="answer-details">Plus, it’s free and been around approximately forever. IRC is not going anywhere, and neither will you once you get started.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="1-3">
+      <h3 class="repeat-question">What is Freenode?</h3>
+      <p class="answer-details"><a href="https://freenode.net/">Freenode</a> is a specific IRC network that is used to discuss peer-directed projects consisting of over 80,000 users. These users join channels of interest to share their knowledge and seek out the knowledge of others on specific topics under their chosen nicknames.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="1-4">
+      <h3 class="repeat-question">What's an IRC client and how do I get one?</h3>
+      <p class="answer-details">IRC clients are programs that allow you to access the IRC servers.</p>
+      <p class="answer-details">Client software generally exists across various operating systems, and even within some web browsers. There are a number of clients for both Mac and Windows users and well as mobile. The pretty extensive list <a href="http://en.wikipedia.org/wiki/Comparison_of_Internet_Relay_Chat_clients">can be viewed here</a> and sorted by system. Once selected, you will then want to install the client.</p>
+      <p class="answer-details">As mentioned in our <a href="https://botbot.me/how-to-setup-irc-channel/">IRC Setup Guide</a>, we recommend <a href="http://www.codeux.com/textual/">Texual</a> or <a href="http://limechat.net/mac/">LimeChat</a> for Mac, <a href="http://www.mirc.com/get.html">mIRC</a> or <a href="https://hexchat.github.io/">HexChat</a> for Windows, and <a href="https://hexchat.github.io/">HexChat</a> for Linux.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="1-5">
+      <h3 class="repeat-question">What is BotBot's role in all this?</h3>
+      <p class="answer-details">BotBot’s role in this beautiful open source world is to act as little butler, of sorts. Once requested by an operator and verified, BotBot will begin logging IRC channels. This can be so handy. All those intelligent discussions taking place that we discussed early will now be recorded and can be referenced for all of time. You won’t have to miss a thing!</p>
+      <p class="answer-details">He’s here to serve you and make allow you to make the most of your IRC experience. He logs for you night a day, year round. We programmed him not to get tired, so don’t worry about him. He loves working.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <!-- Registration -->
+    <div class="answer" id="2-1">
+      <h3 class="repeat-question">How do I get started with IRC?</h3>
+      <p class="answer-details">That's a great question! We've actually written a guide on that as well, you can <a href="https://botbot.me/how-to-setup-irc-channel/">check it out here.</a></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="2-2">
+      <h3 class="repeat-question">How do I register my nickname?</h3>
+      <p class="answer-details">Nickname registration is done through the NickServ bot. Luckily for us the people over at <a href="https://freenode.net/">freenode.net</a> have answered this NickServ registration question <a href="https://freenode.net/faq.shtml#nicksetup">in beautiful detail here</a>.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="2-3">
+      <h3 class="repeat-question">Do IRC nicknames expire?</h3>
+      <p class="answer-details">Yes, in a way. As <a href="https://freenode.net/faq.shtml#userexpirations">stated on the freenode site</a>, nicknames expire at staff discretion. The general rule that is followed is that an IRC nickname expires after it has not been used for ten weeks plus one additional week per full year of registration, with a maximum of five additional weeks.</p>
+      <p class="answer-details">Also worth noting here is that nicknames not confirmed by valid email address will be automatically dropped after 24 hours. So, confirm and be active and you will have nothing to worry about!</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="2-4">
+      <h3 class="repeat-question">Any general etiquette tips before I get started?</h3>
+      <p class="answer-details">In order to fully experience the true benefits of IRC one must adhere to a basic protocol concerning procedure and conduct.</p><br>
+      <p class="answer-details">Lucky for us, the folks over at #Beginner have created a <a href="http://www.ircbeginner.com/ircinfo/etiquette.html">really great summary of such "unspoken" but suggested rules</a>. The freenode site itself has a <a href="https://freenode.net/channel_guidelines.shtml">list of such expectations as well.</a></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <!-- Channel Navigation -->
+    <div class="answer" id="3-1">
+      <h3 class="repeat-question">How do I join a channel?</h3>
+      <p class="answer-details">/join #channelname</p>
+      <p class="answer-details example"><kbd>/join #lincolnloop</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="3-2">
+      <h3 class="repeat-question">How do I leave a channel?</h3>
+      <p class="answer-details"><kbd>/part</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="3-3">
+      <h3 class="repeat-question">How do I leave all channels that I am in?</h3>
+      <p class="answer-details"><kbd>/partall</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="3-4">
+      <h3 class="repeat-question">How do I clear text in my current channel window or all windows?</h3>
+      <p class="answer-details"><kbd>/clear</kbd> <em>or</em> <kbd>/clearall</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="3-5">
+      <h3 class="repeat-question">What do all the different channel modes mean?</h3>
+      <p class="answer-details">Channel modes are set by the channel operator and helps manage the overall functioning of the channel. You can find an incredibly handy <a href="http://docs.dal.net/docs/modes.html#2">list of modes and their meanings here</a>.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="3-6">
+      <h3 class="repeat-question">Why can't I talk in certain channels?</h3>
+      <p class="answer-details">There are two common reasons for not being able to talk in certain channels. One is that you may have been silenced. If you feel this was done unrightfully, you should contact that channel's operator.</p>
+      <p class="answer-details">Another reason may be that the mode of the channel is set to +m, which means that only voiced users and operators can speak. You should be notified of the mode upon joining the room.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <!-- User Actions -->
+    <div class="answer" id="4-1">
+      <h3 class="repeat-question">How do I set an away status?</h3>
+      <p class="answer-details">/away set message</p>
+      <p class="answer-details example"><kbd>/away this bot needs coffee!</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="4-2">
+      <h3 class="repeat-question">How do I convey an action?</h3>
+      <p class="answer-details">/me does something</p>
+      <p class="answer-details example"><kbd>/me waves hello with robot hand</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="4-3">
+      <h3 class="repeat-question">How do I change my nickname?</h3>
+      <p class="answer-details">/nick newnickname</p>
+      <p class="answer-details example"><kbd>/nick botbottoo</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="4-4">
+      <h3 class="repeat-question">How do I ignore someone?</h3>
+      <p class="answer-details">/ignore nickname 3</p>
+      <p class="answer-details example"><kbd>/ignore botbot 3</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="4-5">
+      <h3 class="repeat-question">What are user modes and how do I set mine?</h3>
+      <p class="answer-details">User modes <em>(or umodes)</em> are not to be confused with channel modes, which can only be set by operators. A user mode allows you to specify a number of configurations while in IRC, like how easy it should be for other people to find you.</p>
+      <p class="answer-details">You can find a <a href="http://docs.dal.net/docs/modes.html#3">list of user modes and their meanings here</a>.</p>
+      <p class="answer-details">User modes are usually set as follows: /mode nickname +/- mode(s)</p>
+      <p class="answer-details example"><kbd>/mode botbot -k</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="4-6">
+      <h3 class="repeat-question">How do I change my password?</h3>
+      <p class="answer-details">/msg NickServ SET PASSWORD mynewpassword</p>
+      <p class="answer-details example"><kbd>/msg NickServ SET PASSWORD iluvbots</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <!-- User Navigaton -->
+    <div class="answer" id="5-1">
+      <h3 class="repeat-question">What does a channel OP (operator) do?</h3>
+      <p class="answer-details">A channel operator is the channel's chief administrator. This individual can set the channel topic, approve channel logging with BotBot, set the channel mode, oversee user interactions and ban certain users when necessary, and provide general channel maintenance.</p>
+      <p class="answer-details">A channel operator is not to be confused with an IRC operator; IRC operators enforce network, rather than channel, rules.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="5-2">
+      <h3 class="repeat-question">How do I know if someone is an OP?</h3>
+      <p class="answer-details">When you join a channel it will display which user set the channel topic, in most cases this will be the username of the operator. In addition, the operator will usually have a, "@" symbol by their username in the list of users.</p>
+      <p class="answer-details">You can also find out who all the operators in a room are with the following command: /msg ChanServ ACCESS #channel LIST</p>
+      <p class="answer-details example"><kbd>/msg ChanServ ACCESS #lincolnloop LIST</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="5-3">
+      <h3 class="repeat-question">What does a user having "voice" mean?</h3>
+      <p class="answer-details">Channel operators can select certain users to "have a voice". This "voiced" user will have a "+" symbol by their user name and be able to speak when the +m mode is set. This mode signals a <em>moderated</em> channel, in which only the OP (@) and voices (+) can send messages to the channel while all other messages are blocked.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="5-4">
+      <h3 class="repeat-question">How do I see more information about a user?</h3>
+      <p class="answer-details">/whois nickname</p>
+      <p class="answer-details example"><kbd>/whois botbot</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="5-5">
+      <h3 class="repeat-question">How can I know if a specific user signs on?</h3>
+      <p class="answer-details">/notify nickname</p>
+      <p class="answer-details example"><kbd>/notify botbot</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <!-- Messages -->
+    <div class="answer" id="6-1">
+      <h3 class="repeat-question">How do I private message someone?</h3>
+      <p class="answer-details">/msg nickname message <em>(will open new window)</em></p>
+      <p class="answer-details example"><kbd>/msg botbot Hey, how's it going friend?</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="6-2">
+      <h3 class="repeat-question">How do I send a short message without opening a private window?</h3>
+      <p class="answer-details">/notice nickname message</p>
+      <p class="answer-details example"><kbd>/notice botbot Oh, hi there, nice to meet you.</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="6-3">
+      <h3 class="repeat-question">How do I ping someone?</h3>
+      <p class="answer-details">/ping nickname</p>
+      <p class="answer-details example"><kbd>/ping botbot</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="6-4">
+      <h3 class="repeat-question">How do I only message the OPs?</h3>
+      <p class="answer-details">/omsg #channel</p>
+      <p class="answer-details example"><kbd>/omsg #lincolnloop</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="6-5">
+      <h3 class="repeat-question">How do I contact an offline user?</h3>
+      <p class="answer-details">freenode allows you to send a message to an offline user. That user will then by notified once he/she comes back online or even get an email notification (to enable these notifications: /msg NickServ SET EMAILMEMOS ON).</p>
+      <p class="answer-details">To message an offline user: /msg MemoServ SEND nickname message</p>
+      <p class="answer-details example"><kbd>/msg MemoServ SEND botbot Just wanted to say I Love You.</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <!-- For Operators -->
+    <div class="answer" id="7-1">
+      <h3 class="repeat-question">What are the general guidelines for a channel OP?</h3>
+      <p class="answer-details">Being a channel operator is a big task, so we are glad you are taking it seriously! <a href="http://irchelp.org/">IRChelp.org</a> has a well layed out <a href="http://irchelp.org/irchelp/changuide.html">Operator's Guide</a> to help get you started. Also, a fantastically handy list of <a href="http://www.technerd.net/irc-commands.html">operator specific commands can be found here</a>, below the general user command section.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="7-2">
+      <h3 class="repeat-question">How do I set a channel topic?</h3>
+      <p class="answer-details">/topic #channel enter topic</p>
+      <p class="answer-details example"><kbd>/topic #lincolnloop Lincoln Loop Public Chat https://botbot.me/freenode/lincolnloop/</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="7-3">
+      <h3 class="repeat-question">How do I kick someone off the channel?</h3>
+      <p class="answer-details">/kick username</p>
+      <p class="answer-details example"><kbd>/kick botbot</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="7-4">
+      <h3 class="repeat-question">How do I set a channel mode?</h3>
+      <p class="answer-details">/mode #channel +/- mode(s) <em>set parameters</em></p>
+      <p class="answer-details"><em>Note: only certain modes require additional parameters.</em></p>
+      <p class="answer-details">You can find an incredibly handy <a href="http://docs.dal.net/docs/modes.html#2">list of modes and their meanings here</a>.</p>
+      <p class="answer-details example"><kbd>/mode #lincolnloop -ps</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="7-5">
+      <h3 class="repeat-question">How do I remove someone's voice status?</h3>
+      <p class="answer-details">/devoice nickname</p>
+      <p class="answer-details example"><kbd>/devoice botbot</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <!-- ChanServ -->
+    <div class="answer" id="8-1">
+      <h3 class="repeat-question">What is ChanServ?</h3>
+      <p class="answer-details">ChanServ is a "Channel Service" bot. This bot governs the creation and operation of channels on the network and allows any user with a registered nickname to create a channel.</p>
+      <p class="answer-details">ChanServ also helps protect channel operators from channel take overs by allowing the operator to not always have to be in the channel to maintain their status and helps run for the channel alongside the operator.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="8-2">
+      <h3 class="repeat-question">How do I get general help info from the server?</h3>
+      <p class="answer-details">/msg ChanServ HELP <em>or</em> /msg ChanServ HELP [papameters]</p>
+      <p class="answer-details example"><kbd>/msg ChanServ HELP REGISTER</kbd></p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="8-3">
+      <h3 class="repeat-question">How do I know if my channel topic is approriate for freenode?</h3>
+      <p class="answer-details">That's a fantastic question! The helpful staff over at freenode have put together a list of <a href="http://freenode.net/policy.shtml#ontopic">on-topic uses</a> and <a href="http://freenode.net/policy.shtml#offtopic">off-topic uses</a> of the network.</p>
+      <p class="answer-details">Taking a look at the <a href="http://freenode.net/philosophy.shtml">freenode philosophy</a> should also help you determine whether or not your potential channel is acceptable on freenode specifically.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="8-4">
+      <h3 class="repeat-question">How do I register a channel?</h3>
+      <p class="answer-details">freenode has you covered when it's time to register your channel, walking through the <a href="https://blog.freenode.net/2008/04/registering-a-channel-on-freenode/">channel registration process in detail</a> on their staff blog. Before you start, however, you will want to make sure your nickname is <a href="http://freenode.net/faq.shtml#nicksetup">registered with NickServ</a>.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+    <div class="answer" id="8-5">
+      <h3 class="repeat-question">How do I customize my channel with ChanServ?</h3>
+      <p class="answer-details">ChanServ allows operators to set their channels up to do certain things automatically. This "custimization" is done through matching a certain feature with a numbered level through the use of the ChanServ levels command (<kbd>/cs levels</kbd>).</p>
+      <p class="answer-details">To view a list of levels for your channel: /cs levels #channel list</p>
+      <p class="answer-details">To change levels: /cs levels #channel set option level</p>
+      <p class="answer-details">You can find a list of default ChanServ <a href="http://wiki.swiftirc.net/index.php?title=ChanServ_Levels">levels and their descriptions here</a>.</p>
+      <a class="to-top" href="#top">Back to Top<i class="fa fa-arrow-circle-up"></i></a>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+
+    <div class="contain-social">
+      <a href="https://botbot.me/"><img class="crafted-by" src="{% static "img/irc-guide/crafted.svg" %}" alt="Crafted with enthusiasm by the botbot team" /></a>
+      <a href="https://twitter.com/botbotme"><i class="fa fa-twitter-square"></i></a>
+      <a href="https://github.com/BotBotMe/botbot-web/blob/master/botbot/templates/irc-guide.html"><i class="fa fa-github-square"></i></a>
+    </div>
+
+  </footer>
+{% include "includes/google-analytics.html" %}
+</body>
+</html>

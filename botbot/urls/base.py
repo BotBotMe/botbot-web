@@ -18,6 +18,9 @@ urlpatterns = patterns('django.shortcuts',
     url(r'^how-to-setup-irc-channel/$', 'render', {
         'template_name': 'howto.html'},
         name='how-to'),
+    url(r'^irc-guide/$', 'render', {
+        'template_name': 'irc-guide.html'},
+        name='irc-guide'),
 )
 
 if settings.INCLUDE_DJANGO_ADMIN:
