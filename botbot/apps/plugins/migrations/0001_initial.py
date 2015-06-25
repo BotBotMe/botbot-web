@@ -15,9 +15,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ActivePlugin',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('configuration', botbot.core.fields.JSONField(default={}, help_text=b'User-specified attributes for this plugin {"username": "joe", "api-key": "foo"}', blank=True)),
-                ('channel', models.ForeignKey(to='bots.Channel')),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, help_text='', auto_created=True)),
+                ('configuration', botbot.core.fields.JSONField(blank=True, default={}, help_text=b'User-specified attributes for this plugin {"username": "joe", "api-key": "foo"}')),
+                ('channel', models.ForeignKey(help_text='', to='bots.Channel')),
             ],
             options={
             },
@@ -26,9 +26,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Plugin',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=100)),
-                ('slug', models.SlugField()),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, help_text='', auto_created=True)),
+                ('name', models.CharField(max_length=100, help_text='')),
+                ('slug', models.SlugField(help_text='')),
             ],
             options={
             },
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='activeplugin',
             name='plugin',
-            field=models.ForeignKey(to='plugins.Plugin'),
+            field=models.ForeignKey(help_text='', to='plugins.Plugin'),
             preserve_default=True,
         ),
     ]
