@@ -1,4 +1,5 @@
 """Near duplicate of Django's `urlizetrunc` with support for image classes"""
+from collections import OrderedDict
 import urlparse
 
 from django.template.base import Library, Node
@@ -196,7 +197,7 @@ def urlize_impl(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 # Make URL we want to point to.
                 url = parse_url(middle)
                 if url:
-                    html_attrs = {'class': []}
+                    html_attrs = OrderedDict([('class', [])])
 
                     if not url.scheme == "mailto" and nofollow:
                         html_attrs['rel'] = 'nofollow'

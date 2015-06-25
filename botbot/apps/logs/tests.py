@@ -192,13 +192,13 @@ class TemplateTagTestCase(TestCase):
         # Test image
         self.assertEqual(
             urlize_impl(u'http://www.example.com/image.png'),
-            u'<a data-src="http://www.example.com/image.png" href="http://www.example.com/image.png" data-type="image" class="image">http://www.example.com/image.png</a>'
+            u'<a class="image" data-type="image" href="http://www.example.com/image.png" data-src="http://www.example.com/image.png">http://www.example.com/image.png</a>'
         )
 
         # Test youtube video
         self.assertEqual(
             urlize_impl(u'https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
-            u'<a data-src="//www.youtube.com/embed/dQw4w9WgXcQ" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" data-type="youtube" class="image">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>'
+            u'<a class="image" data-type="youtube" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" data-src="//www.youtube.com/embed/dQw4w9WgXcQ">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>'
         )
 
         # Test invalid youtube link
@@ -210,19 +210,19 @@ class TemplateTagTestCase(TestCase):
         # Test dropbox
         self.assertEqual(
             urlize_impl(u'https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png'),
-            u'<a data-src="https://dl.dropboxusercontent.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png" href="https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png" data-type="image" class="image">https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png</a>'
+            u'<a class="image" data-type="image" href="https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png" data-src="https://dl.dropboxusercontent.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png">https://www.dropbox.com/s/1vbeuicgr18ialb/Screenshot%202014-06-09%2015.02.39.png</a>'
         )
 
         # Test cloudapp
         self.assertEqual(
             urlize_impl(u'http://cl.ly/image/1Y0A1C3l370z'),
-            u'<a data-src="http://cl.ly/1Y0A1C3l370z/content" href="http://cl.ly/image/1Y0A1C3l370z" data-type="image" class="image">http://cl.ly/image/1Y0A1C3l370z</a>'
+            u'<a class="image" data-type="image" href="http://cl.ly/image/1Y0A1C3l370z" data-src="http://cl.ly/1Y0A1C3l370z/content">http://cl.ly/image/1Y0A1C3l370z</a>'
         )
 
         # Test cloudapp without image in url
         self.assertEqual(
             urlize_impl(u'http://cl.ly/1Y0A1C3l370z'),
-            u'<a data-src="http://cl.ly/1Y0A1C3l370z/content" href="http://cl.ly/1Y0A1C3l370z" data-type="image" class="image">http://cl.ly/1Y0A1C3l370z</a>'
+            u'<a class="image" data-type="image" href="http://cl.ly/1Y0A1C3l370z" data-src="http://cl.ly/1Y0A1C3l370z/content">http://cl.ly/1Y0A1C3l370z</a>'
         )
 
 
