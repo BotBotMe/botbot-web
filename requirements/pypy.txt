@@ -1,0 +1,3 @@
+-r common.txt
+
+psycopg2cffi==2.7.1

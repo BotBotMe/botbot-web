@@ -1,9 +1,16 @@
 import ast
 import os
 import urlparse
+
+import dj_database_url
+try:
+    from psycopg2cffi import compat
+    compat.register()
+except ImportError:
+    pass
+
 # Import global settings to make it easier to extend settings.
 from django.conf.global_settings import *   # pylint: disable=W0614,W0401
-import dj_database_url
 
 #==============================================================================
 # Generic Django project settings
