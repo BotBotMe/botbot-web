@@ -1,9 +1,7 @@
 {% extends "base.html" %}
-{% load channel_url logs_tags %}
-{% load static from staticfiles %}
 
 
-{% block head_title %}IRC Logs for {{ channel.name }} {{ block.super }}{% endblock %}
+{% block head_title %}IRC Logs for {{ channel.name }} {{ super() }}{% endblock %}
 {% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}
 {% if channel_ads %} display_bbsponsor{% endif %}{% endblock %}
 
@@ -11,10 +9,10 @@
 
     <header id="Log-Header">
         <a href="/dashboard/" class="brand-btn">
-            <object data="{% static "img/logo.svg" %}" type="image/svg+xml" id="Logo"></object>
+            <object data="{{ static("img/logo.svg") }}" type="image/svg+xml" id="Logo"></object>
         </a>
         <div class="log-title">
-          <h1><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></h1>
+          <h1><a href="{{ channel_url(channel, 'log_current') }}">{{ channel.name }}</a></h1>
           {% if not channel.is_public %}<i class="icon icon-large icon-lock" title="This is a private channel"></i>{% endif %}
           <span class="divider">/</span>
           <h4 class="date"></h4>
@@ -25,34 +23,34 @@
           <a href="#Log-Nav" class="nav-toggle"><i class="icon-calendar icon-large"></i></a>
         </nav>
 
-        <form id="Search" method="get" action="{% channel_url channel 'log_search' %}">
+        <form id="Search" method="get" action="{{ channel_url(channel, 'log_search') }}">
             {{ search_form.q }}
             {# <a href="#" class="context-help"> <i class="icon-question-sign icon-large"></i></a> #}
         </form>
 
         <nav class="channel-nav">
-          {% comment %}
+          {#
           <span class="user-count wicon">
             <i class="icon-group icon-large"></i>
             {{ size }}
           </span>
-          {% endcomment %}
+          #}
 
-          {% comment %}
+          {#
           <a href="#" class="wicon">
             <i class="icon-text-height icon-large"></i>
             <span>Smaller Text</span>
           </a>
-          {% endcomment %}
+          #}
 
           {% if show_kudos %}
-          <a href="{% channel_url channel 'kudos' %}" class="wicon" title="Helpful individuals in this channel">
+          <a href="{{ channel_url(channel, 'kudos') }}" class="wicon" title="Helpful individuals in this channel">
             <i class="icon-gift icon-large"></i>
             <span>Kudos</span>
           </a>
           {% endif %}
 
-          <a href="{% channel_url channel 'help_bot' %}" class="wicon" title="A list of commands for BotBot in this channel">
+          <a href="{{ channel_url(channel, 'help_bot') }}" class="wicon" title="A list of commands for BotBot in this channel">
             <i class="icon-book icon-large"></i>
             <span>Channel Docs</span>
           </a>
@@ -85,22 +83,22 @@
               {% if timeline|length > 3 %}
               <li class="older"><a href="#">Older</a></li>
               {% endif %}
-              {% for year, months in timeline.items %}
+              {% for year, months in timeline.items() %}
                   <li class="year"><a href="#{{ year }}"><span>{{ year }}</span></a>
                     <ul class="month-list">
                       {% for first_of_month in months %}
-                        <li class="month"><a class="jump-date" data-date="{{ first_of_month|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=first_of_month|date:"Y" month=first_of_month|date:"m" day=first_of_month|date:"d" %}"><span>{{ first_of_month|date:"F" }}</span></a></li>
+                        <li class="month"><a class="jump-date" data-date="{{ first_of_month.strftime('%Y%m%d') }}" href="{{ channel_url(channel, 'log_day', kwargs=dict(year=first_of_month.year, month=first_of_month.strftime('%m'), day=first_of_month.strftime('%d'))) }}"><span>{{ first_of_month.strftime("%B") }}</span></a></li>
                       {% endfor %}
                       {# Account for times when the start of the last month is after the week dates below. The ".5" is added to ensure a date never matches it.  #}
-                      {% if forloop.last %}
-                        <li class="month"><a class="jump-date" data-date="{{ last_month.adjusted|date:"Ymd" }}.5" href="{% channel_url channel 'log_day' year=last_month.real|date:"Y" month=last_month.real|date:"m" day=last_month.real|date:"d" %}"><span>{{ last_month.real|date:"F" }}</span></a></li>
+                      {% if loop.last %}
+                        <li class="month"><a class="jump-date" data-date="{{ last_month.adjusted.strftime('%Y%m%d') }}.5" href="{{ channel_url(channel, 'log_day', kwargs=dict(year=last_month.real.year, month=last_month.real.strftime('%m'), day=last_month.real.strftime('%d'))) }}"><span>{{ last_month.real.strftime("%B") }}</span></a></li>
                       {% endif %}
                     </ul>
                   </li>
               {% endfor %}
-              <li><a class="jump-date" data-date="{{ last_week|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=last_week|date:"Y" month=last_week|date:"m" day=last_week|date:"d" %}"><span>Last Week</span></a></li>
-              <li><a class="jump-date" data-date="{{ this_week|date:"Ymd" }}" href="{% channel_url channel 'log_day' year=this_week|date:"Y" month=this_week|date:"m" day=this_week|date:"d" %}"><span>This Week</span></a></li>
-              <li><a class="jump-date current" data-date="99999999" href="{% channel_url channel 'log_current' %}"><span>Current</span></a></li>
+              <li><a class="jump-date" data-date="{{ last_week.strftime('%Y%m%d') }}" href="{{ channel_url(channel, 'log_day', kwargs=dict(year=last_week.year, month=last_week.strftime('%m'), day=last_week.strftime('%d'))) }}"><span>Last Week</span></a></li>
+              <li><a class="jump-date" data-date="{{ this_week.strftime('%Y%m%d') }}" href="{{ channel_url(channel,'log_day', kwargs=dict(year=this_week.year, month=this_week.strftime('%m'), day=this_week.strftime('%d'))) }}"><span>This Week</span></a></li>
+              <li><a class="jump-date current" data-date="99999999" href="{{ channel_url(channel, 'log_current') }}"><span>Current</span></a></li>
           </ul>
         </nav>
         {% endif %}
@@ -111,14 +109,14 @@
 
 {% block extra_head %}
 <style type="text/css">
-  .log li[data-nick='{{ user.username }}'] .actor { color: #757500; }
+  .log li[data-nick='{{ request.user.username }}'] .actor { color: #757500; }
 </style>
 
 {% if highlight %}
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@botbotme">
 <meta name="twitter:title" content="{{ highlight.nick }} in {{ channel.name }}">
-<meta name="twitter:description" content="{{ highlight.text|bbme_urlizetrunc:50 }}">
+<meta name="twitter:description" content="{{ bbme_urlizetrunc(highlight.text, 50) }}">
 {% endif %}
 
 <link rel="canonical" href="{{ current_page }}"/>

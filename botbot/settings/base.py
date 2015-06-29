@@ -135,22 +135,44 @@ GEOIP_CITY_DB_PATH = os.environ.get('GEOIP_CITY_DB_PATH',
 #==============================================================================
 # Templates
 #==============================================================================
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+import pipeline
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [
+            os.path.join(PROJECT_DIR, 'jinja2_templates'),
+            os.path.join(os.path.dirname(pipeline.__file__), 'templates'),
+        ],
+        'OPTIONS': {
+            'environment': 'botbot.jinja2.environment',
+        },
+    },
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(PROJECT_DIR, 'django_templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': (
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+                "django.core.context_processors.request",
+                "allauth.account.context_processors.account",
+                "allauth.socialaccount.context_processors.socialaccount",
+            ),
+            'debug': DEBUG,
 
-TEMPLATE_DIRS = (
-    os.path.join(PROJECT_DIR, 'templates'),
-)
-
-TEMPLATE_CONTEXT_PROCESSORS += (
-    'django.core.context_processors.request',
-    'django.core.context_processors.tz',
-    "allauth.account.context_processors.account",
-    "allauth.socialaccount.context_processors.socialaccount",
-)
-
+        },
+    },
+]
+# required by current version of allauth
+TEMPLATE_CONTEXT_PROCESSORS = TEMPLATES[1]['OPTIONS']['context_processors']
 #==============================================================================
 # Middleware
 #==============================================================================
@@ -306,5 +328,3 @@ STATSD_PATCHES = [
 STATSD_PREFIX = os.environ.get('STATSD_PREFIX', 'bbme')
 
 DJANGO_HSTORE_ADAPTER_REGISTRATION = 'connection'
-
-SOUTH_TESTS_MIGRATE = False

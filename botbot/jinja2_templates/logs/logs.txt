@@ -1,0 +1,9 @@
+{%- for line in message_list %}
+{%- if line.action -%}
+[{{ line.timestamp.strftime("%H:%M:%s") }}] * {{ line.nick }} {{ line.text }}
+{%- elif line.command == "PRIVMSG" -%}
+[{{ line.timestamp.strftime("%H:%M:%s") }}] {% if line.nick %}<{{ line.nick }}>{% else %}*{% endif %} {{ line.text }}
+{%- else -%}
+[{{ line.timestamp.strftime("%H:%M:%s") }}] * {{ line }}
+{%- endif -%}
+{% endfor %}
