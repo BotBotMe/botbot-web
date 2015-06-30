@@ -6,7 +6,7 @@
       <h3 class="utc" id="date-{{ line.timestamp.strftime("%Y%M%d") }}" data-date="{{ line.timestamp.strftime("%Y%M%d") }}"><span>{{ line.timestamp.strftime("%F %j%S, %Y") }}</span></h3>
     {%- endif %}
 {%- endif %}
-    <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{{ line.command.lower() }} {% if line.pk == highlight %}highlight{% endif %}" data-nick="{{ line.nick }}" data-type="{% if line.command == "PRIVMSG" %}message{% else %}info{% endif %}">
+    <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{% if line.command %}{{ line.command.lower() }}{% endif %} {% if line.pk == highlight %}highlight{% endif %}" data-nick="{{ line.nick }}" data-type="{% if line.command == "PRIVMSG" %}message{% else %}info{% endif %}">
 
     <a href="{{ line.get_absolute_url() }}" class="moment" rel="nofollow">
         <time class="hide" datetime="{{ line.timestamp.strftime("%c") }}">{{ line.timestamp.strftime("%g:%i %A") }}</time>
