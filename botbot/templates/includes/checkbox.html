@@ -1,0 +1,19 @@
+<div class="control-group required {% if field_class %} {{ field_class }}{% endif %}">
+
+  <label for="id_{{ field.html_name }}">
+  	{{ field }}
+  	{% if label %}{{ label }}{% else %}{{ field.label }}{% endif %}
+  </label>
+
+  {% for error in field.errors %}
+      <p class="text-error">{{ error }}</p>
+  {% endfor %}
+
+  <div class="controls">
+    {% with help_text=help_text or field.help_text %}
+      {% if help_text %}
+            <span class="help-inline">{{ help_text }}</span>
+      {% endif %}
+    {% endwith %}
+  </div>
+</div>

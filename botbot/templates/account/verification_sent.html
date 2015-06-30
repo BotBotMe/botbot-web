@@ -1,0 +1,13 @@
+{% extends "account/base.html" %}
+
+{% block head_title %}{{ _("Verify Your Email Address") }}{% endblock %}
+
+{% block content %}
+  <header class="page-header account-header">
+    <h1 class="page-title">{{ _("Verify Your Email Address") }}</h1>
+  </header>
+
+  <div class="account-body">
+    <p>{{ _("We have sent an email to you for verification. Follow the link provided to finalize the signup process. Please contact us if you do not receive it within a few minutes.") }}</p>
+  </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block head_title %}Channels {{ super() }}{% endblock %}
+
+{% block content %}
+    <div class="settings-header clearfix">
+        <h1 class="pull-left">Channels</h1>
+
+        {#
+        <ul class="nav nav-pills pull-left">
+            <li class="active"><a href="#">All</a></li>
+            <li><a href="#Private-Logs">Private</a></li>
+            <li><a href="#Public-Logs">Public</a></li>
+        </ul>
+        #}
+        {% if request.user.is_staff or request.user.is_superuser %}<a href="{{ url('add_channel') }}" class="btn btn-primary pull-right"><i class="icon-plus-sign icon-white icon-large"> </i> Add Channel</a>{% endif %}
+    </div>
+
+{% if request.user.is_authenticated() %}
+    <h2>Private</h2>
+    {% if private_channels %}
+        <ul class="channels">
+        {% for channel in private_channels %}
+            <li>
+                <a href="{{ channel.get_absolute_url() }}">{{ channel }}</a> (<a href="{{ channel_url(channel, 'help_bot') }}">Channel Docs</a>)
+                {% if channel in admin_channels %}/ <a href="{{ channel_url(channel, 'manage_channel') }}">manage</a>{% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no private channels.</p>
+    {% endif %}
+{% endif %}
+
+    <h2>Public</h2>
+    {% if public_channels %}
+        <ul class="channels">
+        {% for channel in public_channels %}
+            <li>
+                <a href="{{ channel.get_absolute_url() }}">{{ channel }}</a>  (<a href="{{ channel_url(channel, 'help_bot') }}">Channel Docs</a>)
+                {% if channel in admin_channels %}/ <a href="{{ channel_url(channel, 'manage_channel') }}">manage</a>{% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no public channels.</p>
+    {% endif %}
+{% endblock content %}

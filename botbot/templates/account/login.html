@@ -1,0 +1,58 @@
+{% extends "account/base.html" %}
+
+{% block head_title %}{{ _("Sign In") }}{% endblock %}
+
+{% block content %}
+<header class="page-header account-header">
+  <h1 class="page-title">{{ _("Sign In") }}</h1>
+</header>
+
+<div class="account-body">
+  {% if socialaccount.providers  %}
+    <p>
+      {% trans %}
+        Please sign in with one of your existing third party accounts.
+      {% endtrans %}
+    </p>
+
+    <div class="socialaccount_ballot">
+      <ul class="socialaccount_providers">
+        {% with process = "login" %}
+        {% include "socialaccount/snippets/provider_list.html" %}
+        {% endwith %}
+      </ul>
+    </div>
+
+    <p>
+      {% trans site_name=site.name %}
+      Or, <strong><a href="{{ signup_url }}">sign up</a></strong> for a {{ site_name }} account and sign in below:
+      {% endtrans %}
+    </p>
+
+    {% include "socialaccount/snippets/login_extra.html" %}
+
+  {% else %}
+    <p>{% trans %}If you have not created an account yet, then please
+    <a href="{{ signup_url }}">sign up</a> first.{% endtrans %}</p>
+  {% endif %}
+</div>
+
+<form class="login account-form" method="post" action="{{ url('account_login') }}">
+  {% csrf_token %}
+
+  <div class="account-content-wrap">
+    {% with form=form, layout="vertical" %}
+    {% include "bootstrap_toolkit/form.html" %}
+    {% endwith %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">{{ _("Sign Up") }}</button>
+    <a class="button" href="{{ url('account_reset_password') }}">{{ _("Forgot Password?") }}</a>
+  </div>
+</form>
+
+{% endblock %}

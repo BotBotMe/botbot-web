@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block head_title %}Documentation for {{ channel }} {{ super() }}{% endblock %}
+{% block body_class %}help-view{% endblock %}
+
+{% block content %}
+
+<p><a href="{{ channel_url(channel, 'log_current') }}">&larr; Return to <strong>{{ channel }}</strong></a>
+
+<h1>Kudos</h1>
+
+<article>
+
+<p>Kudos is a way of identifying helpful individuals in a channel.</p>
+<p>By noting appreciation from participants, we can acknowledge the good work of those who devote so much time helping others be successful.</p>
+
+{% if search %}
+<h2>{{ search.nick }}</h2>
+{% if search.details %}
+<p>{{ search.nick }} is a {% if search.details.current_perc %}top {{ search.details.current_perc }}% {% endif %}helpful individual!
+{% else %}
+<p><em>Botbot hasn't tracked any appreciation for this individual in {{ channel }} yet.</em></p>
+{% endif %}
+{% endif %}
+
+{#
+<form action="." method="get">
+<p><label for="kudos_search">Search for a nick</label> <input id="kudos_search" name="nick"><button type="submit">Search</button></p>
+</form>
+#}
+
+{% if random_scoreboard %}
+<h3>Some{% if search %} other{% endif %} helpful people</h3>
+<p>Here's an sample of some of the helpful individuals in {{ channel }}:</p>
+<ul>
+{% for nick in random_scoreboard %}
+	<li>
+		{% if search and search.nick %}<a href="?nick={{ nick }}">{% endif %}
+		{{ nick }}
+		{% if search and search.nick %}</a>{% endif %}
+	</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if channel_messages %}
+<p>Botbot has scanned {{ channel_messages }} lines of discussion in {{ channel }}, of which {{ channel_kudos_perc }} are messages of appreciation.</p>
+{% endif %}
+
+</article>
+
+{% endblock content %}

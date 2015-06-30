@@ -136,12 +136,14 @@ GEOIP_CITY_DB_PATH = os.environ.get('GEOIP_CITY_DB_PATH',
 # Templates
 #==============================================================================
 import pipeline
+import bootstrap_toolkit
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.jinja2.Jinja2',
         'DIRS': [
-            os.path.join(PROJECT_DIR, 'jinja2_templates'),
+            os.path.join(PROJECT_DIR, 'templates'),
             os.path.join(os.path.dirname(pipeline.__file__), 'templates'),
+            os.path.join(os.path.dirname(bootstrap_toolkit.__file__), 'templates'),
         ],
         'OPTIONS': {
             'environment': 'botbot.jinja2.environment',
@@ -149,9 +151,7 @@ TEMPLATES = [
     },
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(PROJECT_DIR, 'django_templates'),
-        ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': (

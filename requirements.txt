@@ -1,6 +1,8 @@
 django==1.8.2
 
 pytz
+Jinja2==2.7.3
+django-jinja==1.4.1
 psycopg2==2.5.2
 dj-database-url==0.2.2
 # TODO (yml): Remove hstore when we squash the migration
