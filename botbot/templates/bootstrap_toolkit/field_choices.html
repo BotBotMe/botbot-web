@@ -1,0 +1,21 @@
+{{ choices_start }}
+{% for choice_id, choice_label in field.field.choices %}
+    <label class="{{ type }}{% if display == "inline" or field.field.widget.attrs.inline %} inline{% endif %}">
+        <input
+            type="{{ type }}"
+            name="{{ field.html_name }}"
+            value="{{ choice_id }}"
+            {% if field.field.widget.allow_multiple_selected %}
+                {% if choice_id|safe in field.value|safeseq %}checked{% endif %}
+            {% else %}
+                {% if field.value|safe == choice_id|safe %}checked{% endif %}
+            {% endif %}
+            {{ field.field.widget.attrs|html_attrs }}
+        />
+        {{ choice_label }}
+    </label>
+    {% if not loop.last and choices_separator > "" and loop.index is divisibleby(choices_group) %}
+        {{ choices_separator }}
+    {% endif %}
+{% endfor %}
+{{ choices_end }}

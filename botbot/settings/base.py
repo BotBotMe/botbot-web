@@ -143,7 +143,6 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(PROJECT_DIR, 'templates'),
             os.path.join(os.path.dirname(pipeline.__file__), 'templates'),
-            os.path.join(os.path.dirname(bootstrap_toolkit.__file__), 'templates'),
         ],
         'OPTIONS': {
             'environment': 'botbot.jinja2.environment',
