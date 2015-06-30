@@ -8,29 +8,13 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('bots', '0001_initial'),
-        ('accounts', '__first__'),
+        ('accounts', '0002_auto_20150630_1459'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('plugins', '0001_initial'),
+        ('plugins', '0002_auto_20140912_1656'),
+        ('bots', '0001_initial'),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='channel',
-            name='plugins',
-            field=models.ManyToManyField(to='plugins.Plugin', through='plugins.ActivePlugin'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='channel',
-            name='users',
-            field=models.ManyToManyField(to=settings.AUTH_USER_MODEL, through='accounts.Membership'),
-            preserve_default=True,
-        ),
-        migrations.AlterUniqueTogether(
-            name='channel',
-            unique_together=set([('slug', 'chatbot'), ('name', 'chatbot')]),
-        ),
         migrations.CreateModel(
             name='PersonalChannels',
             fields=[
@@ -50,5 +34,19 @@ class Migration(migrations.Migration):
                 'proxy': True,
             },
             bases=('bots.channel',),
+        ),
+        migrations.AddField(
+            model_name='channel',
+            name='plugins',
+            field=models.ManyToManyField(to='plugins.Plugin', through='plugins.ActivePlugin'),
+        ),
+        migrations.AddField(
+            model_name='channel',
+            name='users',
+            field=models.ManyToManyField(to=settings.AUTH_USER_MODEL, through='accounts.Membership'),
+        ),
+        migrations.AlterUniqueTogether(
+            name='channel',
+            unique_together=set([('slug', 'chatbot'), ('name', 'chatbot')]),
         ),
     ]

@@ -170,8 +170,6 @@ TEMPLATES = [
         },
     },
 ]
-# required by current version of allauth
-TEMPLATE_CONTEXT_PROCESSORS = TEMPLATES[1]['OPTIONS']['context_processors']
 #==============================================================================
 # Middleware
 #==============================================================================
