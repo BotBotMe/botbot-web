@@ -10,7 +10,7 @@
         {% if membership.is_owner  %}<a href="{{ channel_url(channel, 'delete_channel') }}" class="btn btn-primary pull-right"><i class="icon-plus-sign icon-white"> </i> Delete</a>{% endif %}
     </div>
 
-    <form action="." method="post" id="chatbot">{% csrf_token %}
+    <form action="." method="post" id="chatbot">{{ csrf_input }}
 
     <fieldset>
       <legend>Connection Information</legend>

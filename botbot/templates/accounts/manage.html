@@ -12,7 +12,7 @@
 
 
   <form class="manage" id="manage_form" method="post" action=".">
-    {% csrf_token %}
+    {{ csrf_input }}
 
     <div class="account-body">
       {% for field in form %}

@@ -22,7 +22,6 @@ def environment(**options):
         "jinja2.ext.with_",
         "jinja2.ext.i18n",
         'pipeline.templatetags.ext.PipelineExtension',
-        'django_jinja.builtins.extensions.CsrfExtension',
         'django_jinja.builtins.extensions.CacheExtension',
     ]
     env = Environment(**options)

@@ -5,7 +5,7 @@
 {% block content %}
     {% if login_form %}
     <h1>Login</h1>
-    <form action="{{ url('login') }}" method="post">{% csrf_token %}
+    <form action="{{ url('login') }}" method="post">{{ csrf_input }}
         {{ login_form.as_p() }}
         <p class="actions">
             <button type="submit" class="btn">Log in</button> or

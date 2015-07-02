@@ -10,7 +10,7 @@
   </header>
 
   <form class="signup" id="signup_form" method="post" action="{{ url('account_signup') }}">
-    {% csrf_token %}
+    {{ csrf_input }}
 
     <div class="account-body">
       {% with form=form, layout="vertical" %}

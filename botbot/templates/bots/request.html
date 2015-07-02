@@ -1,7 +1,7 @@
 {% extends "landing/base.html" %}
 
 {% block content %}
-    <form action="." method="post">{% csrf_token %}
+    <form action="." method="post">{{ csrf_input }}
     <fieldset>
       <legend>Channel Request</legend>
       <p>Want BotBot to log your channel, fill out this simple form to get the ball rolling.</p>

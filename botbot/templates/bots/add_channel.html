@@ -10,7 +10,7 @@
 </header>
 
 <form class="account-body signup" id="chatbot" method="post" action=".">
-  {% csrf_token %}
+  {{ csrf_input }}
 
   <div class="account-body">
     {% for field in form %}

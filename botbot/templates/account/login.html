@@ -38,7 +38,7 @@
 </div>
 
 <form class="login account-form" method="post" action="{{ url('account_login') }}">
-  {% csrf_token %}
+  {{ csrf_input }}
 
   <div class="account-content-wrap">
     {% with form=form, layout="vertical" %}

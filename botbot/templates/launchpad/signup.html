@@ -15,7 +15,7 @@
 
     <div id="Glob"></div>
 
-    <form method="post" action="." class="teaser-form">{% csrf_token %}
+    <form method="post" action="." class="teaser-form">{{ csrf_input }}
 
         <div class="request">
             <h2>Get Updates</h2>
