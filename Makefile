@@ -87,7 +87,7 @@ jshint:
 local-settings: .env
 
 ### General Tasks
-dependencies: less-install pip-install local-settings $(LOCAL_BIN)/botbot-bot $(LOCAL_BIN)/botbot-eventsource
+dependencies: less-install pip-install local-settings $(LOCAL_BIN)/botbot-bot
 
 $(LOCAL_VAR)/GeoLite2-City.mmdb:
 	curl http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz | gunzip -c > $@
