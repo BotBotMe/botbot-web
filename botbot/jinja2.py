@@ -39,7 +39,7 @@ def environment(**options):
         'plugin_docs': plugin_docs_as_html,
 
         # allauth
-        'socialaccount': providers.registry.get_list(),
+        'socialaccount_providers': providers.registry.get_list(),
         'user_display': user_display,
 
         # bootstrap_toolkit
