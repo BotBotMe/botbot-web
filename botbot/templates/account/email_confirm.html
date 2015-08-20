@@ -1,6 +1,6 @@
 {% extends "account/base.html" %}
 
-{% block head_title %}{{ _("Confirm Email Address" %}{% endblock) }}
+{% block head_title %}{{ _("Confirm Email Address") }}{% endblock %}
 
 {% block content %}
   <header class="page-header account-header">
@@ -11,12 +11,12 @@
     {% if confirmation %}
 
     <p>
-      {% trans confirmation.email_address.email=email, user_display=user_display(confirmation.email_address.user) %}
+      {% trans email=confirmation.email_address.email, user_display=user_display(confirmation.email_address.user) %}
       Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.
       {% endtrans %}
     </p>
 
-    <form method="post" action="{{ url('account_confirm_email', confirmation.key) }}">
+    <form method="post" action="{{ url('account_confirm_email', args=[confirmation.key]) }}">
     {{ csrf_input }}
         <button type="submit" class="btn btn-primary">{{ _('Confirm') }}</button>
     </form>

@@ -10,7 +10,6 @@ import dj_database_url
 #==============================================================================
 
 DEBUG = ast.literal_eval(os.environ.get('DEBUG', 'True'))
-TEMPLATE_DEBUG = DEBUG
 
 SITE_ID = 1
 # Local time zone for this installation. Choices can be found here:

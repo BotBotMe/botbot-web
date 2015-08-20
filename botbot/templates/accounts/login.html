@@ -29,7 +29,7 @@
 <a href="{{ url('django.contrib.auth.views.password_reset') }}" class="forgot">Forgotten Password?</a></p>
 <p class="third-party">
     <small>Log in with</small>
-    <a href="{{ url('social:begin', 'google') }}" class="btn"><i class="icon icon-google-plus"></i> Google</a>
+    <a href="{{ url('social:begin', args=['google']) }}" class="btn"><i class="icon icon-google-plus"></i> Google</a>
 </p>
 </form>
 {% endblock content %}
