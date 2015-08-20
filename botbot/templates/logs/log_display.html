@@ -9,7 +9,7 @@
     <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{% if line.command %}{{ line.command.lower() }}{% endif %} {% if line.pk == highlight %}highlight{% endif %}" data-nick="{{ line.nick }}" data-type="{% if line.command == "PRIVMSG" %}message{% else %}info{% endif %}">
 
     <a href="{{ line.get_absolute_url() }}" class="moment" rel="nofollow">
-        <time class="hide" datetime="{{ line.timestamp.strftime("%c") }}">{{ line.timestamp.strftime("%g:%i %A") }}</time>
+        <time class="hide" datetime="{{ line.timestamp.isoformat() }}">{{ line.timestamp.strftime("%-H:%M %p") }}</time>
     </a>
     {%- if line.action %}
         <div class="actor">{{ line.nick }} {{ bbme_urlizetrunc(line.text, 50) }}</div>
