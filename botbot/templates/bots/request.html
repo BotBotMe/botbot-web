@@ -1,43 +1,29 @@
 {% extends "landing/base.html" %}
 
 {% block content %}
-    <form action="." method="post">{% csrf_token %}
-    <fieldset>
-      <legend>Channel Request</legend>
-      <p>Want BotBot to log your channel, fill out this simple form to get the ball rolling.</p>
-      {% for field in form %}
-        {% if field.name == "op" %}
-          {% include "includes/checkbox.html" %}
-        {% else %}
-          {% if field.name == "connection" %}
-            {% include "includes/field.html" with hide_optional=True %}
-          {% else %}
-            {% include "includes/field.html" %}
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-    </fieldset>
+  <h1>Request a Channel</h1>
+  <p>Thank you for your interest in BotBot.me! There are a few things to keep in mind:</p>
 
+  <ul>
+    <li>We manually setup logging for each channel. This process takes time.</li>
+    <li>We will need an OP in your channel to approve logging.</li>
+    <li>We do not log every channel that is requested. If you need immediate logging you may wish to setup BotBot yourself. <a href="https://github.com/botbotme">Check us out on Github!</a></li>
+  </ul>
+
+  <form action="." method="post">{% csrf_token %}
+    {% for field in form %}
+      {% if field.name == "op" %}
+        {% include "includes/checkbox.html" %}
+      {% else %}
+        {% if field.name == "connection" %}
+          {% include "includes/field.html" with hide_optional=True %}
+        {% else %}
+          {% include "includes/field.html" %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
     <p class="actions">
       <button type="submit" class="btn btn-primary">Send Request</button>
     </p>
   </form>
-{% endblock %}
-
-{% block tail %}
-<script type="text/javascript">
-  var $connection = $("#id_connection").parents('.field');
-  var $server = $('#id_server');
-  $server.change(function () {
-    if ($(this).val() === "new") {
-      $connection.show();
-    } else {
-      $connection.hide();
-    }
-  });
-
-  if ($server.val() !== "new") {
-    $connection.hide()
-  }
-</script>
 {% endblock %}
