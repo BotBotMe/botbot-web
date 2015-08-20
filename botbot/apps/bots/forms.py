@@ -57,6 +57,42 @@ class ChannelRequestForm(forms.Form):
         choices.insert(0, ('', '---------'))
         self.fields['server'].choices = choices
 
+    def clean_channel_name(self):
+        channel_name = self.cleaned_data['channel_name']
+        if not channel_name.startswith("#"):
+            channel_name = "#" + channel_name
+
+        try:
+            channel = models.Channel.objects.filter(name=channel_name)[0]
+            if channel.is_active:
+                msg = mark_safe('<a href="{}">{}</a> is already being '
+                                'monitored.'.format(channel.get_absolute_url(),
+                                                    channel_name))
+            else:
+                msg = ('This channel is already in the request queue. Please '
+                       'be patient while we process the request.')
+            raise forms.ValidationError(msg)
+        except IndexError:
+            pass
+
+
+        return channel_name
+
+    def clean_server(self):
+        """
+        Make sure server data is clean.
+        :return: ChatBot if it was selected, None if the user should have gave
+        us input to create a new one. Validation error if ChatBot was not found.
+        """
+        pk = self.cleaned_data['server']
+        if pk == "new":
+            return None
+
+        try:
+            return ChatBot.objects.get(pk=pk)
+        except ChatBot.DoesNotExist:
+            raise forms.ValidationError("Server doesn't exist.")
+
 class UsersForm(forms.Form):
     users = forms.ModelMultipleChoiceField(required=False,
                                            queryset=accounts_models.User.objects.all())
