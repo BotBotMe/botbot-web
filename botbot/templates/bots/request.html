@@ -1,14 +1,17 @@
 {% extends "landing/base.html" %}
 
 {% block content %}
-  <h1>Request a Channel</h1>
-  <p>Thank you for your interest in BotBot.me! There are a few things to keep in mind:</p>
+<div class="Request-Form">
+  <section class="intro">
+    <h1>Request a Channel</h1>
+    <p>Thank you for your interest in BotBot.me! There are a few things to keep in mind when requesting a channel:</p>
 
-  <ul>
-    <li>We manually setup logging for each channel. This process takes time.</li>
-    <li>We will need an OP in your channel to approve logging.</li>
-    <li>We do not log every channel that is requested. If you need immediate logging you may wish to setup BotBot yourself. <a href="https://github.com/botbotme">Check us out on Github!</a></li>
-  </ul>
+    <ul>
+      <li>We manually setup logging for each channel. This process takes time.</li>
+      <li>We will need an OP in your channel to approve logging.</li>
+      <li>We do not log every channel that is requested. If you need immediate logging you may wish to setup BotBot yourself. <a href="https://github.com/botbotme">Check us out on Github!</a></li>
+    </ul>
+  </section>
 
   <form action="." method="post">{% csrf_token %}
     {% for field in form %}
@@ -26,4 +29,5 @@
       <button type="submit" class="btn btn-primary">Send Request</button>
     </p>
   </form>
+</div>
 {% endblock %}
