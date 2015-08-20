@@ -1,4 +1,4 @@
-django==1.8.2
+django==1.8.4
 
 pytz
 Jinja2==2.7.3
