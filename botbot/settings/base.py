@@ -135,7 +135,6 @@ GEOIP_CITY_DB_PATH = os.environ.get('GEOIP_CITY_DB_PATH',
 # Templates
 #==============================================================================
 import pipeline
-import bootstrap_toolkit
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.jinja2.Jinja2',
