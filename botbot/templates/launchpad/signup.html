@@ -1,22 +1,21 @@
 {% extends "landing/base.html" %}
-{% load cache channel_url %}
 {% block content %}
     <section class="preview-box">
         <h3>Featured channels</h3>
         <ul class="channel-list">
         {% cache 600 "signup-featured-channels-list" %}
         {% for channel in featured_channels %}
-            <li><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></li>
+            <li><a href="{{ channel_url(channel, 'log_current') }}">{{ channel.name }}</a></li>
         {% endfor %}
         {% endcache %}
         </ul>
 
-        <p><strong>New to IRC?</strong> Check out our <a href="{% url "irc-guide" %}">quick start guide</a> or learn how to <a href="{% url "how-to" %}">setup your own private channel</a>.</p>
+        <p><strong>New to IRC?</strong> Check out our <a href="{{ url("irc-guide") }}">quick start guide</a> or learn how to <a href="{{ url("how-to") }}">setup your own private channel</a>.</p>
     </section>
 
     <div id="Glob"></div>
 
-    <form method="post" action="." class="teaser-form">{% csrf_token %}
+    <form method="post" action="." class="teaser-form">{{ csrf_input }}
 
         <div class="request">
             <h2>Get Updates</h2>
@@ -29,11 +28,11 @@
                 <div class="field">
                     {{ form.email }}
                 </div>
-                {% comment %}
+                {#
                 <div class="field">
                     {{ form.channel }}
                 </div>
-                {% endcomment %}
+                #}
 
                 <button type="submit" class="btn btn-info">Subscribe</button>
             </fieldset>
@@ -48,13 +47,13 @@
 
     <p><strong>More public channels:</strong></p>
     <p class="contain-request">
-     Don't see your channel listed?<br><span class="op">If you're a channel op:</span><br><a class="request-here" href="{% url 'request_channel' %}">Request it here</a>
+     Don't see your channel listed?<br><span class="op">If you're a channel op:</span><br><a class="request-here" href="{{ url('request_channel') }}">Request it here</a>
     </p>
 
     <ul class="channel-list-compact">
     {% cache 600 "signup-public-channels" %}
     {% for channel in public_not_featured_channels %}
-        <li><a href="{% channel_url channel 'log_current' %}">{{ channel.name }}</a></li>
+        <li><a href="{{ channel_url(channel, 'log_current') }}">{{ channel.name }}</a></li>
     {% endfor %}
     {% endcache %}
     </ul>

@@ -1,6 +1,6 @@
 {% extends "account/base.html" %}
 
-{% block head_title %}Settings {{ block.super }}{% endblock %}
+{% block head_title %}Settings {{ super() }}{% endblock %}
 {% block account_active %}active{% endblock %}
 
 {% block content %}
@@ -12,18 +12,18 @@
 
 
   <form class="manage" id="manage_form" method="post" action=".">
-    {% csrf_token %}
+    {{ csrf_input }}
 
     <div class="account-body">
       {% for field in form %}
-          {% include "includes/field.html" with field=field %}
+          {% include "includes/field.html" %}
       {% endfor %}
 
       <label for="change_password_toggle">Change Password <input id="change_password_toggle" type="checkbox"></label>
 
       <div id="password_form" style="display:none">
         {% for field in password_form %}
-          {% include "includes/field.html" with field=field %}
+          {% include "includes/field.html" %}
         {% endfor %}
       </div>
     </div>

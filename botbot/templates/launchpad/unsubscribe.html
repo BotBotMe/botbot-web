@@ -1,5 +1,5 @@
 {% if member.is_subscribed %}
-<form method="post" action=".">{% csrf_token %}
+<form method="post" action=".">{{ csrf_input }}
     <p>Unsubscribe {{ member.email }}? <input type="submit" value="Unsubscribe" /></p>
 </form>
 {% else %}

@@ -1,0 +1,35 @@
+<span class="control-group{% if field.errors %} error{% endif %}{% if field.field.required %} required{% endif %}">
+{% if input_type == "checkbox" %}
+    {% include "bootstrap_toolkit/field_checkbox.html" %}
+    {% with display="inline" %}
+    {% include "bootstrap_toolkit/field_help.html" %}
+    {% endwith %}
+{% elif input_type == "multicheckbox" %}
+    {% with type="checkbox" %}
+    {% include "bootstrap_toolkit/field_choices.html" %}
+    {% endwith %}
+    {% with display="block" %}
+    {% include "bootstrap_toolkit/field_help.html" %}
+    {% endwith %}
+{% else %}
+    {% if field.label %}
+        <label class="control-label"{% if field.auto_id %} for="{{ field.auto_id }}"{% endif %}>{{ field.label }}</label>
+    {% endif %}
+    {% if input_type == "radioset" %}
+        {% with type="radio" %}
+        {% include "bootstrap_toolkit/field_choices.html" %}
+        {% endwith %}
+        {% with display="block" %}
+        {% include "bootstrap_toolkit/field_help.html" %}
+        {% endwith %}
+    {% else %}
+        {% with display="inline" %}
+        {% include "bootstrap_toolkit/field_default.html" %}
+        {% include "bootstrap_toolkit/field_help.html" %}
+        {% endwith %}
+    {% endif %}
+{% endif %}
+{% with display="inline" %}
+{% include "bootstrap_toolkit/field_errors.html" %}
+{% endwith %}
+</span>

@@ -1,38 +1,32 @@
-{% spaceless %}
-{% load logs_tags %}
-{% load tz cache %}
-{% timezone "UTC" %}
-{% for line in message_list %}
-    {% ifchanged line.timestamp|date:"Ymd" %}
-    {% if show_first_header or not forloop.first %}
-      <h3 class="utc" id="date-{{ line.timestamp|date:"Ymd" }}" data-date="{{ line.timestamp|date:"Ymd" }}"><span>{{ line.timestamp|date:"F jS, Y" }}</span></h3>
-    {% endif %}
-    {% endifchanged %}
-    <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{% if same_nick %}same {% endif %}{{ line.command|lower }} {% if line.pk == highlight %}highlight{% endif %}" data-nick="{{ line.nick }}" data-type="{% if line.command = "PRIVMSG" %}message{% else %}info{% endif %}">
+{% set last_date = '' %}
+{% set last_nick = '' %}
+{%- for line in message_list %}
+{%- if line.timestamp.date() != last_date %}
+    {%- if show_first_header or not loop.first %}
+      <h3 class="utc" id="date-{{ line.timestamp.strftime("%Y%M%d") }}" data-date="{{ line.timestamp.strftime("%Y%M%d") }}"><span>{{ line.timestamp.strftime("%F %j%S, %Y") }}</span></h3>
+    {%- endif %}
+{%- endif %}
+    <li id={{ line.pk }} class="{% if line.action %}action {% endif %}{% if line.command %}{{ line.command.lower() }}{% endif %} {% if line.pk == highlight %}highlight{% endif %}" data-nick="{{ line.nick }}" data-type="{% if line.command == "PRIVMSG" %}message{% else %}info{% endif %}">
 
-    <a href="{{ line.get_absolute_url }}" class="moment" rel="nofollow">
-        <time class="hide" datetime="{{ line.timestamp|date:"c" }}">{{ line.timestamp|date:"g:i A" }}</time>
+    <a href="{{ line.get_absolute_url() }}" class="moment" rel="nofollow">
+        <time class="hide" datetime="{{ line.timestamp.isoformat() }}">{{ line.timestamp.strftime("%-H:%M %p") }}</time>
     </a>
-    {% if line.action %}
-        <div class="actor">{{ line.nick }} {{ line.text|bbme_urlizetrunc:50 }}</div>
-    {% else %}
-        {% if line.command = "PRIVMSG" %}
-            {% if line.nick %}
-                {% ifchanged %}
-                    <div class="nick-color{{ line.get_nick_color }} actor">{{ line.nick }}</div>
-                {% endifchanged %}
-                <div class="message">{{ line.text|bbme_urlizetrunc:50 }}</div>
-            {% else %}
-                <div class="message"><em>{{ line.text|bbme_urlizetrunc:50 }}</em></div>
-            {% endif %}
-
-        {% else %}
-            {# JOIN, PART, QUIT, NICK, etc #}
-            <div class="info">{{line}}</div>
-        {% endif %}
-    {% endif %}
+    {%- if line.action %}
+        <div class="actor">{{ line.nick }} {{ bbme_urlizetrunc(line.text, 50) }}</div>
+    {%- elif line.command == "PRIVMSG" %}
+            {%- if line.nick %}
+                {%- if line.nick != last_nick %}
+                    <div class="nick-color{{ line.get_nick_color() }} actor">{{ line.nick }}</div>
+                {%- endif %}
+                <div class="message">{{ bbme_urlizetrunc(line.text, 50) }}</div>
+            {%- else %}
+                <div class="message"><em>{{ bbme_urlizetrunc(line.text, 50) }}</em></div>
+            {%- endif %}
+    {%- else %}
+        {# JOIN, PART, QUIT, NICK, etc #}
+        <div class="info">{{line}}</div>
+    {%- endif %}
     </li>
-
+{%- set last_nick = line.nick %}
+{%- set last_date = line.timestamp.date() %}
 {% endfor %}
-{% endtimezone %}
-{% endspaceless %}

@@ -255,10 +255,6 @@ class RequestChannel(FormView):
 
     def form_valid(self, form):
         bot = form.cleaned_data['server']
-        connection = form.cleaned_data['connection']
-        if bot is None:
-            bot, _ = models.ChatBot.objects.get_or_create(
-                server=connection, defaults={"is_active": False})
         slug = slugify(form.cleaned_data['channel_name'])
         channel = models.Channel.objects.create(
             name=form.cleaned_data['channel_name'], chatbot=bot, slug=slug,

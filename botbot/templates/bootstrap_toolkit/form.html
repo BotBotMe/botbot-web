@@ -1,0 +1,18 @@
+{% if form.non_field_errors() %}
+    {% include "bootstrap_toolkit/non_field_errors.html" %}
+{% endif %}
+
+{% for field in form.hidden_fields() %}
+    {% for error in field.errors %}
+        {% include "bootstrap_toolkit/non_field_error.html" %}
+    {% endfor %}
+{% endfor %}
+
+{% set exclude_fields = exclude and exclude.split(',')|map(lower) or [] %}
+{% for field in form %}
+    {% if not field.name.lower() in exclude_fields %}
+        {% if not fields or field.name.lower() in fields.split(',')|map(lower) %}
+            {% include "bootstrap_toolkit/field.html" %}
+        {% endif %}
+    {% endif %}
+{% endfor %}

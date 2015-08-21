@@ -2,11 +2,11 @@
 
 {% block content %}
     <div class="page-header">
-        <h1>{{ chatbot.connection.rooms }}</h1>
-        <form action="." method="post">{% csrf_token %}
+        <h1>{{ channel }}</h1>
+        <form action="." method="post">{{ csrf_input }}
             <p>Are you sure you want to remove the bot from this room ?</p>
             <button type="submit" class="btn btn-primary">Delete</button>
         </form>
-        
+
     </div>
 {% endblock %}

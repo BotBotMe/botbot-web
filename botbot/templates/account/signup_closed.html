@@ -1,18 +1,15 @@
 {% extends "account/base.html" %}
 
-{% load url from future %}
-{% load i18n %}
-
-{% block head_title %}{% trans "Sign Up Closed" %}{% endblock %}
+{% block head_title %}{{ _("Sign Up Closed") }}{% endblock %}
 
 {% block content %}
 {% block span_class_left %}span1{% endblock %}
 {% block span_class_right %}span8{% endblock %}
 {% block content %}
   <div class="settings-header clearfix">
-    <h1>{% trans "Sign Up Closed" %}</h1>
+    <h1>{{ _("Sign Up Closed") }}</h1>
 
-    <p>{% trans "We are sorry, but the sign up is currently closed." %}</p>
+    <p>{{ _("We are sorry, but the sign up is currently closed.") }}</p>
   </div>
 {% endblock %}
 

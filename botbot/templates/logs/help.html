@@ -1,20 +1,17 @@
 {% extends "base.html" %}
-{% load channel_url %}
-{% load plugin_docs %}
-
-{% block head_title %}Documentation for {{ channel }} {{ block.super }}{% endblock %}
+{% block head_title %}Documentation for {{ channel }} {{ super() }}{% endblock %}
 {% block body_class %}help-view{% endblock %}
 
 {% block content %}
 
-<p><a href="{% channel_url channel 'log_current' %}">&larr; Return to <strong>{{ channel }}</strong></a>
+<p><a href="{{ channel_url(channel, 'log_current') }}">&larr; Return to <strong>{{ channel }}</strong></a>
 
 <h1>Help for {{ channel }}</h1>
 
 <article>
-{% for plugin in channel.plugins.all %}
+{% for plugin in channel.plugins.all() %}
 <h3 id="{{ plugin.slug }}">{{ plugin }}</h3>
-<div class="docs">{% plugin_docs plugin channel %}</div>
+<div class="docs">{{ plugin_docs(plugin, channel)|safe }}</div>
 {% endfor %}
 </article>
 

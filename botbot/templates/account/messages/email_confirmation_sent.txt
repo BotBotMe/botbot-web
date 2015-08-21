@@ -1,2 +1,1 @@
-{% load i18n %}
-{% blocktrans %}Confirmation e-mail sent to {{email}}.{% endblocktrans %}
+{% trans email=email %}Confirmation e-mail sent to {{ email }}.{% endtrans %}

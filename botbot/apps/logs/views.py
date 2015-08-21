@@ -437,10 +437,13 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
         """Determine start date for queryset"""
         if all([field in self.kwargs for field in ['year', 'month', 'day']]):
             # localize date so logs start at local time
-            return datetime.datetime(year=int(self.kwargs['year']),
-                                     month=int(self.kwargs['month']),
-                                     day=int(self.kwargs['day']),
-                                     tzinfo=self.request_timezone)
+            try:
+                return datetime.datetime(year=int(self.kwargs['year']),
+                                         month=int(self.kwargs['month']),
+                                         day=int(self.kwargs['day']),
+                                         tzinfo=self.request_timezone)
+            except ValueError:
+                raise Http404("Invalid date.")
 
         # Use the last page.
         self.kwargs['page'] = 'last'

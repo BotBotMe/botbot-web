@@ -1,0 +1,11 @@
+{% with input_type=bootstrap_input_type(field) %}
+    {% if layout == "horizontal" %}
+        {% include "bootstrap_toolkit/field_horizontal.html" %}
+    {% elif layout == "inline" %}
+        {% include "bootstrap_toolkit/field_inline.html" %}
+    {% elif layout == "search" %}
+        {% include "bootstrap_toolkit/field_search.html" %}
+    {% else %}
+        {% include "bootstrap_toolkit/field_vertical.html" %}
+    {% endif %}
+{% endwith %}

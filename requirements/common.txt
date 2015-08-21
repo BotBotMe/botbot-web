@@ -1,6 +1,8 @@
-django==1.7.8
+django==1.8.4
 
 pytz
+Jinja2==2.7.3
+django-jinja==1.4.1
 dj-database-url==0.2.2
 # TODO (yml): Remove hstore when we squash the migration
 django-hstore==1.2.5
@@ -9,7 +11,7 @@ git+https://github.com/vbabiy/django-statsd.git@request-aggregation
 
 markdown==2.3.1
 redis==2.9.1
-django-pipeline==1.4.7
+django-pipeline==1.5.1
     # Requires java runtime
     yuicompressor==2.4.8
 honcho==0.5.0
@@ -17,10 +19,10 @@ honcho==0.5.0
 djorm-ext-pgfulltext==0.9.0
 djorm-ext-pgarray==0.9.0
 
-django-allauth==0.18.0
-    requests==2.2.1
-    oauthlib==0.6.1
-    requests-oauthlib==0.4.0
+django-allauth==0.20.0
+    requests==2.7.0
+    oauthlib==0.7.2
+    requests-oauthlib==0.5.0
 django-bootstrap-toolkit==2.15.0
 
 geoip2==2.1.0

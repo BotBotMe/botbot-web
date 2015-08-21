@@ -29,8 +29,6 @@ class ChannelRequestForm(forms.Form):
     channel_name = forms.CharField()
     server = forms.ChoiceField(choices=[],
                                label="IRC Server")
-    connection = forms.CharField(required=False, label="New IRC Server",
-                                 help_text="IRC Server should be specified as <url>:<port>.")
     github = forms.URLField(label="GitHub Repo URL",
                             help_text="If the channel supports a github repo, the url to the repo.",
                             required=False)
@@ -57,7 +55,6 @@ class ChannelRequestForm(forms.Form):
     def _set_server_choices(self):
         choices = [(c.pk, c.server) for c in ChatBot.objects.filter(is_active=True)]
         choices.insert(0, ('', '---------'))
-        choices.append(("new", "Don't see mine, let me add it."))
         self.fields['server'].choices = choices
 
     def clean_channel_name(self):
@@ -81,18 +78,9 @@ class ChannelRequestForm(forms.Form):
 
         return channel_name
 
-    def clean_connection(self):
-        connection = self.cleaned_data['connection']
-        if connection and not connection_regex.match(connection):
-            raise forms.ValidationError(
-                "Incorrect format, should be <url>:<port>")
-
-        return connection
-
     def clean_server(self):
         """
         Make sure server data is clean.
-
         :return: ChatBot if it was selected, None if the user should have gave
         us input to create a new one. Validation error if ChatBot was not found.
         """
@@ -104,19 +92,6 @@ class ChannelRequestForm(forms.Form):
             return ChatBot.objects.get(pk=pk)
         except ChatBot.DoesNotExist:
             raise forms.ValidationError("Server doesn't exist.")
-
-    def clean(self):
-        cleaned_data = super(ChannelRequestForm, self).clean()
-        server = cleaned_data.get('server')
-        connection = cleaned_data.get('connection')
-        if not self._errors.get('connection'):
-            if server is None and not connection:
-                self._errors["connection"] = self.error_class([
-                    "This field is required."
-                ])
-
-        return cleaned_data
-
 
 class UsersForm(forms.Form):
     users = forms.ModelMultipleChoiceField(required=False,

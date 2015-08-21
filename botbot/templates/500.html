@@ -20,19 +20,19 @@
 <body class="error-view">
 <div id="Content" class="container-fluid">
 <div class="not-found">
-    
-   	<header>
-   		<object data="/static/img/evil-logo-large-red.svg" type="image/svg+xml" class="brand"></object>
-    	<h1>Blegh! <strong>500</strong></h1>
-	</header>
 
-	<section>
-		<h2>Oops, something broke...</h2>
+    <header>
+        <object data="/static/img/evil-logo-large-red.svg" type="image/svg+xml" class="brand"></object>
+        <h1>Blegh! <strong>500</strong></h1>
+    </header>
 
-	    <p class="explanatory">It looks there was an <strong>internal server error</strong>, which is fancy scientist talk for <em>something bad happened</em>.</p>
+    <section>
+        <h2>Oops, something broke...</h2>
 
-	    <p class="explanatory"><a href="/">To the homepage! *vrooom*</a></p>
-	</section>
+        <p class="explanatory">It looks there was an <strong>internal server error</strong>, which is fancy scientist talk for <em>something bad happened</em>.</p>
+
+        <p class="explanatory"><a href="/">To the homepage! *vrooom*</a></p>
+    </section>
 </div>
 </div>
 
@@ -45,8 +45,8 @@
     </section>
 
     <nav class="misc-links">
-        &copy; {% now "Y" %} <a href="http://lincolnloop.com">Lincoln Loop</a> 
-        <a href="/terms/">Terms</a> 
+        &copy; {{ now().strftime("%Y") }} <a href="http://lincolnloop.com">Lincoln Loop</a>
+        <a href="/terms/">Terms</a>
         <a href="/privacy/">Privacy</a>
     </nav>
 </footer>
