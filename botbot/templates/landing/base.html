@@ -23,7 +23,7 @@
     <link rel="shortcut icon" href="{{ static("img/favicon.ico") }}" />
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
 <div class="container">
     <object data="{{ static("img/evil-logo-large.svg") }}" type="image/svg+xml" class="logo-standalone wiggler"></object>

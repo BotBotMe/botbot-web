@@ -62,12 +62,19 @@ less-install: $(LESS_BIN)
 less-compile:
 	lessc botbot/less/screen.less > botbot/static/css/screen.css
 
+less-compile-landing:
+	lessc botbot/less/landing.less > botbot/static/css/landing.css
+
 $(WATCHMEDO_BIN):
 	# Install watchdog to run commands when files change
 	pip install watchdog argcomplete
 
 less-watch: $(WATCHMEDO_BIN)
 	watchmedo shell-command --patterns=*.less --recursive --command="make less-compile" botbot/less
+
+less-watch-landing: $(WATCHMEDO_BIN)
+	watchmedo shell-command --patterns=*.less --recursive --command="make less-compile-landing" botbot/less
+
 
 ### Local JSHint
 
