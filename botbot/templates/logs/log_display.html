@@ -1,7 +1,5 @@
-{% set last_date = '' %}
-{% set last_nick = '' %}
 {%- for line in message_list %}
-{%- if line.timestamp.date() != last_date %}
+{%- if line.timestamp.date() != last_date|default('') %}
     {%- if show_first_header or not loop.first %}
       <h3 class="utc" id="date-{{ line.timestamp.strftime("%Y%M%d") }}" data-date="{{ line.timestamp.strftime("%Y%M%d") }}"><span>{{ line.timestamp.strftime("%F %j%S, %Y") }}</span></h3>
     {%- endif %}
@@ -15,9 +13,10 @@
         <div class="actor">{{ line.nick }} {{ bbme_urlizetrunc(line.text, 50) }}</div>
     {%- elif line.command == "PRIVMSG" %}
             {%- if line.nick %}
-                {%- if line.nick != last_nick %}
+                {%- if line.nick != last_nick|default('') %}
                     <div class="nick-color{{ line.get_nick_color() }} actor">{{ line.nick }}</div>
                 {%- endif %}
+                {%- set last_nick = line.nick %}
                 <div class="message">{{ bbme_urlizetrunc(line.text, 50) }}</div>
             {%- else %}
                 <div class="message"><em>{{ bbme_urlizetrunc(line.text, 50) }}</em></div>
@@ -27,6 +26,6 @@
         <div class="info">{{line}}</div>
     {%- endif %}
     </li>
-{%- set last_nick = line.nick %}
+
 {%- set last_date = line.timestamp.date() %}
 {% endfor %}
