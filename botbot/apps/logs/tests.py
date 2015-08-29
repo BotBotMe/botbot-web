@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.template.response import SimpleTemplateResponse
 import pytz
 
 from botbot.apps.accounts import models as account_models
@@ -159,6 +160,23 @@ class SearchTestCase(TestCase):
         self.assertEqual(len(context), 1)
         self.assertTrue(a in context)
         self.assertFalse(b in context)
+
+class TemplateTestCase(TestCase):
+    def setUp(self):
+        self.chatbot = bot_models.ChatBot.objects.create(
+            server='testserver', nick='botbot', slug='botbot')
+
+        self.public_channel = bot_models.Channel.objects.create(
+            chatbot=self.chatbot, name="#Test", slug='test',
+            is_public=True)
+
+    def test_logs_xss(self):
+        log = log_models.Log.objects.create(
+            bot=self.chatbot, channel=self.public_channel,
+            timestamp=timezone.now(), nick='nick', text='<script>alert("hi")</script>',
+            command='PRIVMSG')
+        response = SimpleTemplateResponse('logs/log_display.html', {'message_list': [log]}).render()
+        self.assertIn('&lt;script&gt;alert', response.content)
 
 
 class TemplateTagTestCase(TestCase):
