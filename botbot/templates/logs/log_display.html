@@ -10,16 +10,16 @@
         <time class="hide" datetime="{{ line.timestamp.isoformat() }}">{{ line.timestamp.strftime("%-H:%M %p") }}</time>
     </a>
     {%- if line.action %}
-        <div class="actor">{{ line.nick }} {{ bbme_urlizetrunc(line.text, 50) }}</div>
+        <div class="actor">{{ line.nick }} {{ bbme_urlizetrunc(line.text|e, 50) }}</div>
     {%- elif line.command == "PRIVMSG" %}
             {%- if line.nick %}
                 {%- if line.nick != last_nick|default('') %}
                     <div class="nick-color{{ line.get_nick_color() }} actor">{{ line.nick }}</div>
                 {%- endif %}
                 {%- set last_nick = line.nick %}
-                <div class="message">{{ bbme_urlizetrunc(line.text, 50) }}</div>
+                <div class="message">{{ bbme_urlizetrunc(line.text|e, 50) }}</div>
             {%- else %}
-                <div class="message"><em>{{ bbme_urlizetrunc(line.text, 50) }}</em></div>
+                <div class="message"><em>{{ bbme_urlizetrunc(line.text|e, 50) }}</em></div>
             {%- endif %}
     {%- else %}
         {# JOIN, PART, QUIT, NICK, etc #}
