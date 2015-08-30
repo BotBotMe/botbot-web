@@ -272,7 +272,9 @@ PUSH_STREAM_URL = os.environ.get('PUSH_STREAM_URL', None)
 # Third party app settings
 # ==============================================================================
 
-# SOUTH_DATABASE_ADAPTERS = {'default': 'south.db.postgresql_psycopg2'}
+CELERY_TASK_SERIALIZER='json'
+CELERY_ACCEPT_CONTENT=['json']
+BROKER_URL = REDIS_PLUGIN_QUEUE_URL
 
 SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']

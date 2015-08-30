@@ -131,10 +131,7 @@ class PluginRunner(object):
     Calls to plugins are done via greenlets
     """
 
-    def __init__(self, use_gevent=False):
-        if use_gevent:
-            import gevent
-            self.gevent = gevent
+    def __init__(self):
         self.bot_bus = redis.StrictRedis.from_url(
             settings.REDIS_PLUGIN_QUEUE_URL)
         self.storage = redis.StrictRedis.from_url(
@@ -176,32 +173,15 @@ class PluginRunner(object):
                 getattr(self, attr.route_rule[0] + '_router').setdefault(
                     plugin.slug, []).append((attr.route_rule[1], attr, plugin))
 
-    def listen(self):
-        """Listens for incoming messages on the Redis queue"""
-        while 1:
-            val = None
-            try:
-                val = self.bot_bus.blpop('q', 1)
+    def process_line(self, line_json):
+        LOG.debug('Recieved: %s', line_json)
+        line = Line(json.loads(line_json), self)
+        # Calculate the transport latency between go and the plugins.
+        delta = datetime.utcnow().replace(tzinfo=utc) - line._received
+        statsd.timing(".".join(["plugins", "latency"]),
+                      delta.total_seconds() * 1000)
+        self.dispatch(line)
 
-                # Track q length
-                ql = self.bot_bus.llen('q')
-                statsd.gauge(".".join(["plugins", "q"]), ql)
-
-                if val:
-                    _, val = val
-                    LOG.debug('Recieved: %s', val)
-                    line = Line(json.loads(val), self)
-
-                    # Calculate the transport latency between go and the plugins.
-                    delta = datetime.utcnow().replace(tzinfo=utc) - line._received
-                    statsd.timing(".".join(["plugins", "latency"]),
-                                 delta.total_seconds() * 1000)
-
-                    self.dispatch(line)
-            except Exception:
-                LOG.error("Line Dispatch Failed", exc_info=True, extra={
-                    "line": val
-                })
 
     def dispatch(self, line):
         """Given a line, dispatch it to the right plugins & functions."""
@@ -214,16 +194,11 @@ class PluginRunner(object):
                 # firehose gets everything, no rule matching
                 LOG.info('Match: %s.%s', plugin_slug, func.__name__)
                 with statsd.timer(".".join(["plugins", plugin_slug])):
-                    # FIXME: This will not have correct timing if go back to
-                    # gevent.
                     channel_plugin = self.setup_plugin_for_channel(
                         plugin.__class__, line)
                     new_func = log_on_error(LOG, getattr(channel_plugin,
                                                          func.__name__))
-                    if hasattr(self, 'gevent'):
-                        self.gevent.Greenlet.spawn(new_func, line)
-                    else:
-                        channel_plugin.respond(new_func(line))
+                    channel_plugin.respond(new_func(line))
 
         # pass line to other routers
         if line._is_message:
@@ -252,30 +227,12 @@ class PluginRunner(object):
                 if match:
                     LOG.info('Match: %s.%s', plugin_slug, func.__name__)
                     with statsd.timer(".".join(["plugins", plugin_slug])):
-                        # FIXME: This will not have correct timing if go back to
-                        # gevent.
                         # Instantiate a plugin specific to this channel
                         channel_plugin = self.setup_plugin_for_channel(
                             plugin.__class__, line)
                         # get the method from the channel-specific plugin
                         new_func = log_on_error(LOG, getattr(channel_plugin,
                                                              func.__name__))
-                        if hasattr(self, 'gevent'):
-                            grnlt = self.gevent.Greenlet(new_func, line,
-                                                         **match.groupdict())
-                            grnlt.link_value(channel_plugin.greenlet_respond)
-                            grnlt.start()
-                        else:
-                            channel_plugin.respond(new_func(line,
-                                                            **match.groupdict()))
 
-
-def start_plugins(*args, **kwargs):
-    """
-    Used by the management command to start-up plugin listener
-    and register the plugins.
-    """
-    LOG.info('Starting plugins. Gevent=%s', kwargs['use_gevent'])
-    app = PluginRunner(**kwargs)
-    app.register_all_plugins()
-    app.listen()
+                        channel_plugin.respond(new_func(line,
+                                                        **match.groupdict()))
