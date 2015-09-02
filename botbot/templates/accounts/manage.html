@@ -19,7 +19,7 @@
           {% include "includes/field.html" %}
       {% endfor %}
 
-      <label for="change_password_toggle">Change Password <input id="change_password_toggle" type="checkbox"></label>
+      <label for="change_password_toggle">Change Password <input id="change_password_toggle" name="change_password_toggle" type="checkbox"></label>
 
       <div id="password_form" style="display:none">
         {% for field in password_form %}
