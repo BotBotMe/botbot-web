@@ -41,7 +41,7 @@
 <p>{{ _('You currently have no social network accounts connected to this account.') }}</p>
 {% endif %}
 
-<h2>{% trans 'Add a 3rd Party Account' %}</h2>
+<h2>{{ _('Add a 3rd Party Account') }}</h2>
 
 <ul class="socialaccount_providers">
 {% include "socialaccount/snippets/provider_list.html" with process="connect" %}
