@@ -7,14 +7,14 @@
 {% block content %}
   <div class="settings-header clearfix">
     <h1>{{ _("E-mail Addresses") }}</h1>
-    {% if user.emailaddress_set.all() %}
+    {% if request.user.emailaddress_set.all() %}
     <p>{{ _('The following e-mail addresses are associated with your account:') }}</p>
 
     <form action="{{ url('account_email') }}" class="email_list" method="post">
     {{ csrf_input }}
     <fieldset class="blockLabels">
 
-      {% for emailaddress in user.emailaddress_set.all() %}
+      {% for emailaddress in request.user.emailaddress_set.all() %}
     <div class="ctrlHolder">
       <label for="email_radio_{{ loop.index }}" class="{% if emailaddress.primary %}primary_email{% endif %}">
 
