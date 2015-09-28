@@ -24,7 +24,13 @@ class Plugin(BasePlugin):
         # is part of a /query
         if line._channel_name.startswith("#"):
             ignore_prefix = self.config['ignore_prefix']
-            if not (ignore_prefix and line.text.startswith(ignore_prefix)):
+            
+            # Delete ACTION prefix created by /me
+            text = line.text
+            if text.startswith("ACTION "):
+                text = text[7:]
+            
+            if not (ignore_prefix and text.startswith(ignore_prefix)):
                 Log.objects.create(
                     channel_id=line._channel.pk,
                     timestamp=line._received,
