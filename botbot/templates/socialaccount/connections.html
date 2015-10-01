@@ -18,7 +18,7 @@
 {% endif %}
 
 {% for base_account in form.accounts %}
-{% with account=base_account.get_provider_account %}
+{% with account=base_account.get_provider_account() %}
 <div>
 <label for="id_account_{{ base_account.id }}">
 <input id="id_account_{{ base_account.id }}" type="radio" name="account" value="{{ base_account.id }}"/>
