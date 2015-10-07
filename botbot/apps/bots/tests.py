@@ -251,38 +251,6 @@ class UrlTests(BaseTestCase):
                              '<a href="{}">{}</a> is already being monitored.'.format(
                                 self.public_channel.get_absolute_url(), self.public_channel.name))
 
-    def test_request_channel_form_invalid_formatted_server(self):
-        url = reverse("request_channel")
-
-        response = self.client.post(url, {
-            "channel_name": "test_channel_name",
-            "server": "new",
-            "connection": "irc.freenode.net",
-            "name": "test_name",
-            "email": "test@example.com",
-            "nick": "test_nick",
-            "op": True
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "form", "connection",
-                             "Incorrect format, should be <url>:<port>")
-
-    def test_request_channel_form_require_connect_if_server_set_to_new(self):
-        url = reverse("request_channel")
-
-        response = self.client.post(url, {
-            "channel_name": "test_channel_name",
-            "server": "new",
-            "connection": "",
-            "name": "test_name",
-            "email": "test@example.com",
-            "nick": "test_nick",
-            "op": True
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, "form", "connection",
-                             "This field is required.")
-
 
 class PrettySlugTestCase(TestCase):
     def test_pretty_slug(self):
