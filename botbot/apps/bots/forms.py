@@ -32,7 +32,7 @@ class ChannelRequestForm(forms.Form):
     connection = forms.CharField(required=False, label="New IRC Server",
                                  help_text="IRC Server should be specified as <url>:<port>.")
     github = forms.URLField(label="GitHub Repo URL",
-                            help_text="If the channel supports a github repo, the url to the repo.",
+                            help_text="If the channel supports a Github repo, the url to the repo.",
                             required=False)
 
     name = forms.CharField(label="Your name")
