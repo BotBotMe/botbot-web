@@ -66,9 +66,9 @@ class DashboardTests(AccountMixin, TestCase):
         self.assertEquals(response.status_code, 200)
 
         for var in ('admin_channels', 'private_channels'):
-            self.assertTrue(var not in response.context.keys())
+            self.assertTrue(var not in response.context_data.keys())
 
-        self.assertTemplateUsed(response, 'accounts/anon_dashboard.html')
+        self.assertIn('accounts/anon_dashboard.html', response.template_name)
 
         self.client.login(username="dupont éîïè", password='secret')
 
@@ -76,9 +76,9 @@ class DashboardTests(AccountMixin, TestCase):
         self.assertEquals(response.status_code, 200)
 
         for var in ('admin_channels', 'private_channels'):
-            self.assertIn(var, response.context.keys())
+            self.assertIn(var, response.context_data.keys())
 
-        self.assertTemplateUsed(response, 'accounts/user_dashboard.html')
+        self.assertIn('accounts/user_dashboard.html', response.template_name)
 
 
 class ChannelsTests(AccountMixin, TestCase):
@@ -94,7 +94,7 @@ class ChannelsTests(AccountMixin, TestCase):
         response = self.client.get(self.url)
         self.assertEquals(response.status_code, 200)
         for var in ('admin_channels', 'private_channels'):
-            self.assertTrue(var not in response.context.keys())
+            self.assertTrue(var not in response.context_data.keys())
         self.assertNotContains(response, 'Private')
 
         self.client.login(username="dupont éîïè", password='secret')
@@ -103,7 +103,7 @@ class ChannelsTests(AccountMixin, TestCase):
         self.assertEquals(response.status_code, 200)
 
         for var in ('admin_channels', 'private_channels'):
-            self.assertIn(var, response.context.keys())
+            self.assertIn(var, response.context_data.keys())
 
         self.assertContains(response, 'Private')
 
@@ -128,7 +128,7 @@ class ManageAccountTests(AccountMixin, TestCase):
         self.client.login(username='Marie Thérèse', password='secret')
 
         response = self.client.get(self.url)
-        instance = response.context['form'].instance
+        instance = response.context_data['form'].instance
 
         self.assertEqual(self.outsider, instance)
 
@@ -154,7 +154,7 @@ class ManageAccountTests(AccountMixin, TestCase):
 
         response = self.client.get(self.url)
         # password form should be in template context
-        self.assertIn('password_form', response.context)
+        self.assertIn('password_form', response.context_data)
 
         data = {
             'username': 'marie',
@@ -167,7 +167,7 @@ class ManageAccountTests(AccountMixin, TestCase):
         response = self.client.post(self.url, data=data)
         self.assertEquals(response.status_code, 200)
         self.assertEquals(
-            response.context['password_form'].errors,
+            response.context_data['password_form'].errors,
             {'new_password2': [u"The two password fields didn't match."]})
 
         data.update({

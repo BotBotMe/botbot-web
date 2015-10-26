@@ -1,4 +1,4 @@
-{% load static from staticfiles %}<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -6,8 +6,8 @@
   <meta name="description" content="IRC Guide">
   <meta name="keywords" content="IRC,freenode,botbot,logging,chatting,open source,chanserv">
   <meta name="author" content="Lincoln Loop">
-  <link rel="icon" href="{% static "img/irc-guide/favbot.png" %}" type="image/x-icon">
-  <link type="text/css" rel="stylesheet" href="{% static "css/irc-guide.css" %}">
+  <link rel="icon" href="{{ static("img/irc-guide/favbot.png") }}" type="image/x-icon">
+  <link type="text/css" rel="stylesheet" href="{{ static("css/irc-guide.css") }}">
   <link href="//fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet" type="text/css">
   <link href="//fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700italic" rel="stylesheet" type="text/css">
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
@@ -72,7 +72,7 @@
   <div class="question-section">
 
     <div class="contain-category" id="top">
-      <img class="icon" src="{% static "img/irc-guide/beforebegin.svg" %}" alt="Before you begin hand motion icon" />
+      <img class="icon" src="{{ static("img/irc-guide/beforebegin.svg") }}" alt="Before you begin hand motion icon" />
       <div class="contain-questions">
         <h2 class="category-title">Before You Begin</h2>
         <ul class="question-list">
@@ -86,7 +86,7 @@
     </div>
 
     <div class="contain-category">
-      <img class="icon" src="{% static "img/irc-guide/registericon.svg" %}" alt="Registration/clipboard icon" />
+      <img class="icon" src="{{ static("img/irc-guide/registericon.svg") }}" alt="Registration/clipboard icon" />
       <div class="contain-questions">
         <h2 class="category-title">User Registration</h2>
         <ul class="question-list">
@@ -99,7 +99,7 @@
     </div>
 
     <div class="contain-category">
-      <img class="icon" src="{% static "img/irc-guide/channelicon.svg" %}" alt="Channel navigation compass icon" />
+      <img class="icon" src="{{ static("img/irc-guide/channelicon.svg") }}" alt="Channel navigation compass icon" />
       <div class="contain-questions">
         <h2 class="category-title">Channel Navigation</h2>
         <ul class="question-list">
@@ -114,7 +114,7 @@
     </div>
 
     <div class="contain-category">
-      <img class="icon" src="{% static "img/irc-guide/usericon.svg" %}" alt="User/person icon" />
+      <img class="icon" src="{{ static("img/irc-guide/usericon.svg") }}" alt="User/person icon" />
       <div class="contain-questions">
         <h2 class="category-title">User Actions</h2>
           <ul class="question-list">
@@ -129,7 +129,7 @@
     </div>
 
     <div class="contain-category">
-      <img class="icon" src="{% static "img/irc-guide/usernav.svg" %}" alt="User and compass icon" />
+      <img class="icon" src="{{ static("img/irc-guide/usernav.svg") }}" alt="User and compass icon" />
       <div class="contain-questions">
         <h2 class="category-title">User Navigation</h2>
         <ul class="question-list">
@@ -143,7 +143,7 @@
     </div>
 
     <div class="contain-category">
-      <img class="icon" src="{% static "img/irc-guide/messageicon.svg" %}" alt="Envelope and bell icon representing messaging" />
+      <img class="icon" src="{{ static("img/irc-guide/messageicon.svg") }}" alt="Envelope and bell icon representing messaging" />
       <div class="contain-questions">
         <h2 class="category-title">Messaging</h2>
         <ul class="question-list">
@@ -157,7 +157,7 @@
     </div>
 
     <div class="contain-category">
-      <img class="icon" src="{% static "img/irc-guide/operator.svg" %}" alt="Crown icon to represent operator" />
+      <img class="icon" src="{{ static("img/irc-guide/operator.svg") }}" alt="Crown icon to represent operator" />
       <div class="contain-questions">
         <h2 class="category-title">For Operators</h2>
         <ul class="question-list">
@@ -171,7 +171,7 @@
     </div>
 
     <div class="contain-category">
-      <img class="icon" src="{% static "img/irc-guide/chanserv.svg" %}" alt="The at symbol to represent ChanServ"/>
+      <img class="icon" src="{{ static("img/irc-guide/chanserv.svg") }}" alt="The at symbol to represent ChanServ"/>
       <div class="contain-questions">
         <h2 class="category-title">ChanServ</h2>
         <ul class="question-list">
@@ -187,7 +187,7 @@
     <div class="contain-category place-hold">
       <div class="contain-questions">
         <h2 class="category-title">More questions &amp; answers coming soon...<br>Beep!</h2>
-        <img class="full-bot" src="{% static "img/irc-guide/fullbot.svg" %}" alt="Full body illustation of BotBot" />
+        <img class="full-bot" src="{{ static("img/irc-guide/fullbot.svg") }}" alt="Full body illustation of BotBot" />
       </div>
     </div>
 
@@ -495,7 +495,7 @@
   <footer class="footer">
 
     <div class="contain-social">
-      <a href="https://botbot.me/"><img class="crafted-by" src="{% static "img/irc-guide/crafted.svg" %}" alt="Crafted with enthusiasm by the botbot team" /></a>
+      <a href="https://botbot.me/"><img class="crafted-by" src="{{ static("img/irc-guide/crafted.svg") }}" alt="Crafted with enthusiasm by the botbot team" /></a>
       <a href="https://twitter.com/botbotme"><i class="fa fa-twitter-square"></i></a>
       <a href="https://github.com/BotBotMe/botbot-web/blob/master/botbot/templates/irc-guide.html"><i class="fa fa-github-square"></i></a>
     </div>

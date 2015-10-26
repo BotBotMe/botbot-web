@@ -1,0 +1,9 @@
+{% load bootstrap_toolkit %}
+
+{{ formset.management_form }}
+
+{% for form in formset %}
+    {% with form=form, layout=layout|default("inline") %}
+    {% include "bootstrap_toolkit/form.html" %}
+    {% endwith %}
+{% endfor %}

@@ -1,0 +1,25 @@
+{% if field.field.widget.bootstrap %}
+    {% with bootstrap=field.field.widget.bootstrap %}
+        {% if prepend %}
+            {% if append %}
+                {% include "bootstrap_toolkit/field_prepend_append.html" %}
+            {% else %}
+                {% with append=bootstrap.append %}
+                {% include "bootstrap_toolkit/field_prepend_append.html" %}
+                {% endwith %}
+            {% endif %}
+        {% else %}
+            {% if append %}
+                {% with prepend=bootstrap.prepend %}
+                {% include "bootstrap_toolkit/field_prepend_append.html" %}
+                {% endwith %}
+            {% else %}
+                {% with prepend=bootstrap.prepend, append=bootstrap.append %}
+                {% include "bootstrap_toolkit/field_prepend_append.html" %}
+                {% endwith %}
+            {% endif %}
+        {% endif %}
+    {% endwith %}
+{% else %}
+    {% include "bootstrap_toolkit/field_prepend_append.html" %}
+{% endif %}

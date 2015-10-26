@@ -1,7 +1,4 @@
 {% extends "account/base.html" %}
-{% load verbatim %}
-{% load bootstrap_toolkit %}
-{% load i18n %}
 
 {% block extra_head %}{% endblock %}
 
@@ -13,11 +10,11 @@
 </header>
 
 <form class="account-body signup" id="chatbot" method="post" action=".">
-  {% csrf_token %}
-  
+  {{ csrf_input }}
+
   <div class="account-body">
     {% for field in form %}
-      {% if field.name == "is_public" or field.name == "is_active" or field.name == "identifiable_url" %}
+      {% if field.name in  ["is_public", "is_active", "identifiable_url"] %}
         {% include "includes/checkbox.html" %}
       {% else %}
         {% include "includes/field.html" %}
@@ -26,7 +23,7 @@
   </div>
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    <button type="submit" class="btn btn-primary">{{ _("Save") }}</button>
   </div>
 </form>
 

@@ -55,6 +55,7 @@ botbot_refresh.short_description = "Reload botbot-bot configuration"
 class ChannelForm(forms.ModelForm):
     class Meta:
         model = models.Channel
+        exclude = []
 
     def clean_private_slug(self):
         return self.cleaned_data['private_slug'] or None

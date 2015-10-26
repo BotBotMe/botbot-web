@@ -1,4 +1,4 @@
-{% load pipeline %}{% load static from staticfiles %}<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en">
 <head>
@@ -19,7 +19,7 @@
         <link rel="stylesheet" type="text/css" href="ie-no-support.css" />
     <![endif]-->
 
-    <link rel="shortcut icon" href="{% static "img/favicon.ico" %}" />
+    <link rel="shortcut icon" href="{{ static("img/favicon.ico") }}" />
 
     {% block extra_head %}{% endblock %}
 </head>
@@ -30,18 +30,18 @@
     <div class="navbar-inner">
         <div class="container-fluid">
             <a href="/" class="brand-btn wiggler">
-                <object data="{% static "img/logo.svg" %}" type="image/svg+xml" id="Logo"></object>
+                <object data="{{ static("img/logo.svg") }}" type="image/svg+xml" id="Logo"></object>
             </a>
             <nav id="Primary-Nav">
             </nav>
             <nav id="User-Nav">
                 {# <a href="/help/" class="btn btn-info pull-right">Help</a> #}
                 <ul class="nav pull-right">
-                   {% if user.is_authenticated %}
-                        <li><a href="{% url 'settings_dashboard' %}">My Account</a></li>
-                        <li><a href="{% url 'account_logout' %}">Log Out</a></li>
+                   {% if request.user.is_authenticated() %}
+                        <li><a href="{{ url('settings_dashboard') }}">My Account</a></li>
+                        <li><a href="{{ url('account_logout') }}">Log Out</a></li>
                     {% else %}
-                        <li><a href="{% url 'account_login' %}">Sign In</a></li>
+                        <li><a href="{{ url('account_login') }}">Sign In</a></li>
                     {% endif %}
                 </ul>
             </nav>

@@ -10,9 +10,9 @@
   {% endfor %}
 
   <div class="controls">
-    {% with help_text=help_text|default:field.help_text %}
+    {% with help_text=help_text or field.help_text %}
       {% if help_text %}
-            <span class="help-inline">{{ field.help_text }}</span>
+            <span class="help-inline">{{ help_text }}</span>
       {% endif %}
     {% endwith %}
   </div>

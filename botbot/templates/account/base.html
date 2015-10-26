@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block body_class %}{{ block.super }} account-view{% endblock %}
+{% block body_class %}{{ super() }} account-view{% endblock %}
 
 {% block content_outer %}
 {% if messages %}
@@ -16,10 +16,10 @@
 
 <main class="page-main">
   {% block outer_account_nav %}
-  {% if user.is_authenticated %}
+  {% if request.user.is_authenticated() %}
   <nav class="account-nav {% block account_nav %}{% endblock %}">
     <a
-      href="{% url 'settings_dashboard' %}"
+      href="{{ url('settings_dashboard') }}"
       class="nav-item nav-dashboard {% if breadcrumb == 'dashboard' %}is-active{% endif %}">
       <span class="nav-item-label">
         <i class="icon-home"></i>Dashboard
@@ -27,7 +27,7 @@
     </a>
 
     <a
-      href="{% url 'account_channels' %}"
+      href="{{ url('account_channels') }}"
       class="nav-item nav-channels {% if breadcrumb == 'my_channels' %}is-active{% endif %}">
       <span class="nav-item-label">
         <i class="icon-th"></i>My Channels
@@ -35,7 +35,7 @@
     </a>
 
     <a
-      href="{% url 'settings_account' %}"
+      href="{{ url('settings_account') }}"
       class="nav-item nav-account {% if breadcrumb == 'account' %}is-active{% endif %}">
       <span class="nav-item-label">
         <i class="icon-user"></i> Account

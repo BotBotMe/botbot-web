@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.template.response import SimpleTemplateResponse
 import pytz
 
 from botbot.apps.accounts import models as account_models
@@ -124,7 +125,7 @@ class SearchTestCase(TestCase):
         }) + '?q=nick:Foo%20World'
 
         response = self.client.get(url)
-        context = response.context['object_list']
+        context = response.context_data['object_list']
 
         self.assertEqual(len(context), 1)
         self.assertTrue(a in context)
@@ -139,7 +140,7 @@ class SearchTestCase(TestCase):
         }) + '?q=World%20nick:Foo'
 
         response = self.client.get(url)
-        context = response.context['object_list']
+        context = response.context_data['object_list']
 
         self.assertEqual(len(context), 1)
         self.assertTrue(a in context)
@@ -154,11 +155,28 @@ class SearchTestCase(TestCase):
         }) + '?q=World%20nick:Foo%20Hello'
 
         response = self.client.get(url)
-        context = response.context['object_list']
+        context = response.context_data['object_list']
 
         self.assertEqual(len(context), 1)
         self.assertTrue(a in context)
         self.assertFalse(b in context)
+
+class TemplateTestCase(TestCase):
+    def setUp(self):
+        self.chatbot = bot_models.ChatBot.objects.create(
+            server='testserver', nick='botbot', slug='botbot')
+
+        self.public_channel = bot_models.Channel.objects.create(
+            chatbot=self.chatbot, name="#Test", slug='test',
+            is_public=True)
+
+    def test_logs_xss(self):
+        log = log_models.Log.objects.create(
+            bot=self.chatbot, channel=self.public_channel,
+            timestamp=timezone.now(), nick='nick', text='<script>alert("hi")</script>',
+            command='PRIVMSG')
+        response = SimpleTemplateResponse('logs/log_display.html', {'message_list': [log]}).render()
+        self.assertIn('&lt;script&gt;alert', response.content)
 
 
 class TemplateTagTestCase(TestCase):
@@ -290,13 +308,13 @@ class KudosTests(BaseTestCase):
 
     def test_basic(self):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, 'logs/kudos.html')
+        self.assertIn('logs/kudos.html', response.template_name)
 
     def test_randomized_order(self):
         scoreboards = []
         for i in range(10):
             response = self.client.get(self.url)
-            scoreboards.append(response.context['random_scoreboard'])
+            scoreboards.append(response.context_data['random_scoreboard'])
         same = True
         for scoreboard in scoreboards[1:]:
             if scoreboards[0] != scoreboard:
@@ -307,7 +325,7 @@ class KudosTests(BaseTestCase):
     def test_no_kudos(self):
         self.public_channel.kudos_set.all().delete()
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, 'logs/kudos.html')
+        self.assertIn('logs/kudos.html', response.template_name)
 
     def test_kudos_total(self):
         KudosTotal.objects.create(
@@ -321,8 +339,8 @@ class KudosTests(BaseTestCase):
             channel=self.public_channel, kudos_given=0,
             message_count=0)
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, 'logs/kudos.html')
-        self.assertNotIn('channel_kudos_perc', response.context)
+        self.assertIn('logs/kudos.html', response.template_name)
+        self.assertNotIn('channel_kudos_perc', response.context_data)
 
     def test_not_public_kudos(self):
         self.public_channel.public_kudos = False
@@ -356,7 +374,7 @@ class KudosTests(BaseTestCase):
         self.assertTrue(self.client.login(
             username='admin', password='password'))
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, 'logs/kudos.html')
+        self.assertIn('logs/kudos.html', response.template_name)
 
 
 class KudosJSONTest(BaseTestCase):

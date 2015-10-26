@@ -1,30 +1,28 @@
 {% extends "account/base.html" %}
 
-{% load bootstrap_toolkit %}
-{% load url from future %}
-{% load i18n %}
-
-{% block head_title %}{% trans "Signup" %}{% endblock %}
+{% block head_title %}{{ _("Sign Up") }}{% endblock %}
 {% block dashboard_active %}{% endblock %}
 
 {% block content %}
   <header class="page-header account-header">
-    <h1 class="page-title">{% trans "Sign Up" %}</h1>
-    <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+    <h1 class="page-title">{{ _("Sign Up") }}</h1>
+    <p>{% trans login_url=login_url %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endtrans %}</p>
   </header>
 
-  <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
-    {% csrf_token %}
+  <form class="signup" id="signup_form" method="post" action="{{ url('account_signup') }}">
+    {{ csrf_input }}
 
     <div class="account-body">
-      {% bootstrap_form form layout="vertical" %}
+      {% with form=form, layout="vertical" %}
+      {% include "bootstrap_toolkit/form.html" %}
+      {% endwith %}
       {% if redirect_field_value %}
       <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
       {% endif %}
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
+      <button type="submit" class="btn btn-primary">{{ _("Sign Up") }}</button>
     </div>
   </form>
 

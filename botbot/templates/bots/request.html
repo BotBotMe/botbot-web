@@ -13,16 +13,12 @@
     </ul>
   </section>
 
-  <form action="." method="post">{% csrf_token %}
+  <form action="." method="post">{{ csrf_input }}
     {% for field in form %}
       {% if field.name == "op" %}
         {% include "includes/checkbox.html" %}
       {% else %}
-        {% if field.name == "connection" %}
-          {% include "includes/field.html" with hide_optional=True %}
-        {% else %}
-          {% include "includes/field.html" %}
-        {% endif %}
+        {% include "includes/field.html" %}
       {% endif %}
     {% endfor %}
     <p class="actions">

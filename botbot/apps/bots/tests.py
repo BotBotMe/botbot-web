@@ -69,6 +69,11 @@ class ModelTests(BaseTestCase):
 
 class UrlTests(BaseTestCase):
 
+    def assertFormError(self, response, form, field, error_str):
+        """Override for Jinja2 templates"""
+        self.assertIn(error_str,
+                      response.context_data[form].errors[field])
+
     def test_help_channel(self):
         url = utils.reverse_channel(self.public_channel, "help_bot")
         response = self.client.get(url)
