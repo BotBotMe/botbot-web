@@ -38,12 +38,6 @@ INSTALLED_APPS = (
     'pipeline',
     'django_statsd',
 
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.github',
-    'allauth.socialaccount.providers.google',
-
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -95,10 +89,6 @@ if not os.path.exists(VAR_ROOT):
 #==============================================================================
 
 ROOT_URLCONF = 'botbot.urls'
-
-LOGIN_URL = '/settings/login/'
-LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/settings/'
 INCLUDE_DJANGO_ADMIN = ast.literal_eval(os.environ.get(
                                         'INCLUDE_DJANGO_ADMIN', 'True'))
 

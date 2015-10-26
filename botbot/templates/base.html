@@ -34,17 +34,6 @@
             </a>
             <nav id="Primary-Nav">
             </nav>
-            <nav id="User-Nav">
-                {# <a href="/help/" class="btn btn-info pull-right">Help</a> #}
-                <ul class="nav pull-right">
-                   {% if request.user.is_authenticated() %}
-                        <li><a href="{{ url('settings_dashboard') }}">My Account</a></li>
-                        <li><a href="{{ url('account_logout') }}">Log Out</a></li>
-                    {% else %}
-                        <li><a href="{{ url('account_login') }}">Sign In</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
         </div>
     </div>
 </header>
