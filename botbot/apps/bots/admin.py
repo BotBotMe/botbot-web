@@ -22,11 +22,6 @@ class ActivePluginInline(admin.StackedInline):
         return 0
 
 
-class MembershipInline(admin.TabularInline):
-    model = models.Channel.users.through
-    raw_id_fields = ("user",)
-    extra = 0
-
 
 class ChatBotAdmin(admin.ModelAdmin):
     exclude = ('connection', 'server_identifier')
@@ -73,7 +68,7 @@ class ChannelAdmin(admin.ModelAdmin):
     list_editable = ('is_active',)
     readonly_fields = ('fingerprint', 'created', 'updated')
     search_fields = ('name', 'chatbot__server')
-    inlines = [ActivePluginInline, MembershipInline]
+    inlines = [ActivePluginInline]
     actions = [botbot_refresh]
 
 

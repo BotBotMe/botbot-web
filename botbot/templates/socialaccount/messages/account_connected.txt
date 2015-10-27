@@ -1,1 +1,0 @@
-{% trans %}The social account has been connected.{% endtrans %}
