@@ -1,1 +1,0 @@
-{{ _("Primary e-mail address set.") }}
