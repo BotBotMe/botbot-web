@@ -4,17 +4,17 @@ import string
 import uuid
 
 from django.core.cache import cache
-from django.conf import settings
 from django.db import models
 from django.db.models import Max, Min
 from django.db.models.aggregates import Count
-from django.utils.text import slugify
 from django.utils.datastructures import SortedDict
+from django.utils.text import slugify
 from djorm_pgarray.fields import ArrayField
+
 from botbot.apps.plugins import models as plugins_models
-from botbot.apps.logs import utils as log_utils
 from botbot.apps.plugins.models import Plugin, ActivePlugin
 from botbot.core.models import TimeStampedModel
+
 
 def pretty_slug(server):
     parts = server.split('.')
@@ -125,8 +125,6 @@ class Channel(TimeStampedModel):
     plugins = models.ManyToManyField('plugins.Plugin',
                                      through='plugins.ActivePlugin')
 
-    users = models.ManyToManyField('accounts.User',
-                                   through='accounts.Membership')
     is_featured = models.BooleanField(default=False)
     fingerprint = models.CharField(max_length=36, blank=True, null=True)
     public_kudos = models.BooleanField(default=True)
@@ -219,7 +217,6 @@ class Channel(TimeStampedModel):
             return True
         return (
             user.is_authenticated()
-            and self.membership_set.filter(user=user, is_admin=True).exists()
         )
 
     @property

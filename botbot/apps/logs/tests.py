@@ -342,25 +342,6 @@ class KudosTests(BaseTestCase):
         self.assertIn('logs/kudos.html', response.template_name)
         self.assertNotIn('channel_kudos_perc', response.context_data)
 
-    def test_not_public_kudos(self):
-        self.public_channel.public_kudos = False
-        self.public_channel.save()
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
-
-    def test_not_public_kudos_member(self):
-        self.public_channel.public_kudos = False
-        self.public_channel.save()
-        member = account_models.User.objects.create_user(
-            username="member",
-            password="password",
-            email="member@botbot.local")
-        self.public_channel.membership_set.create(user=member)
-
-        self.assertTrue(self.client.login(
-            username='member', password='password'))
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
 
     def test_not_public_kudos_admin(self):
         self.public_channel.public_kudos = False
@@ -369,7 +350,6 @@ class KudosTests(BaseTestCase):
             username="admin",
             password="password",
             email="admin@botbot.local")
-        self.public_channel.membership_set.create(user=admin, is_admin=True)
 
         self.assertTrue(self.client.login(
             username='admin', password='password'))
@@ -389,9 +369,6 @@ class KudosJSONTest(BaseTestCase):
             username="admin",
             password="password",
             email="admin@botbot.local")
-        self.public_channel.membership_set.create(user=member)
-        self.public_channel.membership_set.create(user=admin, is_admin=True)
-
         self.url = reverse_channel(self.public_channel, "kudos_json")
 
     def test_anonymous(self):
@@ -404,14 +381,6 @@ class KudosJSONTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/json')
 
-    def test_not_public_kudos_member(self):
-        self.public_channel.public_kudos = False
-        self.public_channel.save()
-
-        self.assertTrue(self.client.login(
-            username='member', password='password'))
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
 
     def test_not_public_kudos_admin(self):
         self.public_channel.public_kudos = False
