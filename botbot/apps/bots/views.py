@@ -108,33 +108,6 @@ class ChannelMixin(object):
         raise http.Http404("No such channel / network combination")
 
 
-class SuggestUsers(View):
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        """
-        Only logged in users can view suggestions.
-        """
-        return super(SuggestUsers, self).dispatch(*args, **kwargs)
-
-    def get(self, *args, **kwargs):
-        """
-        Returns a json list of emails and pks for suggested users, based on
-        the ``term`` GET argument.
-        """
-        term = self.request.GET.get('term')
-        if term:
-            users = accounts_models.User.objects\
-                .filter(username__icontains=term).values('email', 'pk')
-            results = [{'label': u['email'], 'value': u['pk']} for u in users]
-        else:
-            results = []
-        return http.HttpResponse(
-            json.dumps(results), content_type='application/json')
-
-
-
-
 class ChannelList(ListView):
     model = models.Channel
     template_name = "channel_list.html"

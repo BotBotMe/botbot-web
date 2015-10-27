@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 
-from botbot.apps.bots.views import SuggestUsers, ChannelList
+from botbot.apps.bots.views import ChannelList
 from botbot.apps.preview.views import LandingPage
 
 channel_patterns = patterns('',
@@ -11,8 +11,6 @@ channel_patterns = patterns('',
 urlpatterns = patterns('',
                         (r'^$', LandingPage.as_view()),
                         url(r'^sitemap\.xml$', include('botbot.apps.sitemap.urls')),
-
-                        url(r'^_suggest_users/$', SuggestUsers.as_view(), name='suggest_users'),
 
                         url(r'^(?P<bot_slug>[\-\w\:\.]+(\@[\w]+)?)/(?P<channel_slug>[\-\w\.]+)/',
                             include(channel_patterns)),
