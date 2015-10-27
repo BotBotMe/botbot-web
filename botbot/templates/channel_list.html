@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block head_title %}Select a Channel {{ super() }}{% endblock %}
+
+{% block content %}
+  <h1>Public Channels</h1>
+  {% if public_channels %}
+  <ul class="channel-list">
+  {% for channel in public_channels %}
+  <li>
+      <a href="{{ channel.get_absolute_url() }}">{{ channel }}</a>
+  </li>
+  {% endfor %}
+  </ul>
+  {% endif %}
+{% endblock content %}

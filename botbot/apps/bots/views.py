@@ -137,7 +137,7 @@ class SuggestUsers(View):
 
 class ChannelList(ListView):
     model = models.Channel
-    template_name = "accounts/anon_dashboard.html"
+    template_name = "channel_list.html"
 
     def get_queryset(self, *args, **kwargs):
         qs = super(ChannelList, self).get_queryset(*args, **kwargs)
