@@ -1,24 +1,16 @@
 import json
+
+from django import http
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
 from django.http.response import Http404
-from django.utils.text import slugify
+from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.generic import (View)
 from django.views.generic.list import ListView
 
-import redis
-from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse_lazy
-from django.conf import settings
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.decorators import method_decorator
-from django.views.generic import (DeleteView, TemplateView, View,
-                                  CreateView, FormView)
-from django import http
-
 from botbot.apps.accounts import models as accounts_models
-from botbot.apps.plugins import forms as plugins_forms
-from . import forms, models, utils
+from . import models
 
 
 class ChannelMixin(object):
@@ -141,24 +133,6 @@ class SuggestUsers(View):
             json.dumps(results), content_type='application/json')
 
 
-class RequestChannel(FormView):
-    template_name = "bots/request.html"
-    form_class = forms.ChannelRequestForm
-    success_url = reverse_lazy("request_channel_success")
-
-    def form_valid(self, form):
-        bot = form.cleaned_data['server']
-        slug = slugify(form.cleaned_data['channel_name'])
-        channel = models.Channel.objects.create(
-            name=form.cleaned_data['channel_name'], chatbot=bot, slug=slug,
-            is_active=False, is_pending=True, is_public=True)
-        channel.create_default_plugins()
-        message = render_to_string('bots/emails/request.txt',
-                                   {"data": form.cleaned_data})
-        send_mail("Channel Request", message,
-                  settings.DEFAULT_FROM_EMAIL,
-                  [a[1] for a in settings.ADMINS], fail_silently=True)
-        return super(RequestChannel, self).form_valid(form)
 
 
 class ChannelList(ListView):

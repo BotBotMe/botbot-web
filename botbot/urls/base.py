@@ -1,8 +1,7 @@
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 
-from botbot.apps.bots.views import SuggestUsers, RequestChannel, \
-    ChannelList
+from botbot.apps.bots.views import SuggestUsers, ChannelList
 from botbot.apps.preview.views import LandingPage
 
 channel_patterns = patterns('',
@@ -37,7 +36,7 @@ urlpatterns += patterns('',
                         (r'^$', LandingPage.as_view()),
                         (r'', include('launchpad.urls')),
                         url(r'^sitemap\.xml$', include('botbot.apps.sitemap.urls')),
-                        url(r'^request/$', RequestChannel.as_view(), name='request_channel'),
+
                         url(r'^request/success/$', 'django.shortcuts.render',
                             {'template_name': 'bots/request_success.html'}, name='request_channel_success'),
 
