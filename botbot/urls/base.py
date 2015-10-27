@@ -37,9 +37,6 @@ urlpatterns += patterns('',
                         (r'', include('launchpad.urls')),
                         url(r'^sitemap\.xml$', include('botbot.apps.sitemap.urls')),
 
-                        url(r'^request/success/$', 'django.shortcuts.render',
-                            {'template_name': 'bots/request_success.html'}, name='request_channel_success'),
-
                         url(r'^_suggest_users/$', SuggestUsers.as_view(), name='suggest_users'),
 
                         url(r'^(?P<bot_slug>[\-\w\:\.]+(\@[\w]+)?)/(?P<channel_slug>[\-\w\.]+)/',
