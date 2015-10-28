@@ -6100,15 +6100,8 @@ body.welcome-page .account-header {
     float: none;
   }
 }
-label[for="use-js"],
-#use-js,
-.message,
-.success {
-  display: none;
-}
-textarea {
-  width: 420px;
-  height: 105px;
+#Content {
+  margin-top: 30px;
 }
 .container {
   margin-top: 60px;
@@ -6117,6 +6110,9 @@ textarea {
 }
 .logo-standalone {
   float: left;
+}
+.Page-Header {
+  margin-left: 200px;
 }
 .tag-line {
   color: #613016;
@@ -6188,8 +6184,8 @@ h2 {
   display: inline-block;
   vertical-align: middle;
 }
-article {
-  margin-left: 200px;
+.preview-box {
+  clear: both;
 }
 .preview-box h3 {
   font-size: 22px;
@@ -6233,7 +6229,6 @@ p {
   margin-bottom: 40px;
 }
 .request-here {
-  float: right;
   margin: -60px 90px 0 0;
   padding: 13px 18px;
   background: #ee632a;
@@ -6267,6 +6262,9 @@ p {
     text-align: center;
     margin: 0 auto;
     margin-bottom: 60px;
+  }
+  .Page-Header {
+    margin-left: 0;
   }
   .container {
     margin: 60px auto;
