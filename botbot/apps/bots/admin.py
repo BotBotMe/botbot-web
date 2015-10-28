@@ -1,10 +1,10 @@
 """Django admin configuration for the bot objects.
 """
+import redis
+from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
-from django import forms
-import redis
 
 from . import models
 
@@ -58,14 +58,12 @@ class ChannelForm(forms.ModelForm):
 
 class ChannelAdmin(admin.ModelAdmin):
     form = ChannelForm
-    list_display = ('name', 'chatbot', 'is_active',
-                    'is_public', 'is_featured', 'is_pending', 'created', 'updated')
-    list_filter = ('chatbot', 'is_active', 'is_public',
-                   'is_featured', 'is_pending')
+    list_display = ('name', 'chatbot', 'status', 'is_featured', 'created', 'updated')
+    list_filter = ('chatbot', 'is_featured', 'status')
     prepopulated_fields = {
         'slug': ('name',)
     }
-    list_editable = ('is_active',)
+    list_editable = ('status',)
     readonly_fields = ('fingerprint', 'created', 'updated')
     search_fields = ('name', 'chatbot__server')
     inlines = [ActivePluginInline]
