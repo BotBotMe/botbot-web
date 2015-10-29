@@ -105,8 +105,6 @@ object[type='image/svg+xml'] { vertical-align: middle; }
     a { font-size: 16px; }
 }
 
-#IE-Warning { display: none; }
-
 /*  -------
     Framing
     -------
@@ -120,27 +118,43 @@ object[type='image/svg+xml'] { vertical-align: middle; }
 
 #Site-Header .mobile-nav-cta { display: none; }
 
+.main-btn,
 .brand-btn {
-    border-radius: 12px;
+  border-radius: 12px;
 
-    background: @darkContrast2 url(../img/logo.svg) no-repeat center center;
-    text-indent: -999em;
+  position: absolute;
+  border: 4px solid #fff;
+  top: 4px;
+  left: 20px;
 
-    outline: 1px solid transparent; // removes the jaggies when rotating, son
+  padding: 4px 10px;
+  margin: 0;
+  width: 32px;
+  height: 40px;
 
+  .icon {
     position: absolute;
-    border: 4px solid #fff;
-    top: 4px;
-    left: 20px;
+    top: 50%;
+    left: 50%;
+    margin-top: -13px;
+    margin-left: -13px;
+    font-size: 24px;
+    color: #fff;
+  }
 
-    padding: 4px 10px;
-    margin: 0;
-    width: 32px;
-    height: 40px;
+  &:hover {
+    background-color: @highlight1;
+    text-decoration: none;
+  }
+}
 
-    &:hover {
-        background-color: @highlight1;
-    }
+.main-btn {
+  background: @darkContrast2;
+}
+
+.brand-btn {
+  background: @darkContrast2 url(../img/logo.svg) no-repeat center center;
+  text-indent: -999em;
 }
 
 .nav li, .nav a { line-height: @baseLineHeight - 2; }
@@ -215,6 +229,10 @@ body.framed {
     .divider { font-size: 22px; margin: 0 10px; color: @lightColor; }
 }
 
+#Log-Header .main-btn {
+  display: none;
+}
+
 .channel-nav {
     display: inline-block;
     vertical-align: middle;
@@ -245,7 +263,8 @@ body.framed {
 .mobile-nav { display: none; }
 
 #Search {
-    float: right; margin-bottom: 0;
+    float: right;
+    margin-bottom: 0;
     .icon-large:before { font-size: 1.8em; }
     input { margin-bottom: 0; width: 12em; }
 }
@@ -271,7 +290,6 @@ body.framed {
 }
 
 .display_bbsponsor #Log-Container {
-
     .timeline-navigation {
         width: 180px;
         position: fixed;
@@ -286,9 +304,6 @@ body.framed {
 }
 
 #Log-Prep-Prev, #Log-Prep-Next { position: absolute; left:-9999em; }
-
-
-
 
 .log {
     @leftRailWidth: 128px;
@@ -439,7 +454,6 @@ body.framed {
 
 /* 404 */
 .error-view {
-
     header {
         position: relative;
         padding-top: 118px;

@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
 {% block head_title %}IRC Logs for {{ channel.name }} {{ super() }}{% endblock %}
-{% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}
-{% if channel_ads %} display_bbsponsor{% endif %}{% endblock %}
+{% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}{% endblock %}
 
 {% block content_outer %}
     <header id="Log-Header">
-        <a href="/" class="brand-btn">
-            <object data="{{ static("img/logo.svg") }}" type="image/svg+xml" id="Logo"></object>
+        <a href="/" class="main-btn">
+          <i class="icon icon-list-ul"> </i>
         </a>
         <div class="log-title">
           <h1><a href="{{ channel_url(channel, 'log_current') }}">{{ channel.name }}</a></h1>
