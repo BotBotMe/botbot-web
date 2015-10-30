@@ -59,7 +59,7 @@ class ChannelForm(forms.ModelForm):
 class ChannelAdmin(admin.ModelAdmin):
     form = ChannelForm
     list_display = ('name', 'chatbot', 'status', 'is_featured', 'created', 'updated')
-    list_filter = ('chatbot', 'is_featured', 'status')
+    list_filter = ('status', 'is_featured', 'chatbot')
     prepopulated_fields = {
         'slug': ('name',)
     }
