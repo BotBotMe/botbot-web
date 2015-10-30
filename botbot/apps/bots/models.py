@@ -98,11 +98,20 @@ class ChatBot(models.Model):
 
         raise NoAvailableChatBots(slug)
 
+class ChannelQuerySet(models.query.QuerySet):
+    def active(self):
+        return self.filter(status=Channel.ACTIVE)
 
 class ChannelManager(models.Manager):
 
+    def get_queryset(self):
+        return ChannelQuerySet(self.model, using=self._db)
+
     def public(self):
         return self.get_queryset().filter(is_public=True)
+
+    def active(self):
+        self.get_queryset().active()
 
 
 class Channel(TimeStampedModel):

@@ -9,8 +9,8 @@ def move_bools_to_status(apps, schema_editor):
     for channel in Channel.objects.all():
         if channel.is_active:
             channel.status = "ACTIVE"
-
-        channel.status = "PENDING"
+        else:
+            channel.status = "PENDING"
 
         channel.save()
 
