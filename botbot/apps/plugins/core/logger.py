@@ -5,6 +5,7 @@ import botbot_plugins.config as config
 
 class Config(config.BaseConfig):
     ignore_prefix = config.Field(
+        default="!-",
         required=False,
         help_text="Don't log lines starting with this string"
     )
