@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 
-
 {% block head_title %}IRC Logs for {{ channel.name }} {{ super() }}{% endblock %}
 {% block body_class %}log-view{% if big %} big{% endif %}{% if request.GET.framed %} framed{% endif %}
 {% if channel_ads %} display_bbsponsor{% endif %}{% endblock %}
 
 {% block content_outer %}
-
     <header id="Log-Header">
         <a href="/" class="brand-btn">
             <object data="{{ static("img/logo.svg") }}" type="image/svg+xml" id="Logo"></object>
@@ -23,26 +21,12 @@
           <a href="#Log-Nav" class="nav-toggle"><i class="icon-calendar icon-large"></i></a>
         </nav>
 
-        <form id="Search" method="get" action="{{ channel_url(channel, 'log_search') }}">
+        <form id="Search" method="get" class="well form-search" action="{{ channel_url(channel, 'log_search') }}">
             {{ search_form.q }}
-            {# <a href="#" class="context-help"> <i class="icon-question-sign icon-large"></i></a> #}
+            <button class="btn" type="submit"><i class="icon icon-search"></i> Search</button>
         </form>
 
         <nav class="channel-nav">
-          {#
-          <span class="user-count wicon">
-            <i class="icon-group icon-large"></i>
-            {{ size }}
-          </span>
-          #}
-
-          {#
-          <a href="#" class="wicon">
-            <i class="icon-text-height icon-large"></i>
-            <span>Smaller Text</span>
-          </a>
-          #}
-
           {% if show_kudos %}
           <a href="{{ channel_url(channel, 'kudos') }}" class="wicon" title="Helpful individuals in this channel">
             <i class="icon-gift icon-large"></i>
@@ -63,8 +47,6 @@
 
     <div id="Content" class="container-fluid">
       {% block content %}
-
-
       <!-- Current users: {{size}} -->
       <div id="Log-Container">
         <article>
