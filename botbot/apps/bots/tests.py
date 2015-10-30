@@ -33,7 +33,9 @@ class BaseTestCase(TestCase):
             chatbot=self.chatbot,
             name="#Test",
             slug="test",
-            is_public=True)
+            is_public=True,
+            status=models.Channel.ACTIVE
+        )
         logs_models.Log.objects.create(
             channel=self.public_channel,
             command='PRIVMSG',

@@ -1,15 +1,9 @@
-import json
-
 from django import http
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
-from django.views.generic import (View)
 from django.views.generic.list import ListView
 
-from botbot.apps.accounts import models as accounts_models
 from . import models
 
 
@@ -81,7 +75,7 @@ class ChannelMixin(object):
         return self._channel
 
     def _channel_queryset(self):
-        return models.Channel.objects.filter(is_active=True)
+        return models.Channel.objects.filter(status__in=(models.Channel.ACTIVE, models.Channel.ARCHIVED))
 
     def _get_identifiable_channel(self, bot_slug, channel_slug):
         """

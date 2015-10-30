@@ -98,14 +98,33 @@ class ChatBot(models.Model):
 
         raise NoAvailableChatBots(slug)
 
+class ChannelQuerySet(models.query.QuerySet):
+    def active(self):
+        return self.filter(status=Channel.ACTIVE)
 
 class ChannelManager(models.Manager):
+
+    def get_queryset(self):
+        return ChannelQuerySet(self.model, using=self._db)
 
     def public(self):
         return self.get_queryset().filter(is_public=True)
 
+    def active(self):
+        self.get_queryset().active()
+
 
 class Channel(TimeStampedModel):
+    PENDING = 'PENDING'
+    ACTIVE = 'ACTIVE'
+    ARCHIVED = 'ARCHIVED'
+
+    STATUS_CHOICES = (
+        (PENDING, 'Pending'),
+        (ACTIVE, 'Active'),
+        (ARCHIVED, 'Archived')
+    )
+
     # These are the default plugin slugs.
     DEFAULT_PLUGINS = ["logger", "ping", "last_seen", "help", "bangmotivate"]
 
@@ -118,16 +137,18 @@ class Channel(TimeStampedModel):
 
     password = models.CharField(max_length=250, blank=True, null=True,
                                 help_text="Password (mode +k) if the channel requires one")
+
+    status = models.CharField(choices=STATUS_CHOICES, default=PENDING, max_length=20)
+
+    # Flags
     is_public = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_pending = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    public_kudos = models.BooleanField(default=True)
 
     plugins = models.ManyToManyField('plugins.Plugin',
                                      through='plugins.ActivePlugin')
 
-    is_featured = models.BooleanField(default=False)
     fingerprint = models.CharField(max_length=36, blank=True, null=True)
-    public_kudos = models.BooleanField(default=True)
 
     notes = models.TextField(blank=True)
 
@@ -317,10 +338,6 @@ class Channel(TimeStampedModel):
             self.private_slug = self.generate_private_slug()
 
         self.fingerprint = uuid.uuid4()
-
-        # If a room is active, it can't be pending.
-        if self.is_active:
-            self.is_pending = False
 
         super(Channel, self).save(*args, **kwargs)
 

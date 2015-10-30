@@ -25,6 +25,7 @@ class BaseTestCase(TestCase):
             chatbot=self.chatbot,
             name="#Test",
             slug="test",
+            status=bot_models.Channel.ACTIVE,
             is_public=True)
         self.log = log_models.Log.objects.create(
             channel=self.public_channel,
@@ -92,7 +93,7 @@ class SearchTestCase(TestCase):
             server='testserver', nick='botbot', slug='botbot')
 
         self.public_channel = bot_models.Channel.objects.create(
-            chatbot=self.chatbot, name="#Test", slug='test',
+            chatbot=self.chatbot, name="#Test", slug='test', status=bot_models.Channel.ACTIVE,
             is_public=True)
 
     def _add_log_line(self, text, nick="Nick"):
