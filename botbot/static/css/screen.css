@@ -4273,10 +4273,6 @@ object[type='image/svg+xml'] {
 .main-btn {
   background: #3a3e3f;
 }
-.brand-btn {
-  background: #3a3e3f url(../img/logo.svg) no-repeat center center;
-  text-indent: -999em;
-}
 .nav li,
 .nav a {
   line-height: 20px;
