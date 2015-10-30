@@ -110,7 +110,7 @@ class ChannelList(ListView):
         qs = super(ChannelList, self).get_queryset(*args, **kwargs)
         return qs.filter(
             chatbot__slug=self.kwargs['network_slug'],
-            is_public=True, is_active=True)
+            is_public=True).activce()
 
     def get_context_data(self, **kwargs):
         data = super(ChannelList, self).get_context_data(**kwargs)
