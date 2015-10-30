@@ -117,12 +117,14 @@ class ChannelManager(models.Manager):
 class Channel(TimeStampedModel):
     PENDING = 'PENDING'
     ACTIVE = 'ACTIVE'
+    BANNED = 'BANNED'
     ARCHIVED = 'ARCHIVED'
 
     STATUS_CHOICES = (
         (PENDING, 'Pending'),
         (ACTIVE, 'Active'),
-        (ARCHIVED, 'Archived')
+        (ARCHIVED, 'Archived'),
+        (BANNED, 'Banned')
     )
 
     # These are the default plugin slugs.
