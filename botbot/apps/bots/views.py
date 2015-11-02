@@ -67,9 +67,6 @@ class ChannelMixin(object):
                 channel = self._get_identifiable_channel(
                     kwargs['bot_slug'], kwargs['channel_slug'])
 
-            if not channel.user_can_access(
-                    user, only_owners=self.only_channel_owners):
-                raise http.Http404("No permission to access this channel")
             self._channel = channel
 
         return self._channel

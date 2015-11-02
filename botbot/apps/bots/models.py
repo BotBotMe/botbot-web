@@ -223,18 +223,6 @@ class Channel(TimeStampedModel):
             cache.set(cache_key, cached_config)
         return cached_config
 
-    def user_can_access(self, user, only_owners=False):
-        if only_owners:
-            if not user.is_authenticated():
-                return False
-            return self.membership_set.filter(user=user, is_owner=True)\
-                .exists()
-        if self.is_public:
-            return True
-        if self.users.filter(pk=user.id).exists():
-            return True
-        return False
-
     def user_can_access_kudos(self, user):
         if self.public_kudos:
             return True
