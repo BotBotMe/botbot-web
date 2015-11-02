@@ -59,11 +59,11 @@ class ChannelForm(forms.ModelForm):
 class ChannelAdmin(admin.ModelAdmin):
     form = ChannelForm
     list_display = ('name', 'chatbot', 'status', 'is_featured', 'created', 'updated')
-    list_filter = ('status', 'is_featured', 'chatbot')
+    list_filter = ('status', 'is_featured', 'is_public', 'chatbot')
     prepopulated_fields = {
         'slug': ('name',)
     }
-    list_editable = ('status',)
+    list_editable = ('chatbot','status',)
     readonly_fields = ('fingerprint', 'created', 'updated')
     search_fields = ('name', 'chatbot__server')
     inlines = [ActivePluginInline]
