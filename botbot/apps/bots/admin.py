@@ -76,30 +76,15 @@ class PublicChannelApproval(ChannelAdmin):
 
     def get_queryset(self, request):
         qs = super(PublicChannelApproval, self).get_queryset(request)
-        return qs.filter(is_pending=True, is_public=True)
+        return qs.filter(status=self.model.ACTIVE, is_public=True)
 
-
-class PersonalChannelApproval(ChannelAdmin):
-    def has_add_permission(self, request):
-        return False
-
-    def get_queryset(self, request):
-        qs = super(PersonalChannelApproval, self).get_queryset(request)
-        return qs.filter(is_pending=True, is_public=False)
 
 class PublicChannels(models.Channel):
     class Meta:
         proxy = True
         verbose_name = "Pending Public Channel"
 
-class PersonalChannels(models.Channel):
-    class Meta:
-        proxy = True
-        verbose_name = "Pending Personal Channel"
-
-
 admin.site.register(PublicChannels, PublicChannelApproval)
-admin.site.register(PersonalChannels, PersonalChannelApproval)
 
 admin.site.register(models.ChatBot, ChatBotAdmin)
 admin.site.register(models.Channel, ChannelAdmin)
