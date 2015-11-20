@@ -222,7 +222,7 @@ LOGGING = {
             'propagate': True,
             'level': 'INFO',
         },
-        'botbot.plugin_runner': {
+        'botbot': {
             'handlers': ['console'],
             'level': 'INFO',
         }
