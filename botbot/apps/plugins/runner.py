@@ -43,6 +43,11 @@ class Line(object):
 
         self.is_direct_message = self.check_direct_message()
 
+    def is_valid(self):
+        if self._chatbot and self._channel:
+            return True
+        return False
+
     @property
     def _chatbot(self):
         """Simple caching for ChatBot model"""
@@ -50,7 +55,13 @@ class Line(object):
             cache_key = 'chatbot:{0}'.format(self._chatbot_id)
             chatbot = cache.get(cache_key)
             if not chatbot:
-                chatbot = bots_models.ChatBot.objects.get(id=self._chatbot_id)
+                try:
+                    chatbot = bots_models.ChatBot.objects.get(
+                        id=self._chatbot_id)
+                except bots_models.ChatBot.DoesNotExist:
+                    LOG.warn('Chatbot %s does not exist. Line dropped.',
+                             self._chatbot_id)
+                    return None
                 cache.set(cache_key, chatbot, CACHE_TIMEOUT_2H)
             self._chatbot_cache = chatbot
         return self._chatbot_cache
@@ -63,8 +74,14 @@ class Line(object):
             channel = cache.get(cache_key)
 
             if not channel and self._channel_name.startswith("#"):
-                channel = self._chatbot.channel_set.get(
-                    name=self._channel_name)
+                try:
+                    channel = self._chatbot.channel_set.get(
+                        name=self._channel_name)
+                except self._chatbot.channel_set.model.DoesNotExist:
+                    LOG.warn('Chatbot %s should not be listening to %s. '
+                             'Line dropped.',
+                             self._chatbot_id, self._channel_name)
+                    return None
                 cache.set(cache_key, channel, CACHE_TIMEOUT_2H)
 
                 """
@@ -197,7 +214,8 @@ class PluginRunner(object):
                     statsd.timing(".".join(["plugins", "latency"]),
                                  delta.total_seconds() * 1000)
 
-                    self.dispatch(line)
+                    if line.is_valid():
+                        self.dispatch(line)
             except Exception:
                 LOG.error("Line Dispatch Failed", exc_info=True, extra={
                     "line": val
