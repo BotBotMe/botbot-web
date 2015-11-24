@@ -516,7 +516,7 @@ class SingleLogViewer(DayLogViewer):
     def _permalink_to_log(self, log):
         """Scan pages for a single log. Return to permalink to page"""
         cache_key = "line:{}:permalink".format(log.pk)
-        url, params = cache.get(cache_key, [None, None])
+        url, params = cache.get(cache_key, [None, {}])
         if not url:
             paginator = self.get_paginator(
                 self.object_list, self.get_paginate_by(self.object_list))
