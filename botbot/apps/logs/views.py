@@ -527,7 +527,9 @@ class SingleLogViewer(DayLogViewer):
                     url = self.channel_date_url()
                     cache.set(cache_key, [url, params], None)
                     break  # Found the page.
-
+            # page wasn't found
+            if not url:
+                raise Http404
         oparams = self.request.GET.copy()
         oparams.update(params)
         return '{0}?{1}'.format(url, oparams.urlencode())
