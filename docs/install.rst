@@ -20,7 +20,7 @@ Postgresql with hStore extension
   * Homebrew: installed by default
   * Postgres.app: installed by default
 
-* **Ubuntu**: ``apt-get install postgresql-contrib-9.3 postgresql-server-dev-9.3 python-dev virtualenv``
+* **Ubuntu**: ``apt-get install postgresql-contrib-9.3 postgresql-server-dev-9.3 python-dev virtualenvwrapper``
 
 Go
 ~~
