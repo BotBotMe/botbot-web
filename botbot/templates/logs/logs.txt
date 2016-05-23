@@ -1,3 +1,4 @@
+{%- autoescape false %}
 {%- for line in message_list %}
 {%- if line.action -%}
 [{{ line.timestamp.strftime("%H:%M:%s") }}] * {{ line.nick }} {{ line.text }}
@@ -6,4 +7,5 @@
 {% else -%}
 [{{ line.timestamp.strftime("%H:%M:%s") }}] * {{ line }}
 {% endif -%}
-{% endfor %}
+{% endfor -%}
+{% endautoescape %}
