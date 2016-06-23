@@ -1,11 +1,11 @@
 {%- autoescape false %}
 {%- for line in message_list %}
 {%- if line.action -%}
-[{{ line.timestamp.strftime("%H:%M:%s") }}] * {{ line.nick }} {{ line.text }}
+[{{ line.timestamp.strftime("%H:%M:%S") }}] * {{ line.nick }} {{ line.text }}
 {% elif line.command == "PRIVMSG" -%}
-[{{ line.timestamp.strftime("%H:%M:%s") }}] {% if line.nick %}<{{ line.nick }}>{% else %}*{% endif %} {{ line.text }}
+[{{ line.timestamp.strftime("%H:%M:%S") }}] {% if line.nick %}<{{ line.nick }}>{% else %}*{% endif %} {{ line.text }}
 {% else -%}
-[{{ line.timestamp.strftime("%H:%M:%s") }}] * {{ line }}
+[{{ line.timestamp.strftime("%H:%M:%S") }}] * {{ line }}
 {% endif -%}
 {% endfor -%}
 {% endautoescape %}
