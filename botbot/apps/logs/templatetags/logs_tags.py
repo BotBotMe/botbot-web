@@ -1,5 +1,8 @@
 """Near duplicate of Django's `urlizetrunc` with support for image classes"""
-import urlparse
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 
 from django.template.base import Library, Node
 from django.template.defaultfilters import stringfilter
@@ -120,7 +123,7 @@ def build_html_attrs(html_attrs):
     for key, value in html_attrs.iteritems():
         if isinstance(value, (list, tuple)):
             if value:
-                value = u" ".join(map(unicode, value))
+                value = u" ".join(map(six.text_type, value))
             else:
                 value = None
         if not value:

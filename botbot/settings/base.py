@@ -1,6 +1,5 @@
 import ast
 import os
-import urlparse
 # Import global settings to make it easier to extend settings.
 from django.conf.global_settings import *   # pylint: disable=W0614,W0401
 import dj_database_url
