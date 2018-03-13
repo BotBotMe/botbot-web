@@ -19,12 +19,12 @@
           {# <a href="#Search" class="nav-toggle"><i class="icon-search icon-large"></i></a> #}
           <a href="#Log-Nav" class="nav-toggle"><i class="icon-calendar icon-large"></i></a>
         </nav>
-
+        {#
         <form id="Search" method="get" class="well form-search" action="{{ channel_url(channel, 'log_search') }}">
             {{ search_form.q }}
             <button class="btn" type="submit"><i class="icon icon-search"></i> Search</button>
         </form>
-
+        #}
         <nav class="channel-nav">
           {% if show_kudos %}
           <a href="{{ channel_url(channel, 'kudos') }}" class="wicon" title="Helpful individuals in this channel">
