@@ -30,7 +30,7 @@ geoip2==2.1.0
 
 # Needs pinning
 -e git+https://github.com/lincolnloop/django-jsonit.git#egg=jsonit
--e git+https://github.com/lincolnloop/django-launchpad.git#egg=launchpad
+-e git+https://github.com/lincolnloop/django-launchpad.git@5047b2ec967c3ddad671cbcee7c02ce68edec2aa#egg=launchpad
 
 # For plugins
 -e git+https://github.com/BotBotMe/botbot-plugins.git#egg=botbot-plugins
