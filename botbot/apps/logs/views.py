@@ -13,7 +13,6 @@ from django.shortcuts import redirect, get_object_or_404
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.views.generic import ListView, TemplateView, View
-from django.views.decorators.cache import patch_cache_control
 import pytz
 
 from botbot.apps.bots.utils import reverse_channel
@@ -272,7 +271,6 @@ class LogViewer(ChannelMixin, object):
             links = []
             if self.next_page:
                 links.append('{0}; rel="next"'.format(self.next_page))
-                has_next_page = True
 
             if self.prev_page:
                 links.append('{0}; rel="prev"'.format(self.prev_page))
@@ -281,17 +279,9 @@ class LogViewer(ChannelMixin, object):
             # No HTML, pass page info in easily parseable headers
             if self.next_page:
                 response['X-NextPage'] = self.next_page
-                has_next_page = True
 
             if self.prev_page:
                 response['X-PrevPage'] = self.prev_page
-
-        if has_next_page and self.request.user.is_anonymous():
-            patch_cache_control(
-                response, public=True,
-                max_age=settings.CACHE_MIDDLEWARE_SECONDS)
-        else:
-            patch_cache_control(response, private=True)
         return response
 
     def _pages_for_queryset(self, queryset):
@@ -303,6 +293,10 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
     allow_empty = True
 
     def get(self, request, *args, **kwargs):
+        cached_resp = cache.get(self.get_cache_key())
+        if cached_resp:
+            return cached_resp
+
         self.date = self.set_view_date()
         self.object_list = self.get_queryset()
 
@@ -315,7 +309,29 @@ class DayLogViewer(PaginatorPageLinksMixin, LogDateMixin, LogViewer, ListView):
                           % {'class_name': self.__class__.__name__})
 
         context = self.get_context_data()
-        return self.render_to_response(context)
+        response = self.render_to_response(context)
+
+        if self.is_cacheable:
+            # render the response so it can be cached
+            response.render()
+            cache.set(self.get_cache_key(), response,
+                      settings.CACHE_MIDDLEWARE_SECONDS)
+        return response
+
+    @cached_property
+    def is_cacheable(self):
+        # the full page (HTML) is different for logged-in users
+        user_specific_resp = (self.format == 'html' and
+                              not self.request.user.is_anonymous())
+        # has a next page, is a public channel, without a user-specific response
+        return (self.next_page and
+                self.channel.is_public and
+                not user_specific_resp)
+
+    def get_cache_key(self):
+        url = '{}?{}'.format(self.request.path,
+                             self.request.GET.urlencode()).rstrip('?')
+        return 'logs:{}:{}'.format(self.format, url)
 
     def _nearby_log_url(self):
         """Find a date-based log URL that will not be empty"""
